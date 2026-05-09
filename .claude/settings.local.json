@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell(Get-ChildItem -Path D:\\\\projects\\\\stock\\\\inertia, D:\\\\projects\\\\stock\\\\start, D:\\\\projects\\\\stock\\\\config, D:\\\\projects\\\\stock\\\\database, D:\\\\projects\\\\stock\\\\providers, D:\\\\projects\\\\stock\\\\resources, D:\\\\projects\\\\stock\\\\tests -Recurse -File | ForEach-Object { $_.FullName })"
+    ]
+  }
+}
