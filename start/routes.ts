@@ -13,11 +13,14 @@ import router from '@adonisjs/core/services/router'
 
 router.on('/').renderInertia('home', {}).as('home')
 
+/**
+ * Public auth — only login, no signup. Without per-user/per-tenant scoping,
+ * a public signup route would let anyone create an account and edit
+ * everyone else's data. Accounts are provisioned via `node ace user:create`,
+ * `node ace user:edit`, or the catalog seeder.
+ */
 router
   .group(() => {
-    router.get('signup', [controllers.NewAccount, 'create'])
-    router.post('signup', [controllers.NewAccount, 'store'])
-
     router.get('login', [controllers.Session, 'create'])
     router.post('login', [controllers.Session, 'store'])
   })
@@ -26,5 +29,68 @@ router
 router
   .group(() => {
     router.post('logout', [controllers.Session, 'destroy'])
+
+    /**
+     * Stock dashboard + adjustment flow
+     */
+    router.get('/stock', [controllers.Stock, 'index']).as('stock.index')
+    router.get('/stock/adjust', [controllers.Stock, 'create']).as('stock.adjust.create')
+    router.post('/stock/adjust', [controllers.Stock, 'adjust']).as('stock.adjust')
+    router
+      .get('/stock/lookup/categories/:categoryId/products', [
+        controllers.Stock,
+        'productsForCategory',
+      ])
+      .as('stock.lookup.products')
+    router
+      .get('/stock/lookup/products/:productId/variants', [controllers.Stock, 'variantsForProduct'])
+      .as('stock.lookup.variants')
+    router
+      .get('/stock/lookup/variants/:variantId/locations/:locationId', [
+        controllers.Stock,
+        'lookupStock',
+      ])
+      .as('stock.lookup.quantity')
+
+    /**
+     * Movement history
+     */
+    router.get('/movements', [controllers.StockMovements, 'index']).as('movements.index')
+
+    /**
+     * Catalog CRUD
+     */
+    router.get('/products', [controllers.Products, 'index']).as('products.index')
+    router.get('/products/create', [controllers.Products, 'create']).as('products.create')
+    router.post('/products', [controllers.Products, 'store']).as('products.store')
+    router.get('/products/:id', [controllers.Products, 'show']).as('products.show')
+    router.get('/products/:id/edit', [controllers.Products, 'edit']).as('products.edit')
+    router.put('/products/:id', [controllers.Products, 'update']).as('products.update')
+    router.delete('/products/:id', [controllers.Products, 'destroy']).as('products.destroy')
+
+    router.get('/categories', [controllers.Categories, 'index']).as('categories.index')
+    router.post('/categories', [controllers.Categories, 'store']).as('categories.store')
+    router.put('/categories/:id', [controllers.Categories, 'update']).as('categories.update')
+    router.delete('/categories/:id', [controllers.Categories, 'destroy']).as('categories.destroy')
+
+    router.get('/locations', [controllers.Locations, 'index']).as('locations.index')
+    router.post('/locations', [controllers.Locations, 'store']).as('locations.store')
+    router.put('/locations/:id', [controllers.Locations, 'update']).as('locations.update')
+    router.delete('/locations/:id', [controllers.Locations, 'destroy']).as('locations.destroy')
+
+    router.get('/colors', [controllers.Colors, 'index']).as('colors.index')
+    router.post('/colors', [controllers.Colors, 'store']).as('colors.store')
+    router.put('/colors/:id', [controllers.Colors, 'update']).as('colors.update')
+    router.delete('/colors/:id', [controllers.Colors, 'destroy']).as('colors.destroy')
+
+    router.get('/prints', [controllers.Prints, 'index']).as('prints.index')
+    router.post('/prints', [controllers.Prints, 'store']).as('prints.store')
+    router.put('/prints/:id', [controllers.Prints, 'update']).as('prints.update')
+    router.delete('/prints/:id', [controllers.Prints, 'destroy']).as('prints.destroy')
+
+    router.get('/sizes', [controllers.Sizes, 'index']).as('sizes.index')
+    router.post('/sizes', [controllers.Sizes, 'store']).as('sizes.store')
+    router.put('/sizes/:id', [controllers.Sizes, 'update']).as('sizes.update')
+    router.delete('/sizes/:id', [controllers.Sizes, 'destroy']).as('sizes.destroy')
   })
   .use(middleware.auth())

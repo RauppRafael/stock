@@ -4,6 +4,13 @@
  */
 
 export const controllers = {
-  NewAccount: () => import('#controllers/new_account_controller'),
+  Categories: () => import('#controllers/categories_controller'),
+  Colors: () => import('#controllers/colors_controller'),
+  Locations: () => import('#controllers/locations_controller'),
+  Prints: () => import('#controllers/prints_controller'),
+  Products: () => import('#controllers/products_controller'),
   Session: () => import('#controllers/session_controller'),
+  Sizes: () => import('#controllers/sizes_controller'),
+  Stock: () => import('#controllers/stock_controller'),
+  StockMovements: () => import('#controllers/stock_movements_controller'),
 }

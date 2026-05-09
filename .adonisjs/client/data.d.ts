@@ -6,13 +6,58 @@
 /// <reference path="./manifest.d.ts" />
 import type { InferData, InferVariants } from '@adonisjs/core/types/transformers'
 import type { InferSharedProps } from '@adonisjs/inertia/types'
+import type CategoryTransformer from '#transformers/category_transformer'
+import type ColorTransformer from '#transformers/color_transformer'
+import type LocationTransformer from '#transformers/location_transformer'
+import type PrintTransformer from '#transformers/print_transformer'
+import type ProductTransformer from '#transformers/product_transformer'
+import type SizeTransformer from '#transformers/size_transformer'
+import type StockMovementTransformer from '#transformers/stock_movement_transformer'
+import type StockTransformer from '#transformers/stock_transformer'
 import type UserTransformer from '#transformers/user_transformer'
+import type VariantTransformer from '#transformers/variant_transformer'
 import type InertiaMiddleware from '#middleware/inertia_middleware'
 
 export namespace Data {
+  export type Category = InferData<CategoryTransformer>
+  export namespace Category {
+    export type Variants = InferVariants<CategoryTransformer>
+  }
+  export type Color = InferData<ColorTransformer>
+  export namespace Color {
+    export type Variants = InferVariants<ColorTransformer>
+  }
+  export type Location = InferData<LocationTransformer>
+  export namespace Location {
+    export type Variants = InferVariants<LocationTransformer>
+  }
+  export type Print = InferData<PrintTransformer>
+  export namespace Print {
+    export type Variants = InferVariants<PrintTransformer>
+  }
+  export type Product = InferData<ProductTransformer>
+  export namespace Product {
+    export type Variants = InferVariants<ProductTransformer>
+  }
+  export type Size = InferData<SizeTransformer>
+  export namespace Size {
+    export type Variants = InferVariants<SizeTransformer>
+  }
+  export type StockMovement = InferData<StockMovementTransformer>
+  export namespace StockMovement {
+    export type Variants = InferVariants<StockMovementTransformer>
+  }
+  export type Stock = InferData<StockTransformer>
+  export namespace Stock {
+    export type Variants = InferVariants<StockTransformer>
+  }
   export type User = InferData<UserTransformer>
   export namespace User {
     export type Variants = InferVariants<UserTransformer>
+  }
+  export type Variant = InferData<VariantTransformer>
+  export namespace Variant {
+    export type Variants = InferVariants<VariantTransformer>
   }
   export type SharedProps = InferSharedProps<InertiaMiddleware>
 }

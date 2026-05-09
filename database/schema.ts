@@ -7,6 +7,156 @@
 import { BaseModel, column } from '@adonisjs/lucid/orm'
 import { DateTime } from 'luxon'
 
+export class CategorySchema extends BaseModel {
+  static $columns = ['createdAt', 'deletedAt', 'hasColor', 'hasPrint', 'hasSize', 'icon', 'id', 'name', 'updatedAt'] as const
+  $columns = CategorySchema.$columns
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column.dateTime()
+  declare deletedAt: DateTime | null
+  @column()
+  declare hasColor: boolean
+  @column()
+  declare hasPrint: boolean
+  @column()
+  declare hasSize: boolean
+  @column()
+  declare icon: string | null
+  @column({ isPrimary: true })
+  declare id: number
+  @column()
+  declare name: string
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+}
+
+export class ColorSchema extends BaseModel {
+  static $columns = ['code', 'createdAt', 'hexCode', 'id', 'name', 'updatedAt'] as const
+  $columns = ColorSchema.$columns
+  @column()
+  declare code: string
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column()
+  declare hexCode: string | null
+  @column({ isPrimary: true })
+  declare id: number
+  @column()
+  declare name: string
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+}
+
+export class LocationSchema extends BaseModel {
+  static $columns = ['createdAt', 'description', 'id', 'name', 'updatedAt'] as const
+  $columns = LocationSchema.$columns
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column()
+  declare description: string | null
+  @column({ isPrimary: true })
+  declare id: number
+  @column()
+  declare name: string
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+}
+
+export class PrintSchema extends BaseModel {
+  static $columns = ['code', 'createdAt', 'id', 'name', 'updatedAt'] as const
+  $columns = PrintSchema.$columns
+  @column()
+  declare code: string
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column({ isPrimary: true })
+  declare id: number
+  @column()
+  declare name: string
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+}
+
+export class ProductSchema extends BaseModel {
+  static $columns = ['categoryId', 'code', 'createdAt', 'deletedAt', 'description', 'id', 'lowStockThreshold', 'name', 'updatedAt'] as const
+  $columns = ProductSchema.$columns
+  @column()
+  declare categoryId: number
+  @column()
+  declare code: string
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column.dateTime()
+  declare deletedAt: DateTime | null
+  @column()
+  declare description: string | null
+  @column({ isPrimary: true })
+  declare id: number
+  @column()
+  declare lowStockThreshold: number | null
+  @column()
+  declare name: string
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+}
+
+export class SizeSchema extends BaseModel {
+  static $columns = ['code', 'createdAt', 'id', 'name', 'sortOrder', 'updatedAt'] as const
+  $columns = SizeSchema.$columns
+  @column()
+  declare code: string
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column({ isPrimary: true })
+  declare id: number
+  @column()
+  declare name: string
+  @column()
+  declare sortOrder: number
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+}
+
+export class StockMovementSchema extends BaseModel {
+  static $columns = ['createdAt', 'delta', 'id', 'locationId', 'newQuantity', 'previousQuantity', 'reason', 'userId', 'variantId'] as const
+  $columns = StockMovementSchema.$columns
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column()
+  declare delta: number
+  @column({ isPrimary: true })
+  declare id: number
+  @column()
+  declare locationId: number
+  @column()
+  declare newQuantity: number
+  @column()
+  declare previousQuantity: number
+  @column()
+  declare reason: string | null
+  @column()
+  declare userId: number | null
+  @column()
+  declare variantId: number
+}
+
+export class StockSchema extends BaseModel {
+  static $columns = ['createdAt', 'id', 'locationId', 'quantity', 'updatedAt', 'variantId'] as const
+  $columns = StockSchema.$columns
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column({ isPrimary: true })
+  declare id: number
+  @column()
+  declare locationId: number
+  @column()
+  declare quantity: number
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+  @column()
+  declare variantId: number
+}
+
 export class UserSchema extends BaseModel {
   static $columns = ['createdAt', 'email', 'fullName', 'id', 'password', 'updatedAt'] as const
   $columns = UserSchema.$columns
@@ -15,11 +165,30 @@ export class UserSchema extends BaseModel {
   @column()
   declare email: string
   @column()
-  declare fullName: string | null
+  declare fullName: string
   @column({ isPrimary: true })
   declare id: number
   @column({ serializeAs: null })
   declare password: string
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+}
+
+export class VariantSchema extends BaseModel {
+  static $columns = ['colorId', 'createdAt', 'id', 'printId', 'productId', 'sizeId', 'updatedAt'] as const
+  $columns = VariantSchema.$columns
+  @column()
+  declare colorId: number | null
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column({ isPrimary: true })
+  declare id: number
+  @column()
+  declare printId: number | null
+  @column()
+  declare productId: number
+  @column()
+  declare sizeId: number | null
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   declare updatedAt: DateTime | null
 }

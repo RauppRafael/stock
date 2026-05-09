@@ -23,4 +23,18 @@ export default await Env.create(new URL('../', import.meta.url), {
 
   // Session
   SESSION_DRIVER: Env.schema.enum(['cookie', 'memory', 'database'] as const),
+
+  // Database (MySQL)
+  DB_HOST: Env.schema.string({ format: 'host' }),
+  DB_PORT: Env.schema.number(),
+  DB_USER: Env.schema.string(),
+  DB_PASSWORD: Env.schema.string.optional(),
+  DB_DATABASE: Env.schema.string(),
+  DB_DEBUG: Env.schema.boolean.optional(),
+
+  // Default user created by `node ace db:seed`. Optional — falls back to
+  // sensible local-dev values when omitted.
+  SEED_USER_EMAIL: Env.schema.string.optional({ format: 'email' }),
+  SEED_USER_PASSWORD: Env.schema.string.optional(),
+  SEED_USER_NAME: Env.schema.string.optional(),
 })

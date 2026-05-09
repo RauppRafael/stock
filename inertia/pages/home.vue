@@ -1,32 +1,26 @@
 <script setup lang="ts">
-import { Head } from '@inertiajs/vue3'
+import { onMounted } from 'vue'
+import { Head, router, usePage } from '@inertiajs/vue3'
+import { Link } from '@adonisjs/inertia/vue'
+import type { Data } from '@generated/data'
+
+const page = usePage<Data.SharedProps>()
+
+onMounted(() => {
+  if (page.props.user) router.visit('/stock', { replace: true })
+})
 </script>
 
 <template>
-  <Head title="Homepage" />
+  <Head title="Stockroom" />
 
-  <div class="hero">
-    <h1>It works — welcome to the power of a full-stack Vue app</h1>
-    <p>
-      Powered by Inertia and Vue, this setup blends server-driven routing with rich client-side
-      interactivity — seamless, fast, and cohesive.
-    </p>
-  </div>
-
-  <div class="cards">
-    <a href="https://insiders.adonisjs.com/docs/v7-alpha/introduction" target="_blank">
-      <h3>Official Docs &nbsp;›</h3>
-      <p>Comprehensive reference for building with AdonisJS</p>
-    </a>
-
-    <a href="https://adocasts.com/" target="_blank">
-      <h3>Adocasts &nbsp;›</h3>
-      <p>Guided video tutorials for everyday development</p>
-    </a>
-
-    <a href="https://discord.gg/vDcEjq6" target="_blank">
-      <h3>Discord &nbsp;›</h3>
-      <p>Connect with developers building with AdonisJS every day</p>
-    </a>
+  <div class="min-h-screen flex items-center justify-center bg-slate-50">
+    <div class="max-w-md w-full p-8 text-center">
+      <h1 class="text-3xl font-semibold tracking-tight text-slate-900">Stockroom</h1>
+      <p class="mt-3 text-slate-600">A focused inventory system for clothing brands.</p>
+      <div v-if="!page.props.user" class="mt-8 flex justify-center">
+        <Link route="session.create" class="btn-primary">Login</Link>
+      </div>
+    </div>
   </div>
 </template>
