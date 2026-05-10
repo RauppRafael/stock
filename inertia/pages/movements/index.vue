@@ -122,7 +122,7 @@ function changePage(page: number) {
         <label class="label">{{ $t('common.labels.user') }}</label>
         <select v-model.number="filters.userId" class="select">
           <option :value="null">{{ $t('common.all') }}</option>
-          <option v-for="u in users" :key="u.id" :value="u.id">{{ u.email }}</option>
+          <option v-for="u in users" :key="u.id" :value="u.id">{{ u.fullName }}</option>
         </select>
       </div>
       <div>
@@ -137,10 +137,10 @@ function changePage(page: number) {
           <thead class="bg-slate-50 text-xs uppercase tracking-wider text-slate-500">
             <tr>
               <th class="px-4 py-2 text-left">{{ $t('common.labels.date') }}</th>
+              <th class="px-4 py-2 text-left">{{ $t('common.labels.product') }}</th>
               <th class="px-4 py-2 text-left">{{ $t('common.labels.variant') }}</th>
               <th class="px-4 py-2 text-left">{{ $t('common.labels.location') }}</th>
-              <th class="px-4 py-2 text-right">{{ $t('common.labels.change') }}</th>
-              <th class="px-4 py-2 text-right">{{ $t('common.labels.delta') }}</th>
+              <th class="px-4 py-2 text-center">{{ $t('common.labels.change') }}</th>
               <th class="px-4 py-2 text-left">{{ $t('common.labels.user') }}</th>
               <th class="px-4 py-2 text-left">{{ $t('common.labels.reason') }}</th>
             </tr>

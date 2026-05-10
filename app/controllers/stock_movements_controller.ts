@@ -18,7 +18,11 @@ export default class StockMovementsController {
 
     const query = StockMovement.query()
       .preload('variant', (v) =>
-        v.preload('color').preload('print').preload('size').preload('product')
+        v
+          .preload('color')
+          .preload('print')
+          .preload('size')
+          .preload('product', (p) => p.preload('category'))
       )
       .preload('location')
       .preload('user')

@@ -97,7 +97,13 @@ export default class ProductsController {
     const movements = variantIds.length
       ? await StockMovement.query()
           .whereIn('variant_id', variantIds)
-          .preload('variant', (v) => v.preload('color').preload('print').preload('size'))
+          .preload('variant', (v) =>
+            v
+              .preload('color')
+              .preload('print')
+              .preload('size')
+              .preload('product', (p) => p.preload('category'))
+          )
           .preload('location')
           .preload('user')
           .orderBy('created_at', 'desc')

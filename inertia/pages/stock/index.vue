@@ -15,6 +15,7 @@ import { useValidatedProps } from '~/composables/use_validated_props'
 import PageHeader from '~/components/PageHeader.vue'
 import DataTable from '~/components/DataTable.vue'
 import StockBadge from '~/components/StockBadge.vue'
+import VariantTags from '~/components/VariantTags.vue'
 
 const { t } = useI18n()
 
@@ -145,35 +146,7 @@ function rowClick(row: StockRow) {
         </div>
       </template>
       <template #[`cell:variant`]="{ row }">
-        <div class="flex flex-wrap gap-1 text-xs">
-          <span
-            v-if="row.variant?.color"
-            class="inline-flex items-center gap-1 rounded-md bg-slate-100 text-slate-700 px-1.5 py-0.5 whitespace-nowrap"
-          >
-            <span
-              v-if="row.variant.color.hexCode"
-              class="size-2.5 rounded-full ring-1 ring-slate-200"
-              :style="{ background: row.variant.color.hexCode }"
-            />
-            <span class="text-slate-500">{{ $t('common.labels.color') }}:</span>
-            <span class="font-medium">{{ row.variant.color.name }}</span>
-          </span>
-          <span
-            v-if="row.variant?.print"
-            class="inline-flex items-center gap-1 rounded-md bg-slate-100 text-slate-700 px-1.5 py-0.5 whitespace-nowrap"
-          >
-            <span class="text-slate-500">{{ $t('common.labels.print') }}:</span>
-            <span class="font-medium">{{ row.variant.print.name }}</span>
-          </span>
-          <span
-            v-if="row.variant?.size"
-            class="inline-flex items-center gap-1 rounded-md bg-slate-100 text-slate-700 px-1.5 py-0.5 whitespace-nowrap"
-          >
-            <span class="text-slate-500">{{ $t('common.labels.size') }}:</span>
-            <span class="font-medium">{{ row.variant.size.name }}</span>
-          </span>
-          <span v-if="!row.variant?.color && !row.variant?.print && !row.variant?.size" class="text-slate-300">—</span>
-        </div>
+        <VariantTags :variant="row.variant" />
       </template>
       <template #[`cell:location`]="{ row }">
         <span class="inline-flex items-center gap-1 whitespace-nowrap">
