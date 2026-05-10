@@ -48,6 +48,12 @@ const routes = {
     tokens: [{"old":"/stock/adjust","type":0,"val":"stock","end":""},{"old":"/stock/adjust","type":0,"val":"adjust","end":""}],
     types: placeholder as Registry['stock.adjust']['types'],
   },
+  'stock.adjust.bulk': {
+    methods: ["POST"],
+    pattern: '/stock/adjust/bulk',
+    tokens: [{"old":"/stock/adjust/bulk","type":0,"val":"stock","end":""},{"old":"/stock/adjust/bulk","type":0,"val":"adjust","end":""},{"old":"/stock/adjust/bulk","type":0,"val":"bulk","end":""}],
+    types: placeholder as Registry['stock.adjust.bulk']['types'],
+  },
   'stock.lookup.products': {
     methods: ["GET","HEAD"],
     pattern: '/stock/lookup/categories/:categoryId/products',
@@ -65,6 +71,12 @@ const routes = {
     pattern: '/stock/lookup/variants/:variantId/locations/:locationId',
     tokens: [{"old":"/stock/lookup/variants/:variantId/locations/:locationId","type":0,"val":"stock","end":""},{"old":"/stock/lookup/variants/:variantId/locations/:locationId","type":0,"val":"lookup","end":""},{"old":"/stock/lookup/variants/:variantId/locations/:locationId","type":0,"val":"variants","end":""},{"old":"/stock/lookup/variants/:variantId/locations/:locationId","type":1,"val":"variantId","end":""},{"old":"/stock/lookup/variants/:variantId/locations/:locationId","type":0,"val":"locations","end":""},{"old":"/stock/lookup/variants/:variantId/locations/:locationId","type":1,"val":"locationId","end":""}],
     types: placeholder as Registry['stock.lookup.quantity']['types'],
+  },
+  'stock.lookup.grid': {
+    methods: ["GET","HEAD"],
+    pattern: '/stock/lookup/products/:productId/locations/:locationId/grid',
+    tokens: [{"old":"/stock/lookup/products/:productId/locations/:locationId/grid","type":0,"val":"stock","end":""},{"old":"/stock/lookup/products/:productId/locations/:locationId/grid","type":0,"val":"lookup","end":""},{"old":"/stock/lookup/products/:productId/locations/:locationId/grid","type":0,"val":"products","end":""},{"old":"/stock/lookup/products/:productId/locations/:locationId/grid","type":1,"val":"productId","end":""},{"old":"/stock/lookup/products/:productId/locations/:locationId/grid","type":0,"val":"locations","end":""},{"old":"/stock/lookup/products/:productId/locations/:locationId/grid","type":1,"val":"locationId","end":""},{"old":"/stock/lookup/products/:productId/locations/:locationId/grid","type":0,"val":"grid","end":""}],
+    types: placeholder as Registry['stock.lookup.grid']['types'],
   },
   'movements.index': {
     methods: ["GET","HEAD"],

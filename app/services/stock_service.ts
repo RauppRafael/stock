@@ -10,6 +10,12 @@ export type StockAdjustment = {
   reason?: string | null
 }
 
+export type BulkStockAdjustment = {
+  adjustments: Array<{ variantId: number; locationId: number; newQuantity: number }>
+  userId: number
+  reason?: string | null
+}
+
 export class StockServiceError extends Error {
   constructor(message: string) {
     super(message)
@@ -65,6 +71,59 @@ export default class StockService {
       )
 
       return movement
+    })
+  }
+
+  /**
+   * Apply many (variant, location) -> newQuantity updates atomically. Rows
+   * whose quantity already matches `newQuantity` are skipped so we don't
+   * litter the audit history with no-op movements. The whole batch runs in
+   * one transaction with `forUpdate()` per row, so a failure anywhere rolls
+   * everything back.
+   */
+  async bulkAdjust(input: BulkStockAdjustment): Promise<StockMovement[]> {
+    for (const a of input.adjustments) {
+      if (!Number.isInteger(a.newQuantity) || a.newQuantity < 0) {
+        throw new StockServiceError('newQuantity must be a non-negative integer')
+      }
+    }
+
+    return db.transaction(async (trx) => {
+      const movements: StockMovement[] = []
+      for (const a of input.adjustments) {
+        await Stock.firstOrCreate(
+          { variantId: a.variantId, locationId: a.locationId },
+          { variantId: a.variantId, locationId: a.locationId, quantity: 0 },
+          { client: trx }
+        )
+
+        const stock = await Stock.query({ client: trx })
+          .where('variant_id', a.variantId)
+          .andWhere('location_id', a.locationId)
+          .forUpdate()
+          .firstOrFail()
+
+        const previousQuantity = stock.quantity
+        if (previousQuantity === a.newQuantity) continue
+
+        stock.quantity = a.newQuantity
+        await stock.save()
+
+        const movement = await StockMovement.create(
+          {
+            variantId: a.variantId,
+            locationId: a.locationId,
+            previousQuantity,
+            newQuantity: a.newQuantity,
+            delta: a.newQuantity - previousQuantity,
+            reason: input.reason ?? null,
+            userId: input.userId,
+          },
+          { client: trx }
+        )
+        movements.push(movement)
+      }
+      return movements
     })
   }
 }

@@ -75,10 +75,24 @@ watch(
 )
 
 const columns = computed(() => [
-  { key: 'product', label: t('stock.index.columns.product') },
+  {
+    key: 'product',
+    label: t('stock.index.columns.product'),
+    sort: (r: StockRow) => r.variant?.product?.name?.toLowerCase() ?? null,
+  },
   { key: 'variant', label: t('stock.index.columns.variant') },
-  { key: 'location', label: t('stock.index.columns.location') },
-  { key: 'quantity', label: t('stock.index.columns.onHand'), align: 'right' as const, width: '160px' },
+  {
+    key: 'location',
+    label: t('stock.index.columns.location'),
+    sort: (r: StockRow) => r.location?.name?.toLowerCase() ?? null,
+  },
+  {
+    key: 'quantity',
+    label: t('stock.index.columns.onHand'),
+    align: 'right' as const,
+    width: '160px',
+    sort: (r: StockRow) => r.quantity,
+  },
 ])
 
 function rowClick(row: StockRow) {

@@ -137,3 +137,15 @@ export type Pagination = z.infer<typeof paginationSchema>
 export function dataEnvelope<T extends z.ZodTypeAny>(schema: T) {
   return z.object({ data: schema })
 }
+
+/**
+ * Per-size grid lookup payload — variants matching the (product, location,
+ * color?, print?) tuple paired with the on-hand quantity at that location.
+ * Quantities are keyed by variant id and serialised as numeric strings on
+ * the wire (JS object keys), so we accept either form.
+ */
+export const stockGridSchema = z.object({
+  variants: z.array(variantSchema),
+  quantities: z.record(z.string(), z.number().int()),
+})
+export type StockGrid = z.infer<typeof stockGridSchema>

@@ -140,12 +140,19 @@
       "title": "Ajustar estoque",
       "description": "Refine de geral para específico para encontrar a variante exata e definir a quantidade em estoque.",
       "stepLocate": "1 · Localizar variante",
-      "stepQuantity": "2 · Definir quantidade",
-      "pickToContinue": "Escolha uma localização e variante à esquerda para continuar.",
+      "stepQuantity": "2 · Definir quantidades",
+      "pickToContinue": "Escolha uma localização e um produto à esquerda para continuar.",
       "newQuantity": "Nova quantidade",
       "reasonOptional": "Motivo (opcional)",
       "reasonPlaceholder": "ex. ajuste de inventário, unidades danificadas, recebimento do fornecedor…",
-      "save": "Salvar ajuste"
+      "save": "Salvar ajuste",
+      "saveAll": "Salvar alterações",
+      "saveAllPending": "Salvar {count} alteração(ões)",
+      "noChanges": "Nenhuma alteração ainda",
+      "noVariantsForSelection": "Nenhuma variante corresponde à seleção atual.",
+      "loadingGrid": "Carregando tamanhos…",
+      "initialLabel": "Inicial",
+      "changeLabel": "Alteração"
     }
   },
   "movements": {

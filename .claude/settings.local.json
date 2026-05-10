@@ -21,7 +21,9 @@
       "PowerShell(node ace test unit 2>&1 | Select-Object -Last 30)",
       "PowerShell(Get-Item *)",
       "Bash(node *)",
-      "Bash(del *)"
+      "Bash(del *)",
+      "Bash(npx tuyau *)",
+      "Bash(tasklist /FI \"IMAGENAME eq node.exe\")"
     ]
   }
 }

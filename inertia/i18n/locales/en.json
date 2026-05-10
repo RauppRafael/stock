@@ -140,12 +140,19 @@
       "title": "Adjust stock",
       "description": "Drill from coarse to fine to pinpoint the exact variant, then set the on-hand quantity.",
       "stepLocate": "1 · Locate variant",
-      "stepQuantity": "2 · Set quantity",
-      "pickToContinue": "Pick a location and variant on the left to continue.",
+      "stepQuantity": "2 · Set quantities",
+      "pickToContinue": "Pick a location and product on the left to continue.",
       "newQuantity": "New quantity",
       "reasonOptional": "Reason (optional)",
       "reasonPlaceholder": "e.g. cycle count adjustment, damaged units, intake from supplier…",
-      "save": "Save adjustment"
+      "save": "Save adjustment",
+      "saveAll": "Save changes",
+      "saveAllPending": "Save {count} change(s)",
+      "noChanges": "No changes yet",
+      "noVariantsForSelection": "No variants match the current selection.",
+      "loadingGrid": "Loading sizes…",
+      "initialLabel": "Initial",
+      "changeLabel": "Change"
     }
   },
   "movements": {

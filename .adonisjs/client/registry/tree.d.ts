@@ -12,11 +12,13 @@ export interface ApiDefinition {
     index: typeof routes['stock.index']
     adjust: typeof routes['stock.adjust'] & {
       create: typeof routes['stock.adjust.create']
+      bulk: typeof routes['stock.adjust.bulk']
     }
     lookup: {
       products: typeof routes['stock.lookup.products']
       variants: typeof routes['stock.lookup.variants']
       quantity: typeof routes['stock.lookup.quantity']
+      grid: typeof routes['stock.lookup.grid']
     }
   }
   movements: {

@@ -89,7 +89,7 @@ function isActive(item: { route: string }): boolean {
 </script>
 
 <template>
-  <div v-if="isAuthed" class="min-h-screen lg:flex">
+  <div v-if="isAuthed" class="min-h-screen lg:flex lg:h-screen">
     <!-- Mobile top bar -->
     <header
       class="lg:hidden sticky top-0 z-30 flex items-center justify-between bg-slate-900 text-slate-100 px-4 h-14 shadow-sm"
@@ -176,7 +176,10 @@ function isActive(item: { route: string }): boolean {
         </div>
       </nav>
 
-      <div class="px-3 py-3 border-t border-slate-800 space-y-2">
+      <div class="px-3 pt-2 pb-3">
+        <LanguageSwitcher />
+      </div>
+      <div class="px-3 py-3 border-t border-slate-800">
         <div class="flex items-center gap-3">
           <div
             class="size-8 shrink-0 rounded-full bg-brand-600 text-white text-xs font-semibold flex items-center justify-center"
@@ -190,7 +193,6 @@ function isActive(item: { route: string }): boolean {
             <button type="submit" class="text-xs text-slate-400 hover:text-white">{{ $t('common.actions.logout') }}</button>
           </Form>
         </div>
-        <LanguageSwitcher class="w-full" />
       </div>
     </aside>
 

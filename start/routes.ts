@@ -36,6 +36,7 @@ router
     router.get('/stock', [controllers.Stock, 'index']).as('stock.index')
     router.get('/stock/adjust', [controllers.Stock, 'create']).as('stock.adjust.create')
     router.post('/stock/adjust', [controllers.Stock, 'adjust']).as('stock.adjust')
+    router.post('/stock/adjust/bulk', [controllers.Stock, 'bulkAdjust']).as('stock.adjust.bulk')
     router
       .get('/stock/lookup/categories/:categoryId/products', [
         controllers.Stock,
@@ -51,6 +52,12 @@ router
         'lookupStock',
       ])
       .as('stock.lookup.quantity')
+    router
+      .get('/stock/lookup/products/:productId/locations/:locationId/grid', [
+        controllers.Stock,
+        'lookupGrid',
+      ])
+      .as('stock.lookup.grid')
 
     /**
      * Movement history

@@ -12,8 +12,11 @@ import ProductTransformer from '#transformers/product_transformer'
 import VariantTransformer from '#transformers/variant_transformer'
 import {
   adjustStockValidator,
+  bulkAdjustStockValidator,
   stockIndexFiltersValidator,
   stockLookupCategoryParamsValidator,
+  stockLookupGridParamsValidator,
+  stockLookupGridQueryValidator,
   stockLookupProductParamsValidator,
   stockLookupVariantParamsValidator,
 } from '#validators/stock'
@@ -94,7 +97,6 @@ export default class StockController {
     ])
 
     let prefilledVariant: Variant | null = null
-    let prefilledStock: Stock | null = null
     if (variantId) {
       prefilledVariant = await Variant.query()
         .where('id', variantId)
@@ -104,19 +106,12 @@ export default class StockController {
         .preload('product', (p) => p.preload('category'))
         .first()
     }
-    if (variantId && locationId) {
-      prefilledStock = await Stock.query()
-        .where('variant_id', variantId)
-        .andWhere('location_id', locationId)
-        .first()
-    }
 
     return inertia.render('stock/adjust', {
       categories: CategoryTransformer.transform(categories),
       locations: LocationTransformer.transform(locations),
       prefilledVariant: prefilledVariant ? VariantTransformer.transform(prefilledVariant) : null,
       prefilledLocationId: locationId,
-      prefilledQuantity: prefilledStock?.quantity ?? null,
     })
   }
 
@@ -137,6 +132,33 @@ export default class StockController {
       `Stock updated: ${movement.previousQuantity} → ${movement.newQuantity} (Δ ${movement.delta >= 0 ? '+' : ''}${movement.delta}).`
     )
     return response.redirect().toRoute('stock.index')
+  }
+
+  async bulkAdjust({ request, response, session, auth }: HttpContext) {
+    const payload = await request.validateUsing(bulkAdjustStockValidator)
+    const user = auth.getUserOrFail()
+
+    const movements = await new StockService().bulkAdjust({
+      adjustments: payload.adjustments.map((a) => ({
+        variantId: a.variantId,
+        locationId: payload.locationId,
+        newQuantity: a.newQuantity,
+      })),
+      userId: user.id,
+      reason: payload.reason ?? null,
+    })
+
+    if (movements.length === 0) {
+      session.flash('success', 'No changes — quantities already match.')
+    } else {
+      const totalDelta = movements.reduce((sum, m) => sum + m.delta, 0)
+      const sign = totalDelta >= 0 ? '+' : ''
+      session.flash(
+        'success',
+        `${movements.length} variant(s) updated (Δ ${sign}${totalDelta}).`
+      )
+    }
+    return response.redirect().back()
   }
 
   /**
@@ -175,6 +197,64 @@ export default class StockController {
       .first()
     return ctx.response.json({
       data: { quantity: stock?.quantity ?? 0 },
+    })
+  }
+
+  /**
+   * Returns every variant of a product (optionally narrowed by color/print)
+   * paired with the on-hand quantity at the given location. Used by the
+   * adjust page to render a per-size editable grid in one shot. Variants
+   * are ordered by size sortOrder so S/M/L line up consistently.
+   *
+   * Returned as parallel arrays (`variants`, `quantities`) rather than
+   * `[{ variant, quantity }, …]` so the variant collection can flow through
+   * `ctx.serialize` and resolve nested transformer Items the same way the
+   * other lookup endpoints do.
+   */
+  async lookupGrid(ctx: HttpContext) {
+    const { productId, locationId } = await stockLookupGridParamsValidator.validate(
+      ctx.request.params()
+    )
+    const { colorId, printId } = await stockLookupGridQueryValidator.validate(ctx.request.qs())
+
+    const variantsQuery = Variant.query()
+      .where('product_id', productId)
+      .preload('color')
+      .preload('print')
+      .preload('size')
+      .preload('product', (p) => p.preload('category'))
+
+    if (colorId !== undefined) variantsQuery.where('color_id', colorId)
+    if (printId !== undefined) variantsQuery.where('print_id', printId)
+
+    const variants = await variantsQuery
+    variants.sort((a, b) => {
+      const sa = a.size?.sortOrder ?? 0
+      const sb = b.size?.sortOrder ?? 0
+      if (sa !== sb) return sa - sb
+      return (a.size?.name ?? '').localeCompare(b.size?.name ?? '')
+    })
+
+    const variantIds = variants.map((v) => v.id)
+    const stocks = variantIds.length
+      ? await Stock.query()
+          .where('location_id', locationId)
+          .whereIn('variant_id', variantIds)
+      : []
+    const quantityByVariant: Record<number, number> = {}
+    for (const s of stocks) quantityByVariant[s.variantId] = s.quantity
+    for (const v of variants) {
+      if (quantityByVariant[v.id] === undefined) quantityByVariant[v.id] = 0
+    }
+
+    const resolvedVariants = await ctx.serialize.withoutWrapping(
+      VariantTransformer.transform(variants)
+    )
+    return ctx.response.json({
+      data: {
+        variants: resolvedVariants,
+        quantities: quantityByVariant,
+      },
     })
   }
 }

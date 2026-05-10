@@ -16,6 +16,12 @@ const props = defineProps<{
   /** When provided, pre-selects every dropdown to match this variant. */
   initialVariant?: Data.Variant | null
   initialLocationId?: number | null
+  /**
+   * Hide the size picker while still auto-picking a value internally so the
+   * resolver fires. Used when the consumer renders all sizes at once and
+   * doesn't need the user to commit to one.
+   */
+  hideSize?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -274,7 +280,7 @@ onMounted(async () => {
         </select>
       </div>
 
-      <div v-if="category.hasSize">
+      <div v-if="category.hasSize && !hideSize">
         <label class="label">{{ $t('common.labels.size') }}</label>
         <select v-model.number="sizeId" class="select" :disabled="loadingVariants">
           <option :value="null">

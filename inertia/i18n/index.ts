@@ -3,8 +3,8 @@ import en from './locales/en.json'
 import pt from './locales/pt.json'
 
 export const SUPPORTED_LOCALES = [
-  { code: 'en', label: 'English' },
-  { code: 'pt', label: 'Português' },
+  { code: 'en', label: 'English', short: 'EN', flag: '🇺🇸' },
+  { code: 'pt', label: 'Português', short: 'PT', flag: '🇧🇷' },
 ] as const
 
 export type Locale = (typeof SUPPORTED_LOCALES)[number]['code']

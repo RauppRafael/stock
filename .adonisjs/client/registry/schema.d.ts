@@ -91,6 +91,18 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/stock_controller').default['adjust']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
+  'stock.adjust.bulk': {
+    methods: ["POST"]
+    pattern: '/stock/adjust/bulk'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/stock').bulkAdjustStockValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/stock').bulkAdjustStockValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/stock_controller').default['bulkAdjust']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/stock_controller').default['bulkAdjust']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
   'stock.lookup.products': {
     methods: ["GET","HEAD"]
     pattern: '/stock/lookup/categories/:categoryId/products'
@@ -125,6 +137,18 @@ export interface Registry {
       query: ExtractQueryForGet<InferInput<(typeof import('#validators/stock').stockLookupVariantParamsValidator)>>
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/stock_controller').default['lookupStock']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/stock_controller').default['lookupStock']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'stock.lookup.grid': {
+    methods: ["GET","HEAD"]
+    pattern: '/stock/lookup/products/:productId/locations/:locationId/grid'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue, ParamValue]
+      params: { productId: ParamValue; locationId: ParamValue }
+      query: ExtractQueryForGet<InferInput<(typeof import('#validators/stock').stockLookupGridParamsValidator)>|InferInput<(typeof import('#validators/stock').stockLookupGridQueryValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/stock_controller').default['lookupGrid']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/stock_controller').default['lookupGrid']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
   'movements.index': {
