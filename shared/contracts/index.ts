@@ -44,6 +44,7 @@ export const locationSchema = z.object({
   id,
   name: z.string(),
   description: z.string().nullable(),
+  icon: z.string().nullable(),
 })
 export type Location = z.infer<typeof locationSchema>
 

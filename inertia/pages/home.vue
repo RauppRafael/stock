@@ -12,14 +12,14 @@ onMounted(() => {
 </script>
 
 <template>
-  <Head title="Stockroom" />
+  <Head :title="$t('app.name')" />
 
   <div class="min-h-screen flex items-center justify-center bg-slate-50">
     <div class="max-w-md w-full p-8 text-center">
-      <h1 class="text-3xl font-semibold tracking-tight text-slate-900">Stockroom</h1>
-      <p class="mt-3 text-slate-600">A focused inventory system for clothing brands.</p>
+      <h1 class="text-3xl font-semibold tracking-tight text-slate-900">{{ $t('app.name') }}</h1>
+      <p class="mt-3 text-slate-600">{{ $t('app.description') }}</p>
       <div v-if="!page.props.user" class="mt-8 flex justify-center">
-        <Link route="session.create" class="btn-primary">Login</Link>
+        <Link route="session.create" class="btn-primary">{{ $t('common.actions.login') }}</Link>
       </div>
     </div>
   </div>

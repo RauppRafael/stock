@@ -189,15 +189,17 @@ onMounted(async () => {
 <template>
   <div class="space-y-4">
     <div>
-      <label class="label">Location</label>
+      <label class="label">{{ $t('common.labels.location') }}</label>
       <select v-model.number="locationId" class="select">
-        <option :value="null">Select a location…</option>
-        <option v-for="loc in locations" :key="loc.id" :value="loc.id">{{ loc.name }}</option>
+        <option :value="null">{{ $t('common.selectALocation') }}</option>
+        <option v-for="loc in locations" :key="loc.id" :value="loc.id">
+          {{ loc.icon ? `${loc.icon} ` : '' }}{{ loc.name }}
+        </option>
       </select>
     </div>
 
     <div v-if="locationId">
-      <label class="label">Category</label>
+      <label class="label">{{ $t('common.labels.category') }}</label>
       <div class="flex flex-wrap gap-2">
         <button
           v-for="cat in categories"
@@ -218,10 +220,10 @@ onMounted(async () => {
     </div>
 
     <div v-if="categoryId">
-      <label class="label">Product</label>
+      <label class="label">{{ $t('common.labels.product') }}</label>
       <select v-model.number="productId" class="select" :disabled="loadingProducts">
         <option :value="null">
-          {{ loadingProducts ? 'Loading…' : 'Select a product…' }}
+          {{ loadingProducts ? $t('common.actions.loading') : $t('common.selectAProduct') }}
         </option>
         <option v-for="p in products" :key="p.id" :value="p.id">{{ p.name }}</option>
       </select>
@@ -229,14 +231,14 @@ onMounted(async () => {
         v-if="!loadingProducts && categoryId && !products.length"
         class="text-xs text-slate-400 italic mt-1"
       >
-        No products in this category yet.
+        {{ $t('variantSelector.noProducts') }}
       </p>
     </div>
 
     <template v-if="productId && category">
       <div v-if="category.hasColor">
-        <label class="label">Color</label>
-        <div v-if="loadingVariants" class="text-xs text-slate-400 italic">Loading…</div>
+        <label class="label">{{ $t('common.labels.color') }}</label>
+        <div v-if="loadingVariants" class="text-xs text-slate-400 italic">{{ $t('common.actions.loading') }}</div>
         <div v-else-if="colorOptions.length" class="flex flex-wrap gap-2">
           <button
             v-for="opt in colorOptions"
@@ -257,14 +259,14 @@ onMounted(async () => {
             {{ opt.name }}
           </button>
         </div>
-        <p v-else class="text-xs text-slate-400 italic">No colors for this product.</p>
+        <p v-else class="text-xs text-slate-400 italic">{{ $t('variantSelector.noColors') }}</p>
       </div>
 
       <div v-if="category.hasPrint">
-        <label class="label">Print</label>
+        <label class="label">{{ $t('common.labels.print') }}</label>
         <select v-model.number="printId" class="select" :disabled="loadingVariants">
           <option :value="null">
-            {{ loadingVariants ? 'Loading…' : 'Select a print…' }}
+            {{ loadingVariants ? $t('common.actions.loading') : $t('common.selectAPrint') }}
           </option>
           <option v-for="opt in printOptions" :key="opt.id" :value="opt.id">
             {{ opt.name }}
@@ -273,10 +275,10 @@ onMounted(async () => {
       </div>
 
       <div v-if="category.hasSize">
-        <label class="label">Size</label>
+        <label class="label">{{ $t('common.labels.size') }}</label>
         <select v-model.number="sizeId" class="select" :disabled="loadingVariants">
           <option :value="null">
-            {{ loadingVariants ? 'Loading…' : 'Select a size…' }}
+            {{ loadingVariants ? $t('common.actions.loading') : $t('common.selectASize') }}
           </option>
           <option v-for="opt in sizeOptions" :key="opt.id" :value="opt.id">
             {{ opt.name }}

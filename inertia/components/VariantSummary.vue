@@ -1,29 +1,15 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { Data } from '@generated/data'
 
-const props = defineProps<{
+defineProps<{
   variant: Data.Variant
   locationName?: string
+  locationIcon?: string | null
   currentQuantity: number | null
 }>()
 
-const tags = computed(() => {
-  const list: { label: string; key: string; render?: 'color' | 'size' }[] = []
-  if (props.variant.product?.category?.name) {
-    list.push({ key: 'category', label: props.variant.product.category.name })
-  }
-  if (props.variant.color) {
-    list.push({ key: 'color', label: props.variant.color.name, render: 'color' })
-  }
-  if (props.variant.print) {
-    list.push({ key: 'print', label: props.variant.print.name })
-  }
-  if (props.variant.size) {
-    list.push({ key: 'size', label: props.variant.size.name, render: 'size' })
-  }
-  return list
-})
+const { t } = useI18n()
 </script>
 
 <template>
@@ -31,22 +17,10 @@ const tags = computed(() => {
     <div class="flex items-start gap-4">
       <div
         v-if="variant.size"
-        class="size-16 shrink-0 rounded-lg bg-slate-900 text-white flex items-center justify-center text-2xl font-bold tracking-tight"
-        :title="`Size ${variant.size.name}`"
+        class="size-12 shrink-0 rounded-md bg-slate-100 ring-1 ring-slate-200 flex items-center justify-center text-sm font-semibold text-slate-700 tabular-nums"
+        :title="t('variantSummary.sizeTitle', { name: variant.size.name })"
       >
         {{ variant.size.name }}
-      </div>
-      <div
-        v-else-if="variant.color?.hexCode"
-        class="size-16 shrink-0 rounded-lg ring-1 ring-slate-200"
-        :style="{ background: variant.color.hexCode }"
-        :title="variant.color.name"
-      />
-      <div
-        v-else
-        class="size-16 shrink-0 rounded-lg bg-slate-100 ring-1 ring-slate-200 flex items-center justify-center text-slate-400 text-xs font-mono"
-      >
-        SKU
       </div>
 
       <div class="flex-1 min-w-0">
@@ -55,18 +29,32 @@ const tags = computed(() => {
         </p>
         <p class="text-xs text-slate-500 font-mono mt-0.5">{{ variant.skuCode }}</p>
 
-        <div class="mt-3 flex flex-wrap gap-1.5">
+        <div class="mt-3 flex flex-wrap gap-1.5 text-xs">
           <span
-            v-for="tag in tags"
-            :key="tag.key"
-            class="inline-flex items-center gap-1.5 rounded-full bg-white border border-slate-200 px-2 py-0.5 text-xs text-slate-700"
+            v-if="variant.product?.category?.name"
+            class="inline-flex items-center gap-1.5 rounded-full bg-white border border-slate-200 px-2 py-0.5 text-slate-700 whitespace-nowrap"
+          >
+            <span v-if="variant.product.category.icon">{{ variant.product.category.icon }}</span>
+            {{ variant.product.category.name }}
+          </span>
+          <span
+            v-if="variant.color"
+            class="inline-flex items-center gap-1.5 rounded-full bg-white border border-slate-200 px-2 py-0.5 text-slate-700 whitespace-nowrap"
           >
             <span
-              v-if="tag.render === 'color' && variant.color?.hexCode"
+              v-if="variant.color.hexCode"
               class="size-2.5 rounded-full ring-1 ring-slate-200"
               :style="{ background: variant.color.hexCode }"
             />
-            {{ tag.label }}
+            <span class="text-slate-500">{{ $t('common.labels.color') }}:</span>
+            <span class="font-medium">{{ variant.color.name }}</span>
+          </span>
+          <span
+            v-if="variant.print"
+            class="inline-flex items-center gap-1.5 rounded-full bg-white border border-slate-200 px-2 py-0.5 text-slate-700 whitespace-nowrap"
+          >
+            <span class="text-slate-500">{{ $t('common.labels.print') }}:</span>
+            <span class="font-medium">{{ variant.print.name }}</span>
           </span>
         </div>
       </div>
@@ -75,11 +63,16 @@ const tags = computed(() => {
     <div
       class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-sm"
     >
+      <i18n-t keypath="variantSummary.atLocation" tag="span" class="text-slate-500">
+        <template #location>
+          <span class="font-medium text-slate-700 inline-flex items-center gap-1">
+            <span v-if="locationIcon">{{ locationIcon }}</span>
+            {{ locationName ?? '—' }}
+          </span>
+        </template>
+      </i18n-t>
       <span class="text-slate-500">
-        At <span class="font-medium text-slate-700">{{ locationName ?? '—' }}</span>
-      </span>
-      <span class="text-slate-500">
-        Current on-hand:
+        {{ $t('variantSummary.currentOnHand') }}
         <span v-if="currentQuantity !== null" class="font-semibold text-slate-900 tabular-nums">
           {{ currentQuantity }}
         </span>

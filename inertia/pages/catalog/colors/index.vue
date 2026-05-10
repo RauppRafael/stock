@@ -1,12 +1,15 @@
 <script setup lang="ts">
-import { reactive } from 'vue'
+import { computed, reactive } from 'vue'
 import { Head, useForm } from '@inertiajs/vue3'
+import { useI18n } from 'vue-i18n'
 import { urlFor } from '~/client'
 import type { Data } from '@generated/data'
 import PageHeader from '~/components/PageHeader.vue'
 import DataTable from '~/components/DataTable.vue'
 import Modal from '~/components/Modal.vue'
 import ConfirmButton from '~/components/ConfirmButton.vue'
+
+const { t } = useI18n()
 
 defineProps<{
   colors: Data.Color[]
@@ -55,25 +58,25 @@ function submit() {
   }
 }
 
-const columns = [
+const columns = computed(() => [
   { key: 'swatch', label: '', width: '60px' },
-  { key: 'name', label: 'Name' },
-  { key: 'code', label: 'Code', width: '100px' },
-  { key: 'hex', label: 'Hex' },
+  { key: 'name', label: t('common.labels.name') },
+  { key: 'code', label: t('common.labels.code'), width: '100px' },
+  { key: 'hex', label: t('common.labels.hex') },
   { key: 'actions', label: '', align: 'right' as const, width: '180px' },
-]
+])
 </script>
 
 <template>
-  <Head title="Colors" />
+  <Head :title="$t('colors.title')" />
   <div class="p-4 sm:p-6 lg:p-8 max-w-4xl mx-auto">
-    <PageHeader title="Colors" description="Reusable color attribute applied to product variants.">
+    <PageHeader :title="$t('colors.title')" :description="$t('colors.description')">
       <template #actions>
-        <button type="button" class="btn-primary" @click="openCreate">+ New color</button>
+        <button type="button" class="btn-primary" @click="openCreate">{{ $t('colors.new') }}</button>
       </template>
     </PageHeader>
 
-    <DataTable :columns="columns" :rows="colors" :row-key="(row) => row.id" empty="No colors yet.">
+    <DataTable :columns="columns" :rows="colors" :row-key="(row) => row.id" :empty="$t('colors.empty')">
       <template #[`cell:swatch`]="{ row }">
         <span
           v-if="row.hexCode"
@@ -93,11 +96,11 @@ const columns = [
       </template>
       <template #[`cell:actions`]="{ row }">
         <div class="flex justify-end gap-2">
-          <button type="button" class="btn-secondary" @click="openEdit(row)">Edit</button>
+          <button type="button" class="btn-secondary" @click="openEdit(row)">{{ $t('common.actions.edit') }}</button>
           <ConfirmButton
             route="colors.destroy"
             :params="{ id: row.id }"
-            :message="`Delete “${row.name}”?`"
+            :message="$t('colors.deleteConfirm', { name: row.name })"
           />
         </div>
       </template>
@@ -105,12 +108,12 @@ const columns = [
 
     <Modal
       :open="dialog.open"
-      :title="dialog.mode === 'create' ? 'New color' : 'Edit color'"
+      :title="dialog.mode === 'create' ? $t('colors.newTitle') : $t('colors.editTitle')"
       @close="dialog.open = false"
     >
       <form class="space-y-4" @submit.prevent="submit">
         <div>
-          <label for="color-name" class="label">Name</label>
+          <label for="color-name" class="label">{{ $t('common.labels.name') }}</label>
           <input
             id="color-name"
             v-model="form.name"
@@ -121,7 +124,7 @@ const columns = [
           <p v-if="form.errors.name" class="field-error">{{ form.errors.name }}</p>
         </div>
         <div>
-          <label for="color-code" class="label">Code (used in SKUs, A–Z / 0–9, max 8)</label>
+          <label for="color-code" class="label">{{ $t('colors.codeLabel') }}</label>
           <input
             id="color-code"
             v-model="form.code"
@@ -134,7 +137,7 @@ const columns = [
           <p v-if="form.errors.code" class="field-error">{{ form.errors.code }}</p>
         </div>
         <div>
-          <label for="color-hex" class="label">Hex (optional)</label>
+          <label for="color-hex" class="label">{{ $t('colors.hexLabel') }}</label>
           <input
             id="color-hex"
             v-model="form.hexCode"
@@ -145,9 +148,9 @@ const columns = [
           <p v-if="form.errors.hexCode" class="field-error">{{ form.errors.hexCode }}</p>
         </div>
         <div class="flex justify-end gap-2">
-          <button type="button" class="btn-ghost" @click="dialog.open = false">Cancel</button>
+          <button type="button" class="btn-ghost" @click="dialog.open = false">{{ $t('common.actions.cancel') }}</button>
           <button type="submit" class="btn-primary" :disabled="form.processing">
-            {{ form.processing ? 'Saving…' : dialog.mode === 'create' ? 'Create' : 'Save' }}
+            {{ form.processing ? $t('common.actions.saving') : dialog.mode === 'create' ? $t('common.actions.create') : $t('common.actions.save') }}
           </button>
         </div>
       </form>

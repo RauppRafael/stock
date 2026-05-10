@@ -14,15 +14,15 @@ const fields = {
 export const createSizeValidator = vine.compile(
   vine.object({
     ...fields,
-    name: fields.name.unique({ table: 'sizes', column: 'name' }),
-    code: fields.code.unique({ table: 'sizes', column: 'code' }),
+    name: fields.name.clone().unique({ table: 'sizes', column: 'name' }),
+    code: fields.code.clone().unique({ table: 'sizes', column: 'code' }),
   })
 )
 
 export const updateSizeValidator = vine.withMetaData<{ id: number }>().compile(
   vine.object({
     ...fields,
-    name: fields.name.unique(async (db, value, field) => {
+    name: fields.name.clone().unique(async (db, value, field) => {
       const row = await db
         .from('sizes')
         .where('name', value)
@@ -30,7 +30,7 @@ export const updateSizeValidator = vine.withMetaData<{ id: number }>().compile(
         .first()
       return !row
     }),
-    code: fields.code.unique(async (db, value, field) => {
+    code: fields.code.clone().unique(async (db, value, field) => {
       const row = await db
         .from('sizes')
         .where('code', value)

@@ -84,50 +84,50 @@ function changePage(page: number) {
 </script>
 
 <template>
-  <Head title="Stock movements" />
+  <Head :title="$t('movements.title')" />
   <div class="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto">
     <PageHeader
-      title="Stock movements"
-      description="Append-only history of every stock change."
+      :title="$t('movements.title')"
+      :description="$t('movements.description')"
     >
       <template #actions>
-        <Link route="stock.adjust.create" class="btn-secondary">+ New adjustment</Link>
+        <Link route="stock.adjust.create" class="btn-secondary">{{ $t('movements.newAdjustment') }}</Link>
       </template>
     </PageHeader>
 
     <div class="card p-4 mb-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3">
       <div>
-        <label class="label">From</label>
+        <label class="label">{{ $t('common.labels.from') }}</label>
         <input v-model="filters.from" type="date" class="input" />
       </div>
       <div>
-        <label class="label">To</label>
+        <label class="label">{{ $t('common.labels.to') }}</label>
         <input v-model="filters.to" type="date" class="input" />
       </div>
       <div>
-        <label class="label">Product</label>
+        <label class="label">{{ $t('common.labels.product') }}</label>
         <select v-model.number="filters.productId" class="select">
-          <option :value="null">All</option>
+          <option :value="null">{{ $t('common.all') }}</option>
           <option v-for="p in products" :key="p.id" :value="p.id">{{ p.name }}</option>
         </select>
       </div>
       <div>
-        <label class="label">Location</label>
+        <label class="label">{{ $t('common.labels.location') }}</label>
         <select v-model.number="filters.locationId" class="select">
-          <option :value="null">All</option>
+          <option :value="null">{{ $t('common.all') }}</option>
           <option v-for="l in locations" :key="l.id" :value="l.id">{{ l.name }}</option>
         </select>
       </div>
       <div>
-        <label class="label">User</label>
+        <label class="label">{{ $t('common.labels.user') }}</label>
         <select v-model.number="filters.userId" class="select">
-          <option :value="null">All</option>
+          <option :value="null">{{ $t('common.all') }}</option>
           <option v-for="u in users" :key="u.id" :value="u.id">{{ u.email }}</option>
         </select>
       </div>
       <div>
-        <label class="label">Variant ID</label>
-        <input v-model.number="filters.variantId" type="number" class="input" placeholder="e.g. 42" />
+        <label class="label">{{ $t('movements.variantId') }}</label>
+        <input v-model.number="filters.variantId" type="number" class="input" :placeholder="$t('movements.variantIdPlaceholder')" />
       </div>
     </div>
 
@@ -136,20 +136,20 @@ function changePage(page: number) {
         <table class="w-full min-w-[800px]">
           <thead class="bg-slate-50 text-xs uppercase tracking-wider text-slate-500">
             <tr>
-              <th class="px-4 py-2 text-left">Date</th>
-              <th class="px-4 py-2 text-left">Variant</th>
-              <th class="px-4 py-2 text-left">Location</th>
-              <th class="px-4 py-2 text-right">Change</th>
-              <th class="px-4 py-2 text-right">Δ</th>
-              <th class="px-4 py-2 text-left">User</th>
-              <th class="px-4 py-2 text-left">Reason</th>
+              <th class="px-4 py-2 text-left">{{ $t('common.labels.date') }}</th>
+              <th class="px-4 py-2 text-left">{{ $t('common.labels.variant') }}</th>
+              <th class="px-4 py-2 text-left">{{ $t('common.labels.location') }}</th>
+              <th class="px-4 py-2 text-right">{{ $t('common.labels.change') }}</th>
+              <th class="px-4 py-2 text-right">{{ $t('common.labels.delta') }}</th>
+              <th class="px-4 py-2 text-left">{{ $t('common.labels.user') }}</th>
+              <th class="px-4 py-2 text-left">{{ $t('common.labels.reason') }}</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-slate-100">
             <MovementRow v-for="m in movements" :key="m.id" :movement="m" />
             <tr v-if="!movements.length">
               <td colspan="7" class="px-4 py-10 text-center text-sm text-slate-400 italic">
-                No movements match these filters.
+                {{ $t('movements.empty') }}
               </td>
             </tr>
           </tbody>
@@ -161,7 +161,7 @@ function changePage(page: number) {
         class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 px-5 py-3 border-t border-slate-100 text-sm text-slate-600"
       >
         <span>
-          Page {{ pagination.page }} of {{ pagination.lastPage }} · {{ pagination.total }} total
+          {{ $t('movements.pagination', { page: pagination.page, lastPage: pagination.lastPage, total: pagination.total }) }}
         </span>
         <div class="flex gap-2">
           <button
@@ -170,7 +170,7 @@ function changePage(page: number) {
             :disabled="pagination.page <= 1"
             @click="changePage(pagination.page - 1)"
           >
-            Previous
+            {{ $t('common.actions.previous') }}
           </button>
           <button
             type="button"
@@ -178,7 +178,7 @@ function changePage(page: number) {
             :disabled="pagination.page >= pagination.lastPage"
             @click="changePage(pagination.page + 1)"
           >
-            Next
+            {{ $t('common.actions.next') }}
           </button>
         </div>
       </footer>

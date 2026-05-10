@@ -29,6 +29,6 @@ function ask() {
     :class="variant === 'ghost' ? 'btn-ghost' : 'btn-danger'"
     @click="ask"
   >
-    <slot>{{ label ?? 'Delete' }}</slot>
+    <slot>{{ label ?? $t('common.actions.delete') }}</slot>
   </button>
 </template>

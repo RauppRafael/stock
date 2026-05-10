@@ -1,10 +1,13 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 
 const props = defineProps<{
   quantity: number
   threshold?: number | null
 }>()
+
+const { t } = useI18n()
 
 const tone = computed(() => {
   if (props.quantity <= 0) return 'out'
@@ -13,9 +16,9 @@ const tone = computed(() => {
 })
 
 const label = computed(() => {
-  if (tone.value === 'out') return 'Out of stock'
-  if (tone.value === 'low') return 'Low stock'
-  return 'In stock'
+  if (tone.value === 'out') return t('stockBadge.out')
+  if (tone.value === 'low') return t('stockBadge.low')
+  return t('stockBadge.ok')
 })
 </script>
 

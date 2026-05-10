@@ -1,0 +1,266 @@
+{
+  "app": {
+    "name": "Stockroom",
+    "tagline": "Controle de estoque",
+    "description": "Um sistema de estoque focado para marcas de roupa."
+  },
+  "common": {
+    "actions": {
+      "edit": "Editar",
+      "delete": "Excluir",
+      "archive": "Arquivar",
+      "cancel": "Cancelar",
+      "save": "Salvar",
+      "saving": "Salvando…",
+      "create": "Criar",
+      "creating": "Criando…",
+      "back": "Voltar",
+      "close": "Fechar",
+      "logout": "Sair",
+      "login": "Entrar",
+      "loading": "Carregando…",
+      "previous": "Anterior",
+      "next": "Próximo",
+      "selectAll": "todos",
+      "selectNone": "nenhum",
+      "saveChanges": "Salvar alterações",
+      "clear": "Limpar"
+    },
+    "labels": {
+      "name": "Nome",
+      "code": "Código",
+      "description": "Descrição",
+      "category": "Categoria",
+      "categories": "Categorias",
+      "product": "Produto",
+      "products": "Produtos",
+      "location": "Localização",
+      "locations": "Localizações",
+      "user": "Usuário",
+      "users": "Usuários",
+      "color": "Cor",
+      "colors": "Cores",
+      "print": "Estampa",
+      "prints": "Estampas",
+      "size": "Tamanho",
+      "sizes": "Tamanhos",
+      "variant": "Variante",
+      "variants": "Variantes",
+      "sku": "SKU",
+      "stock": "Estoque",
+      "quantity": "Quantidade",
+      "onHand": "Em estoque",
+      "reason": "Motivo",
+      "date": "Data",
+      "change": "Alteração",
+      "delta": "Δ",
+      "search": "Buscar",
+      "from": "De",
+      "to": "Até",
+      "icon": "Ícone",
+      "hex": "Hex",
+      "sortOrder": "Ordem",
+      "language": "Idioma",
+      "page": "Página"
+    },
+    "placeholders": {
+      "optional": "opcional",
+      "searchByName": "Buscar por nome…"
+    },
+    "empty": {
+      "noRecords": "Nenhum registro encontrado.",
+      "noOptions": "Nenhuma opção disponível.",
+      "noIcon": "Nenhum ícone selecionado",
+      "noReason": "sem motivo",
+      "noChange": "sem alteração",
+      "notStocked": "Não estocado em lugar algum"
+    },
+    "all": "Todos",
+    "allCategories": "Todas as categorias",
+    "allProducts": "Todos os produtos",
+    "allLocations": "Todas as localizações",
+    "selectACategory": "Selecione uma categoria…",
+    "selectAProduct": "Selecione um produto…",
+    "selectALocation": "Selecione uma localização…",
+    "selectAColor": "Selecione uma cor…",
+    "selectAPrint": "Selecione uma estampa…",
+    "selectASize": "Selecione um tamanho…",
+    "noAttributes": "sem atributos",
+    "dash": "—",
+    "selected": "Selecionado:"
+  },
+  "nav": {
+    "groups": {
+      "operations": "Operações",
+      "catalog": "Catálogo",
+      "attributes": "Atributos"
+    },
+    "items": {
+      "stock": "Estoque",
+      "adjustStock": "Ajustar estoque",
+      "movements": "Movimentações",
+      "products": "Produtos",
+      "categories": "Categorias",
+      "locations": "Localizações",
+      "colors": "Cores",
+      "prints": "Estampas",
+      "sizes": "Tamanhos"
+    },
+    "toggle": "Alternar navegação"
+  },
+  "stockBadge": {
+    "out": "Sem estoque",
+    "low": "Estoque baixo",
+    "ok": "Em estoque"
+  },
+  "auth": {
+    "title": "Bem-vindo de volta",
+    "subtitle": "Entre para gerenciar seu estoque.",
+    "email": "E-mail",
+    "password": "Senha",
+    "signingIn": "Entrando…",
+    "needAccess": "Precisa de acesso? Peça a um administrador para criar sua conta com o comando {command}."
+  },
+  "stock": {
+    "index": {
+      "title": "Estoque",
+      "description": "Quantidades em estoque por variante e localização, em tempo real.",
+      "newAdjustment": "+ Ajustar estoque",
+      "lowOnly": "Apenas estoque baixo / esgotado",
+      "empty": "Nenhum estoque corresponde aos filtros atuais.",
+      "columns": {
+        "product": "Produto",
+        "variant": "Variante",
+        "sku": "SKU",
+        "location": "Localização",
+        "onHand": "Em estoque"
+      }
+    },
+    "adjust": {
+      "title": "Ajustar estoque",
+      "description": "Refine de geral para específico para encontrar a variante exata e definir a quantidade em estoque.",
+      "stepLocate": "1 · Localizar variante",
+      "stepQuantity": "2 · Definir quantidade",
+      "pickToContinue": "Escolha uma localização e variante à esquerda para continuar.",
+      "newQuantity": "Nova quantidade",
+      "reasonOptional": "Motivo (opcional)",
+      "reasonPlaceholder": "ex. ajuste de inventário, unidades danificadas, recebimento do fornecedor…",
+      "save": "Salvar ajuste"
+    }
+  },
+  "movements": {
+    "title": "Movimentações de estoque",
+    "description": "Histórico imutável de toda alteração de estoque.",
+    "newAdjustment": "+ Novo ajuste",
+    "variantId": "ID da variante",
+    "variantIdPlaceholder": "ex. 42",
+    "empty": "Nenhuma movimentação corresponde a esses filtros.",
+    "emptyForProduct": "Ainda não há movimentações para este produto.",
+    "recent": "Movimentações recentes",
+    "pagination": "Página {page} de {lastPage} · {total} no total",
+    "fallbackVariant": "Variante #{id}"
+  },
+  "products": {
+    "index": {
+      "title": "Produtos",
+      "description": "O catálogo de itens que você vende.",
+      "newProduct": "+ Novo produto",
+      "empty": "Nenhum produto corresponde a esses filtros.",
+      "lowThreshold": "Limite baixo",
+      "archiveConfirm": "Arquivar “{name}”? O histórico de movimentações é preservado."
+    },
+    "show": {
+      "totalOnHand": "Total em estoque",
+      "lowStockThreshold": "Limite de estoque baixo",
+      "variantsAndStock": "Variantes e estoque",
+      "stockByLocation": "Estoque por localização",
+      "noVariants": "Ainda não há variantes."
+    },
+    "create": {
+      "title": "Novo produto",
+      "description": "Defina um produto e as combinações de variantes em que ele é vendido.",
+      "namePlaceholder": "Moletom Fold",
+      "codePlaceholder": "FLDH",
+      "lowStockThreshold": "Limite de estoque baixo",
+      "variantsHint": "Escolha os valores de atributo que você produz. Vamos gerar um SKU por combinação ({count} variante | {count} variantes no total).",
+      "submit": "Criar produto",
+      "submitting": "Criando…"
+    },
+    "edit": {
+      "title": "Editar {name}",
+      "description": "Adicione novas combinações de atributos para introduzir mais variantes. Variantes e estoque existentes não são afetados.",
+      "variantsHint": "Selecionar valores adicionais cria novas combinações de variantes. Remover um valor aqui não remove a variante — ela permanece para que seu histórico seja preservado."
+    }
+  },
+  "categories": {
+    "title": "Categorias",
+    "description": "Cada categoria declara quais atributos seus produtos usam.",
+    "new": "+ Nova categoria",
+    "newTitle": "Nova categoria",
+    "editTitle": "Editar categoria",
+    "empty": "Ainda não há categorias.",
+    "attributesUsed": "Atributos usados pelos produtos desta categoria",
+    "archiveConfirm": "Arquivar “{name}”?",
+    "iconLabel": "Escolher um ícone de categoria"
+  },
+  "locations": {
+    "title": "Localizações",
+    "description": "Locais físicos onde o estoque é mantido.",
+    "new": "+ Nova localização",
+    "newTitle": "Nova localização",
+    "editTitle": "Editar localização",
+    "empty": "Ainda não há localizações.",
+    "deleteConfirm": "Excluir “{name}”?",
+    "iconLabel": "Escolher um ícone de localização"
+  },
+  "colors": {
+    "title": "Cores",
+    "description": "Atributo de cor reutilizável aplicado às variantes de produto.",
+    "new": "+ Nova cor",
+    "newTitle": "Nova cor",
+    "editTitle": "Editar cor",
+    "empty": "Ainda não há cores.",
+    "codeLabel": "Código (usado em SKUs, A–Z / 0–9, máx 8)",
+    "hexLabel": "Hex (opcional)",
+    "deleteConfirm": "Excluir “{name}”?"
+  },
+  "prints": {
+    "title": "Estampas",
+    "description": "Atributo de estampa reutilizável aplicado às variantes de produto.",
+    "new": "+ Nova estampa",
+    "newTitle": "Nova estampa",
+    "editTitle": "Editar estampa",
+    "empty": "Ainda não há estampas.",
+    "codeLabel": "Código (usado em SKUs, A–Z / 0–9, máx 8)",
+    "deleteConfirm": "Excluir “{name}”?"
+  },
+  "sizes": {
+    "title": "Tamanhos",
+    "description": "Atributo de tamanho reutilizável aplicado às variantes de produto.",
+    "new": "+ Novo tamanho",
+    "newTitle": "Novo tamanho",
+    "editTitle": "Editar tamanho",
+    "empty": "Ainda não há tamanhos.",
+    "codeLabel": "Código (usado em SKUs, A–Z / 0–9, máx 8)",
+    "deleteConfirm": "Excluir “{name}”?"
+  },
+  "variantSelector": {
+    "noProducts": "Ainda não há produtos nesta categoria.",
+    "noColors": "Sem cores para este produto."
+  },
+  "variantSummary": {
+    "sizeTitle": "Tamanho {name}",
+    "atLocation": "Em {location}",
+    "currentOnHand": "Em estoque agora:"
+  },
+  "quantityStepper": {
+    "decrement": "Diminuir",
+    "increment": "Aumentar",
+    "was": "Era {value}",
+    "noChange": "sem alteração"
+  },
+  "errors": {
+    "notFound": "Página não encontrada",
+    "serverError": "Algo deu errado."
+  }
+}

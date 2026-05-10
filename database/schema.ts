@@ -48,12 +48,14 @@ export class ColorSchema extends BaseModel {
 }
 
 export class LocationSchema extends BaseModel {
-  static $columns = ['createdAt', 'description', 'id', 'name', 'updatedAt'] as const
+  static $columns = ['createdAt', 'description', 'icon', 'id', 'name', 'updatedAt'] as const
   $columns = LocationSchema.$columns
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
   @column()
   declare description: string | null
+  @column()
+  declare icon: string | null
   @column({ isPrimary: true })
   declare id: number
   @column()

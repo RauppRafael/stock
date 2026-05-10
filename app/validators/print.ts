@@ -12,14 +12,14 @@ const fields = {
 
 export const createPrintValidator = vine.compile(
   vine.object({
-    name: fields.name.unique({ table: 'prints', column: 'name' }),
-    code: fields.code.unique({ table: 'prints', column: 'code' }),
+    name: fields.name.clone().unique({ table: 'prints', column: 'name' }),
+    code: fields.code.clone().unique({ table: 'prints', column: 'code' }),
   })
 )
 
 export const updatePrintValidator = vine.withMetaData<{ id: number }>().compile(
   vine.object({
-    name: fields.name.unique(async (db, value, field) => {
+    name: fields.name.clone().unique(async (db, value, field) => {
       const row = await db
         .from('prints')
         .where('name', value)
@@ -27,7 +27,7 @@ export const updatePrintValidator = vine.withMetaData<{ id: number }>().compile(
         .first()
       return !row
     }),
-    code: fields.code.unique(async (db, value, field) => {
+    code: fields.code.clone().unique(async (db, value, field) => {
       const row = await db
         .from('prints')
         .where('code', value)

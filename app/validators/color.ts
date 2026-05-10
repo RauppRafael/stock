@@ -19,15 +19,15 @@ const fields = {
 export const createColorValidator = vine.compile(
   vine.object({
     ...fields,
-    name: fields.name.unique({ table: 'colors', column: 'name' }),
-    code: fields.code.unique({ table: 'colors', column: 'code' }),
+    name: fields.name.clone().unique({ table: 'colors', column: 'name' }),
+    code: fields.code.clone().unique({ table: 'colors', column: 'code' }),
   })
 )
 
 export const updateColorValidator = vine.withMetaData<{ id: number }>().compile(
   vine.object({
     ...fields,
-    name: fields.name.unique(async (db, value, field) => {
+    name: fields.name.clone().unique(async (db, value, field) => {
       const row = await db
         .from('colors')
         .where('name', value)
@@ -35,7 +35,7 @@ export const updateColorValidator = vine.withMetaData<{ id: number }>().compile(
         .first()
       return !row
     }),
-    code: fields.code.unique(async (db, value, field) => {
+    code: fields.code.clone().unique(async (db, value, field) => {
       const row = await db
         .from('colors')
         .where('code', value)

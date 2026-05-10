@@ -1,8 +1,9 @@
 import vine from '@vinejs/vine'
+import { EMOJI_PATTERN } from '#validators/emoji'
 
 const fields = {
   name: vine.string().trim().minLength(1).maxLength(100),
-  icon: vine.string().trim().minLength(1).maxLength(8).nullable().optional(),
+  icon: vine.string().trim().minLength(1).maxLength(8).regex(EMOJI_PATTERN).nullable().optional(),
   hasColor: vine.boolean(),
   hasPrint: vine.boolean(),
   hasSize: vine.boolean(),
@@ -11,14 +12,14 @@ const fields = {
 export const createCategoryValidator = vine.compile(
   vine.object({
     ...fields,
-    name: fields.name.unique({ table: 'categories', column: 'name' }),
+    name: fields.name.clone().unique({ table: 'categories', column: 'name' }),
   })
 )
 
 export const updateCategoryValidator = vine.withMetaData<{ id: number }>().compile(
   vine.object({
     ...fields,
-    name: fields.name.unique(async (db, value, field) => {
+    name: fields.name.clone().unique(async (db, value, field) => {
       const row = await db
         .from('categories')
         .where('name', value)

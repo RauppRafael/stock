@@ -3,6 +3,6 @@ import type Location from '#models/location'
 
 export default class LocationTransformer extends BaseTransformer<Location> {
   toObject() {
-    return this.pick(this.resource, ['id', 'name', 'description'])
+    return this.pick(this.resource, ['id', 'name', 'description', 'icon'])
   }
 }

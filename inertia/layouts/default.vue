@@ -4,6 +4,7 @@ import { usePage } from '@inertiajs/vue3'
 import { toast, Toaster } from 'vue-sonner'
 import type { Data } from '@generated/data'
 import { Link, Form } from '@adonisjs/inertia/vue'
+import LanguageSwitcher from '~/components/LanguageSwitcher.vue'
 
 const page = usePage<Data.SharedProps>()
 
@@ -34,27 +35,27 @@ const isAuthed = computed(() => !!page.props.user)
 
 const navGroups = [
   {
-    label: 'Operations',
+    labelKey: 'nav.groups.operations',
     items: [
-      { label: 'Stock', route: 'stock.index', matches: ['/stock'] },
-      { label: 'Adjust stock', route: 'stock.adjust.create', matches: ['/stock/adjust'] },
-      { label: 'Movements', route: 'movements.index', matches: ['/movements'] },
+      { labelKey: 'nav.items.stock', route: 'stock.index', matches: ['/stock'] },
+      { labelKey: 'nav.items.adjustStock', route: 'stock.adjust.create', matches: ['/stock/adjust'] },
+      { labelKey: 'nav.items.movements', route: 'movements.index', matches: ['/movements'] },
     ],
   },
   {
-    label: 'Catalog',
+    labelKey: 'nav.groups.catalog',
     items: [
-      { label: 'Products', route: 'products.index', matches: ['/products'] },
-      { label: 'Categories', route: 'categories.index', matches: ['/categories'] },
-      { label: 'Locations', route: 'locations.index', matches: ['/locations'] },
+      { labelKey: 'nav.items.products', route: 'products.index', matches: ['/products'] },
+      { labelKey: 'nav.items.categories', route: 'categories.index', matches: ['/categories'] },
+      { labelKey: 'nav.items.locations', route: 'locations.index', matches: ['/locations'] },
     ],
   },
   {
-    label: 'Attributes',
+    labelKey: 'nav.groups.attributes',
     items: [
-      { label: 'Colors', route: 'colors.index', matches: ['/colors'] },
-      { label: 'Prints', route: 'prints.index', matches: ['/prints'] },
-      { label: 'Sizes', route: 'sizes.index', matches: ['/sizes'] },
+      { labelKey: 'nav.items.colors', route: 'colors.index', matches: ['/colors'] },
+      { labelKey: 'nav.items.prints', route: 'prints.index', matches: ['/prints'] },
+      { labelKey: 'nav.items.sizes', route: 'sizes.index', matches: ['/sizes'] },
     ],
   },
 ] as const
@@ -93,12 +94,12 @@ function isActive(item: { route: string }): boolean {
     <header
       class="lg:hidden sticky top-0 z-30 flex items-center justify-between bg-slate-900 text-slate-100 px-4 h-14 shadow-sm"
     >
-      <Link route="stock.index" class="text-base font-semibold tracking-tight">Stockroom</Link>
+      <Link route="stock.index" class="text-base font-semibold tracking-tight">{{ $t('app.name') }}</Link>
       <button
         type="button"
         class="p-2 -mr-2 rounded-md hover:bg-slate-800"
         :aria-expanded="mobileMenuOpen"
-        aria-label="Toggle navigation"
+        :aria-label="$t('nav.toggle')"
         @click="mobileMenuOpen = !mobileMenuOpen"
       >
         <svg
@@ -148,14 +149,14 @@ function isActive(item: { route: string }): boolean {
       :class="mobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'"
     >
       <div class="px-5 py-4 border-b border-slate-800">
-        <Link route="stock.index" class="block text-lg font-semibold tracking-tight">Stockroom</Link>
-        <p class="text-xs text-slate-400 mt-0.5">Inventory control</p>
+        <Link route="stock.index" class="block text-lg font-semibold tracking-tight">{{ $t('app.name') }}</Link>
+        <p class="text-xs text-slate-400 mt-0.5">{{ $t('app.tagline') }}</p>
       </div>
 
       <nav class="flex-1 px-3 py-4 space-y-6 overflow-y-auto">
-        <div v-for="group in navGroups" :key="group.label">
+        <div v-for="group in navGroups" :key="group.labelKey">
           <div class="px-2 text-[11px] uppercase tracking-wider text-slate-500 mb-1.5 font-semibold">
-            {{ group.label }}
+            {{ $t(group.labelKey) }}
           </div>
           <ul class="space-y-0.5">
             <li v-for="item in group.items" :key="item.route">
@@ -168,25 +169,28 @@ function isActive(item: { route: string }): boolean {
                     : 'text-slate-300 hover:bg-slate-800/60 hover:text-white'
                 "
               >
-                {{ item.label }}
+                {{ $t(item.labelKey) }}
               </Link>
             </li>
           </ul>
         </div>
       </nav>
 
-      <div class="px-3 py-3 border-t border-slate-800 flex items-center gap-3">
-        <div
-          class="size-8 shrink-0 rounded-full bg-brand-600 text-white text-xs font-semibold flex items-center justify-center"
-        >
-          {{ page.props.user?.initials }}
+      <div class="px-3 py-3 border-t border-slate-800 space-y-2">
+        <div class="flex items-center gap-3">
+          <div
+            class="size-8 shrink-0 rounded-full bg-brand-600 text-white text-xs font-semibold flex items-center justify-center"
+          >
+            {{ page.props.user?.initials }}
+          </div>
+          <div class="flex-1 min-w-0">
+            <p class="text-xs text-slate-400 truncate">{{ page.props.user?.email }}</p>
+          </div>
+          <Form route="session.destroy">
+            <button type="submit" class="text-xs text-slate-400 hover:text-white">{{ $t('common.actions.logout') }}</button>
+          </Form>
         </div>
-        <div class="flex-1 min-w-0">
-          <p class="text-xs text-slate-400 truncate">{{ page.props.user?.email }}</p>
-        </div>
-        <Form route="session.destroy">
-          <button type="submit" class="text-xs text-slate-400 hover:text-white">Logout</button>
-        </Form>
+        <LanguageSwitcher class="w-full" />
       </div>
     </aside>
 

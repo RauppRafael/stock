@@ -1,11 +1,14 @@
 <script setup lang="ts">
-import { reactive, watch } from 'vue'
+import { computed, reactive, watch } from 'vue'
 import { Head, router } from '@inertiajs/vue3'
 import { Link } from '@adonisjs/inertia/vue'
+import { useI18n } from 'vue-i18n'
 import type { Data } from '@generated/data'
 import PageHeader from '~/components/PageHeader.vue'
 import DataTable from '~/components/DataTable.vue'
 import ConfirmButton from '~/components/ConfirmButton.vue'
+
+const { t } = useI18n()
 
 const props = defineProps<{
   products: Data.Product[]
@@ -30,33 +33,33 @@ watch(filters, (next) => {
   }, 300)
 }, { deep: true })
 
-const columns = [
-  { key: 'name', label: 'Name' },
-  { key: 'category', label: 'Category' },
-  { key: 'description', label: 'Description' },
-  { key: 'threshold', label: 'Low threshold', align: 'right' as const, width: '140px' },
+const columns = computed(() => [
+  { key: 'name', label: t('common.labels.name') },
+  { key: 'category', label: t('common.labels.category') },
+  { key: 'description', label: t('common.labels.description') },
+  { key: 'threshold', label: t('products.index.lowThreshold'), align: 'right' as const, width: '140px' },
   { key: 'actions', label: '', align: 'right' as const, width: '180px' },
-]
+])
 </script>
 
 <template>
-  <Head title="Products" />
+  <Head :title="$t('products.index.title')" />
   <div class="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto">
-    <PageHeader title="Products" description="The catalog of items you sell.">
+    <PageHeader :title="$t('products.index.title')" :description="$t('products.index.description')">
       <template #actions>
-        <Link route="products.create" class="btn-primary">+ New product</Link>
+        <Link route="products.create" class="btn-primary">{{ $t('products.index.newProduct') }}</Link>
       </template>
     </PageHeader>
 
     <div class="card p-4 mb-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
       <div>
-        <label class="label">Search</label>
-        <input v-model="filters.search" placeholder="Search by name…" class="input" />
+        <label class="label">{{ $t('common.labels.search') }}</label>
+        <input v-model="filters.search" :placeholder="$t('common.placeholders.searchByName')" class="input" />
       </div>
       <div>
-        <label class="label">Category</label>
+        <label class="label">{{ $t('common.labels.category') }}</label>
         <select v-model.number="filters.categoryId" class="select">
-          <option :value="null">All categories</option>
+          <option :value="null">{{ $t('common.allCategories') }}</option>
           <option v-for="c in categories" :key="c.id" :value="c.id">{{ c.name }}</option>
         </select>
       </div>
@@ -66,7 +69,7 @@ const columns = [
       :columns="columns"
       :rows="products"
       :row-key="(row) => row.id"
-      empty="No products match these filters."
+      :empty="$t('products.index.empty')"
     >
       <template #[`cell:name`]="{ row }">
         <Link route="products.show" :params="{ id: row.id }" class="font-medium text-slate-900 hover:text-brand-700">
@@ -85,12 +88,12 @@ const columns = [
       </template>
       <template #[`cell:actions`]="{ row }">
         <div class="flex justify-end gap-2">
-          <Link route="products.edit" :params="{ id: row.id }" class="btn-secondary">Edit</Link>
+          <Link route="products.edit" :params="{ id: row.id }" class="btn-secondary">{{ $t('common.actions.edit') }}</Link>
           <ConfirmButton
             route="products.destroy"
             :params="{ id: row.id }"
-            :message="`Archive “${row.name}”? Movement history is preserved.`"
-            label="Archive"
+            :message="$t('products.index.archiveConfirm', { name: row.name })"
+            :label="$t('common.actions.archive')"
           />
         </div>
       </template>

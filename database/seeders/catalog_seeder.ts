@@ -61,9 +61,9 @@ const SIZES: { name: string; code: string; sortOrder: number }[] = [
   { name: 'One Size', code: 'OS', sortOrder: 99 },
 ]
 
-const LOCATIONS: { name: string; description: string }[] = [
-  { name: 'Main Warehouse', description: 'Primary fulfillment center' },
-  { name: 'Pop-up Store', description: 'Downtown retail location' },
+const LOCATIONS: { name: string; description: string; icon: string }[] = [
+  { name: 'Main Warehouse', description: 'Primary fulfillment center', icon: '🏭' },
+  { name: 'Pop-up Store', description: 'Downtown retail location', icon: '🏪' },
 ]
 
 const PRODUCTS: ProductDef[] = [

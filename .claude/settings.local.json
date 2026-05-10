@@ -19,7 +19,9 @@
       "Bash(curl -s -c - -b - http://localhost:3333/login -o /dev/null)",
       "Bash(curl -s 'http://localhost:3333/stock' -H \"X-Inertia: true\" -H \"X-Requested-With: XMLHttpRequest\" -H \"Cookie: $\\(curl -s -c - -b - http://localhost:3333/login -o /dev/null)",
       "PowerShell(node ace test unit 2>&1 | Select-Object -Last 30)",
-      "PowerShell(Get-Item *)"
+      "PowerShell(Get-Item *)",
+      "Bash(node *)",
+      "Bash(del *)"
     ]
   }
 }

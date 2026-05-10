@@ -65,7 +65,7 @@ const emit = defineEmits<{
               :colspan="columns.length"
               class="px-4 py-10 text-center text-sm text-slate-400 italic"
             >
-              {{ empty ?? 'No records found.' }}
+              {{ empty ?? $t('common.empty.noRecords') }}
             </td>
           </tr>
         </tbody>

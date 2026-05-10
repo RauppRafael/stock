@@ -1,12 +1,15 @@
 <script setup lang="ts">
-import { reactive } from 'vue'
+import { computed, reactive } from 'vue'
 import { Head, useForm } from '@inertiajs/vue3'
+import { useI18n } from 'vue-i18n'
 import { urlFor } from '~/client'
 import type { Data } from '@generated/data'
 import PageHeader from '~/components/PageHeader.vue'
 import DataTable from '~/components/DataTable.vue'
 import Modal from '~/components/Modal.vue'
 import ConfirmButton from '~/components/ConfirmButton.vue'
+
+const { t } = useI18n()
 
 defineProps<{
   prints: Data.Print[]
@@ -46,23 +49,23 @@ function submit() {
   }
 }
 
-const columns = [
-  { key: 'name', label: 'Name' },
-  { key: 'code', label: 'Code', width: '120px' },
+const columns = computed(() => [
+  { key: 'name', label: t('common.labels.name') },
+  { key: 'code', label: t('common.labels.code'), width: '120px' },
   { key: 'actions', label: '', align: 'right' as const, width: '180px' },
-]
+])
 </script>
 
 <template>
-  <Head title="Prints" />
+  <Head :title="$t('prints.title')" />
   <div class="p-4 sm:p-6 lg:p-8 max-w-3xl mx-auto">
-    <PageHeader title="Prints" description="Reusable print attribute applied to product variants.">
+    <PageHeader :title="$t('prints.title')" :description="$t('prints.description')">
       <template #actions>
-        <button type="button" class="btn-primary" @click="openCreate">+ New print</button>
+        <button type="button" class="btn-primary" @click="openCreate">{{ $t('prints.new') }}</button>
       </template>
     </PageHeader>
 
-    <DataTable :columns="columns" :rows="prints" :row-key="(row) => row.id" empty="No prints yet.">
+    <DataTable :columns="columns" :rows="prints" :row-key="(row) => row.id" :empty="$t('prints.empty')">
       <template #[`cell:name`]="{ row }">
         <span class="font-medium text-slate-900">{{ row.name }}</span>
       </template>
@@ -71,11 +74,11 @@ const columns = [
       </template>
       <template #[`cell:actions`]="{ row }">
         <div class="flex justify-end gap-2">
-          <button type="button" class="btn-secondary" @click="openEdit(row)">Edit</button>
+          <button type="button" class="btn-secondary" @click="openEdit(row)">{{ $t('common.actions.edit') }}</button>
           <ConfirmButton
             route="prints.destroy"
             :params="{ id: row.id }"
-            :message="`Delete “${row.name}”?`"
+            :message="$t('prints.deleteConfirm', { name: row.name })"
           />
         </div>
       </template>
@@ -83,12 +86,12 @@ const columns = [
 
     <Modal
       :open="dialog.open"
-      :title="dialog.mode === 'create' ? 'New print' : 'Edit print'"
+      :title="dialog.mode === 'create' ? $t('prints.newTitle') : $t('prints.editTitle')"
       @close="dialog.open = false"
     >
       <form class="space-y-4" @submit.prevent="submit">
         <div>
-          <label for="print-name" class="label">Name</label>
+          <label for="print-name" class="label">{{ $t('common.labels.name') }}</label>
           <input
             id="print-name"
             v-model="form.name"
@@ -99,7 +102,7 @@ const columns = [
           <p v-if="form.errors.name" class="field-error">{{ form.errors.name }}</p>
         </div>
         <div>
-          <label for="print-code" class="label">Code (used in SKUs, A–Z / 0–9, max 8)</label>
+          <label for="print-code" class="label">{{ $t('prints.codeLabel') }}</label>
           <input
             id="print-code"
             v-model="form.code"
@@ -112,9 +115,9 @@ const columns = [
           <p v-if="form.errors.code" class="field-error">{{ form.errors.code }}</p>
         </div>
         <div class="flex justify-end gap-2">
-          <button type="button" class="btn-ghost" @click="dialog.open = false">Cancel</button>
+          <button type="button" class="btn-ghost" @click="dialog.open = false">{{ $t('common.actions.cancel') }}</button>
           <button type="submit" class="btn-primary" :disabled="form.processing">
-            {{ form.processing ? 'Saving…' : dialog.mode === 'create' ? 'Create' : 'Save' }}
+            {{ form.processing ? $t('common.actions.saving') : dialog.mode === 'create' ? $t('common.actions.create') : $t('common.actions.save') }}
           </button>
         </div>
       </form>

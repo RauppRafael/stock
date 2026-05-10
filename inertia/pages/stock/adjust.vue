@@ -40,9 +40,11 @@ const currentQuantity = ref<number | null>(props.prefilledQuantity)
 const newQuantity = ref<number | null>(null)
 const reason = ref<string>('')
 
-const locationName = computed(
-  () => props.locations.find((l) => l.id === locationId.value)?.name
+const selectedLocation = computed(
+  () => props.locations.find((l) => l.id === locationId.value)
 )
+const locationName = computed(() => selectedLocation.value?.name)
+const locationIcon = computed(() => selectedLocation.value?.icon ?? null)
 
 watch([variant, locationId], async ([v, loc]) => {
   if (!v || !loc) {
@@ -70,17 +72,17 @@ function onCleared() {
 </script>
 
 <template>
-  <Head title="Adjust stock" />
+  <Head :title="$t('stock.adjust.title')" />
   <div class="p-4 sm:p-6 lg:p-8 max-w-5xl mx-auto">
     <PageHeader
-      title="Adjust stock"
-      description="Drill from coarse to fine to pinpoint the exact variant, then set the on-hand quantity."
+      :title="$t('stock.adjust.title')"
+      :description="$t('stock.adjust.description')"
     />
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
       <div class="card p-5">
         <h2 class="text-sm font-semibold text-slate-700 uppercase tracking-wider mb-4">
-          1 · Locate variant
+          {{ $t('stock.adjust.stepLocate') }}
         </h2>
         <VariantSelector
           :categories="categories"
@@ -94,20 +96,21 @@ function onCleared() {
 
       <div class="card p-5">
         <h2 class="text-sm font-semibold text-slate-700 uppercase tracking-wider mb-4">
-          2 · Set quantity
+          {{ $t('stock.adjust.stepQuantity') }}
         </h2>
 
         <div
           v-if="!variant || !locationId"
           class="text-sm text-slate-400 italic py-12 text-center"
         >
-          Pick a location and variant on the left to continue.
+          {{ $t('stock.adjust.pickToContinue') }}
         </div>
 
         <div v-else class="space-y-5">
           <VariantSummary
             :variant="variant"
             :location-name="locationName"
+            :location-icon="locationIcon"
             :current-quantity="currentQuantity"
           />
 
@@ -121,7 +124,7 @@ function onCleared() {
             <input type="hidden" name="locationId" :value="locationId" />
 
             <div>
-              <label class="label">New quantity</label>
+              <label class="label">{{ $t('stock.adjust.newQuantity') }}</label>
               <QuantityStepper
                 v-model="newQuantity"
                 :current="currentQuantity"
@@ -132,14 +135,14 @@ function onCleared() {
             </div>
 
             <div>
-              <label for="reason" class="label">Reason (optional)</label>
+              <label for="reason" class="label">{{ $t('stock.adjust.reasonOptional') }}</label>
               <textarea
                 id="reason"
                 v-model="reason"
                 name="reason"
                 rows="3"
                 maxlength="1000"
-                placeholder="e.g. cycle count adjustment, damaged units, intake from supplier…"
+                :placeholder="$t('stock.adjust.reasonPlaceholder')"
                 class="textarea"
                 :data-invalid="errors.reason ? 'true' : undefined"
               />
@@ -153,7 +156,7 @@ function onCleared() {
                 processing || newQuantity === null || newQuantity === currentQuantity
               "
             >
-              {{ processing ? 'Saving…' : 'Save adjustment' }}
+              {{ processing ? $t('common.actions.saving') : $t('stock.adjust.save') }}
             </button>
           </Form>
         </div>

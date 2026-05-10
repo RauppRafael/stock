@@ -1,12 +1,17 @@
 <script setup lang="ts">
-import { reactive } from 'vue'
+import { computed, reactive } from 'vue'
 import { Head, useForm } from '@inertiajs/vue3'
+import { useI18n } from 'vue-i18n'
 import { urlFor } from '~/client'
 import type { Data } from '@generated/data'
 import PageHeader from '~/components/PageHeader.vue'
 import DataTable from '~/components/DataTable.vue'
 import Modal from '~/components/Modal.vue'
 import ConfirmButton from '~/components/ConfirmButton.vue'
+import EmojiPicker from '~/components/EmojiPicker.vue'
+import { LOCATION_EMOJIS } from '~/components/emoji_sets'
+
+const { t } = useI18n()
 
 defineProps<{
   locations: Data.Location[]
@@ -21,6 +26,7 @@ const dialog = reactive({
 const form = useForm({
   name: '',
   description: '',
+  icon: '',
 })
 
 function openCreate() {
@@ -33,13 +39,18 @@ function openCreate() {
 function openEdit(loc: Data.Location) {
   form.name = loc.name
   form.description = loc.description ?? ''
+  form.icon = loc.icon ?? ''
   dialog.mode = 'edit'
   dialog.editingId = loc.id
   dialog.open = true
 }
 
 function submit() {
-  const payload = form.transform((data) => ({ ...data, description: data.description || null }))
+  const payload = form.transform((data) => ({
+    ...data,
+    description: data.description || null,
+    icon: data.icon || null,
+  }))
   if (dialog.mode === 'create') {
     payload.post(urlFor('locations.store'), { onSuccess: () => (dialog.open = false) })
   } else if (dialog.editingId !== null) {
@@ -49,23 +60,27 @@ function submit() {
   }
 }
 
-const columns = [
-  { key: 'name', label: 'Name' },
-  { key: 'description', label: 'Description' },
+const columns = computed(() => [
+  { key: 'icon', label: '', width: '60px' },
+  { key: 'name', label: t('common.labels.name') },
+  { key: 'description', label: t('common.labels.description') },
   { key: 'actions', label: '', align: 'right' as const, width: '180px' },
-]
+])
 </script>
 
 <template>
-  <Head title="Locations" />
+  <Head :title="$t('locations.title')" />
   <div class="p-4 sm:p-6 lg:p-8 max-w-4xl mx-auto">
-    <PageHeader title="Locations" description="Physical places where stock is held.">
+    <PageHeader :title="$t('locations.title')" :description="$t('locations.description')">
       <template #actions>
-        <button type="button" class="btn-primary" @click="openCreate">+ New location</button>
+        <button type="button" class="btn-primary" @click="openCreate">{{ $t('locations.new') }}</button>
       </template>
     </PageHeader>
 
-    <DataTable :columns="columns" :rows="locations" :row-key="(row) => row.id" empty="No locations yet.">
+    <DataTable :columns="columns" :rows="locations" :row-key="(row) => row.id" :empty="$t('locations.empty')">
+      <template #[`cell:icon`]="{ row }">
+        <span class="text-2xl leading-none">{{ row.icon ?? '·' }}</span>
+      </template>
       <template #[`cell:name`]="{ row }">
         <span class="font-medium text-slate-900">{{ row.name }}</span>
       </template>
@@ -74,11 +89,11 @@ const columns = [
       </template>
       <template #[`cell:actions`]="{ row }">
         <div class="flex justify-end gap-2">
-          <button type="button" class="btn-secondary" @click="openEdit(row)">Edit</button>
+          <button type="button" class="btn-secondary" @click="openEdit(row)">{{ $t('common.actions.edit') }}</button>
           <ConfirmButton
             route="locations.destroy"
             :params="{ id: row.id }"
-            :message="`Delete “${row.name}”?`"
+            :message="$t('locations.deleteConfirm', { name: row.name })"
           />
         </div>
       </template>
@@ -86,12 +101,12 @@ const columns = [
 
     <Modal
       :open="dialog.open"
-      :title="dialog.mode === 'create' ? 'New location' : 'Edit location'"
+      :title="dialog.mode === 'create' ? $t('locations.newTitle') : $t('locations.editTitle')"
       @close="dialog.open = false"
     >
       <form class="space-y-4" @submit.prevent="submit">
         <div>
-          <label for="loc-name" class="label">Name</label>
+          <label for="loc-name" class="label">{{ $t('common.labels.name') }}</label>
           <input
             id="loc-name"
             v-model="form.name"
@@ -102,7 +117,12 @@ const columns = [
           <p v-if="form.errors.name" class="field-error">{{ form.errors.name }}</p>
         </div>
         <div>
-          <label for="loc-description" class="label">Description</label>
+          <label class="label">{{ $t('common.labels.icon') }}</label>
+          <EmojiPicker v-model="form.icon" :emojis="LOCATION_EMOJIS" :aria-label="$t('locations.iconLabel')" />
+          <p v-if="form.errors.icon" class="field-error">{{ form.errors.icon }}</p>
+        </div>
+        <div>
+          <label for="loc-description" class="label">{{ $t('common.labels.description') }}</label>
           <textarea
             id="loc-description"
             v-model="form.description"
@@ -113,9 +133,9 @@ const columns = [
           <p v-if="form.errors.description" class="field-error">{{ form.errors.description }}</p>
         </div>
         <div class="flex justify-end gap-2">
-          <button type="button" class="btn-ghost" @click="dialog.open = false">Cancel</button>
+          <button type="button" class="btn-ghost" @click="dialog.open = false">{{ $t('common.actions.cancel') }}</button>
           <button type="submit" class="btn-primary" :disabled="form.processing">
-            {{ form.processing ? 'Saving…' : dialog.mode === 'create' ? 'Create' : 'Save' }}
+            {{ form.processing ? $t('common.actions.saving') : dialog.mode === 'create' ? $t('common.actions.create') : $t('common.actions.save') }}
           </button>
         </div>
       </form>

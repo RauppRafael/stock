@@ -1,12 +1,15 @@
 <script setup lang="ts">
-import { reactive } from 'vue'
+import { computed, reactive } from 'vue'
 import { Head, useForm } from '@inertiajs/vue3'
+import { useI18n } from 'vue-i18n'
 import { urlFor } from '~/client'
 import type { Data } from '@generated/data'
 import PageHeader from '~/components/PageHeader.vue'
 import DataTable from '~/components/DataTable.vue'
 import Modal from '~/components/Modal.vue'
 import ConfirmButton from '~/components/ConfirmButton.vue'
+
+const { t } = useI18n()
 
 defineProps<{
   sizes: Data.Size[]
@@ -51,24 +54,24 @@ function submit() {
   }
 }
 
-const columns = [
-  { key: 'name', label: 'Name' },
-  { key: 'code', label: 'Code', width: '100px' },
-  { key: 'sortOrder', label: 'Sort order', align: 'right' as const, width: '140px' },
+const columns = computed(() => [
+  { key: 'name', label: t('common.labels.name') },
+  { key: 'code', label: t('common.labels.code'), width: '100px' },
+  { key: 'sortOrder', label: t('common.labels.sortOrder'), align: 'right' as const, width: '140px' },
   { key: 'actions', label: '', align: 'right' as const, width: '180px' },
-]
+])
 </script>
 
 <template>
-  <Head title="Sizes" />
+  <Head :title="$t('sizes.title')" />
   <div class="p-4 sm:p-6 lg:p-8 max-w-3xl mx-auto">
-    <PageHeader title="Sizes" description="Reusable size attribute applied to product variants.">
+    <PageHeader :title="$t('sizes.title')" :description="$t('sizes.description')">
       <template #actions>
-        <button type="button" class="btn-primary" @click="openCreate">+ New size</button>
+        <button type="button" class="btn-primary" @click="openCreate">{{ $t('sizes.new') }}</button>
       </template>
     </PageHeader>
 
-    <DataTable :columns="columns" :rows="sizes" :row-key="(row) => row.id" empty="No sizes yet.">
+    <DataTable :columns="columns" :rows="sizes" :row-key="(row) => row.id" :empty="$t('sizes.empty')">
       <template #[`cell:name`]="{ row }">
         <span class="font-medium text-slate-900">{{ row.name }}</span>
       </template>
@@ -80,11 +83,11 @@ const columns = [
       </template>
       <template #[`cell:actions`]="{ row }">
         <div class="flex justify-end gap-2">
-          <button type="button" class="btn-secondary" @click="openEdit(row)">Edit</button>
+          <button type="button" class="btn-secondary" @click="openEdit(row)">{{ $t('common.actions.edit') }}</button>
           <ConfirmButton
             route="sizes.destroy"
             :params="{ id: row.id }"
-            :message="`Delete “${row.name}”?`"
+            :message="$t('sizes.deleteConfirm', { name: row.name })"
           />
         </div>
       </template>
@@ -92,12 +95,12 @@ const columns = [
 
     <Modal
       :open="dialog.open"
-      :title="dialog.mode === 'create' ? 'New size' : 'Edit size'"
+      :title="dialog.mode === 'create' ? $t('sizes.newTitle') : $t('sizes.editTitle')"
       @close="dialog.open = false"
     >
       <form class="space-y-4" @submit.prevent="submit">
         <div>
-          <label for="size-name" class="label">Name</label>
+          <label for="size-name" class="label">{{ $t('common.labels.name') }}</label>
           <input
             id="size-name"
             v-model="form.name"
@@ -108,7 +111,7 @@ const columns = [
           <p v-if="form.errors.name" class="field-error">{{ form.errors.name }}</p>
         </div>
         <div>
-          <label for="size-code" class="label">Code (used in SKUs, A–Z / 0–9, max 8)</label>
+          <label for="size-code" class="label">{{ $t('sizes.codeLabel') }}</label>
           <input
             id="size-code"
             v-model="form.code"
@@ -121,7 +124,7 @@ const columns = [
           <p v-if="form.errors.code" class="field-error">{{ form.errors.code }}</p>
         </div>
         <div>
-          <label for="size-sort" class="label">Sort order</label>
+          <label for="size-sort" class="label">{{ $t('common.labels.sortOrder') }}</label>
           <input
             id="size-sort"
             v-model.number="form.sortOrder"
@@ -133,9 +136,9 @@ const columns = [
           <p v-if="form.errors.sortOrder" class="field-error">{{ form.errors.sortOrder }}</p>
         </div>
         <div class="flex justify-end gap-2">
-          <button type="button" class="btn-ghost" @click="dialog.open = false">Cancel</button>
+          <button type="button" class="btn-ghost" @click="dialog.open = false">{{ $t('common.actions.cancel') }}</button>
           <button type="submit" class="btn-primary" :disabled="form.processing">
-            {{ form.processing ? 'Saving…' : dialog.mode === 'create' ? 'Create' : 'Save' }}
+            {{ form.processing ? $t('common.actions.saving') : dialog.mode === 'create' ? $t('common.actions.create') : $t('common.actions.save') }}
           </button>
         </div>
       </form>

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 
 const props = defineProps<{
   modelValue: number | null
@@ -11,6 +12,8 @@ const props = defineProps<{
 const emit = defineEmits<{
   'update:modelValue': [value: number | null]
 }>()
+
+const { t } = useI18n()
 
 const max = computed(() => props.max ?? 1_000_000)
 
@@ -36,7 +39,7 @@ const deltaTone = computed(() => {
 
 const deltaLabel = computed(() => {
   if (delta.value === null) return ''
-  if (delta.value === 0) return 'no change'
+  if (delta.value === 0) return t('quantityStepper.noChange')
   return `${delta.value > 0 ? '+' : ''}${delta.value}`
 })
 </script>
@@ -51,7 +54,7 @@ const deltaLabel = computed(() => {
         type="button"
         class="px-4 py-3 text-slate-600 hover:bg-slate-50 active:bg-slate-100 rounded-l-xl text-2xl font-light disabled:opacity-30 disabled:cursor-not-allowed"
         :disabled="(modelValue ?? 0) <= 0"
-        :aria-label="'Decrement'"
+        :aria-label="$t('quantityStepper.decrement')"
         @click="bump(-1)"
       >
         −
@@ -71,7 +74,7 @@ const deltaLabel = computed(() => {
       <button
         type="button"
         class="px-4 py-3 text-slate-600 hover:bg-slate-50 active:bg-slate-100 rounded-r-xl text-2xl font-light"
-        :aria-label="'Increment'"
+        :aria-label="$t('quantityStepper.increment')"
         @click="bump(1)"
       >
         +
@@ -79,7 +82,7 @@ const deltaLabel = computed(() => {
     </div>
 
     <div class="flex items-center justify-between text-xs text-slate-500 px-1">
-      <span v-if="current !== null">Was {{ current }}</span>
+      <span v-if="current !== null">{{ $t('quantityStepper.was', { value: current }) }}</span>
       <span v-else>&nbsp;</span>
       <span class="font-semibold tabular-nums" :class="deltaTone">{{ deltaLabel }}</span>
     </div>

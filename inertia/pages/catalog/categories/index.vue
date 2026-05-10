@@ -1,12 +1,17 @@
 <script setup lang="ts">
-import { reactive } from 'vue'
+import { computed, reactive } from 'vue'
 import { Head, useForm } from '@inertiajs/vue3'
+import { useI18n } from 'vue-i18n'
 import { urlFor } from '~/client'
 import type { Data } from '@generated/data'
 import PageHeader from '~/components/PageHeader.vue'
 import DataTable from '~/components/DataTable.vue'
 import Modal from '~/components/Modal.vue'
 import ConfirmButton from '~/components/ConfirmButton.vue'
+import EmojiPicker from '~/components/EmojiPicker.vue'
+import { CATEGORY_EMOJIS } from '~/components/emoji_sets'
+
+const { t } = useI18n()
 
 const props = defineProps<{
   categories: Data.Category[]
@@ -51,23 +56,23 @@ function submit() {
   }
 }
 
-const columns = [
+const columns = computed(() => [
   { key: 'icon', label: '', width: '60px' },
-  { key: 'name', label: 'Name' },
-  { key: 'attributes', label: 'Attributes' },
+  { key: 'name', label: t('common.labels.name') },
+  { key: 'attributes', label: t('nav.groups.attributes') },
   { key: 'actions', label: '', align: 'right' as const, width: '180px' },
-]
+])
 </script>
 
 <template>
-  <Head title="Categories" />
+  <Head :title="$t('categories.title')" />
   <div class="p-4 sm:p-6 lg:p-8 max-w-5xl mx-auto">
     <PageHeader
-      title="Categories"
-      description="Each category declares which attributes its products use."
+      :title="$t('categories.title')"
+      :description="$t('categories.description')"
     >
       <template #actions>
-        <button type="button" class="btn-primary" @click="openCreate">+ New category</button>
+        <button type="button" class="btn-primary" @click="openCreate">{{ $t('categories.new') }}</button>
       </template>
     </PageHeader>
 
@@ -75,7 +80,7 @@ const columns = [
       :columns="columns"
       :rows="categories"
       :row-key="(row) => row.id"
-      empty="No categories yet."
+      :empty="$t('categories.empty')"
     >
       <template #[`cell:icon`]="{ row }">
         <span class="text-2xl leading-none">{{ row.icon ?? '·' }}</span>
@@ -89,36 +94,36 @@ const columns = [
             v-if="row.hasColor"
             class="badge bg-slate-100 text-slate-700"
           >
-            color
+            {{ $t('common.labels.color').toLowerCase() }}
           </span>
           <span
             v-if="row.hasPrint"
             class="badge bg-slate-100 text-slate-700"
           >
-            print
+            {{ $t('common.labels.print').toLowerCase() }}
           </span>
           <span
             v-if="row.hasSize"
             class="badge bg-slate-100 text-slate-700"
           >
-            size
+            {{ $t('common.labels.size').toLowerCase() }}
           </span>
           <span
             v-if="!row.hasColor && !row.hasPrint && !row.hasSize"
             class="text-slate-300 italic"
           >
-            no attributes
+            {{ $t('common.noAttributes') }}
           </span>
         </div>
       </template>
       <template #[`cell:actions`]="{ row }">
         <div class="flex justify-end gap-2">
-          <button type="button" class="btn-secondary" @click="openEdit(row)">Edit</button>
+          <button type="button" class="btn-secondary" @click="openEdit(row)">{{ $t('common.actions.edit') }}</button>
           <ConfirmButton
             route="categories.destroy"
             :params="{ id: row.id }"
-            :message="`Archive “${row.name}”?`"
-            label="Archive"
+            :message="$t('categories.archiveConfirm', { name: row.name })"
+            :label="$t('common.actions.archive')"
           />
         </div>
       </template>
@@ -126,54 +131,45 @@ const columns = [
 
     <Modal
       :open="dialog.open"
-      :title="dialog.mode === 'create' ? 'New category' : 'Edit category'"
+      :title="dialog.mode === 'create' ? $t('categories.newTitle') : $t('categories.editTitle')"
       @close="dialog.open = false"
     >
       <form class="space-y-4" @submit.prevent="submit">
-        <div class="grid grid-cols-[5rem_1fr] gap-3">
-          <div>
-            <label for="cat-icon" class="label">Icon</label>
-            <input
-              id="cat-icon"
-              v-model="form.icon"
-              maxlength="8"
-              placeholder="🧥"
-              class="input text-center text-xl"
-              :data-invalid="form.errors.icon ? 'true' : undefined"
-            />
-          </div>
-          <div>
-            <label for="cat-name" class="label">Name</label>
-            <input
-              id="cat-name"
-              v-model="form.name"
-              required
-              class="input"
-              :data-invalid="form.errors.name ? 'true' : undefined"
-            />
-          </div>
+        <div>
+          <label for="cat-name" class="label">{{ $t('common.labels.name') }}</label>
+          <input
+            id="cat-name"
+            v-model="form.name"
+            required
+            class="input"
+            :data-invalid="form.errors.name ? 'true' : undefined"
+          />
+          <p v-if="form.errors.name" class="field-error">{{ form.errors.name }}</p>
         </div>
-        <p v-if="form.errors.name" class="field-error">{{ form.errors.name }}</p>
-        <p v-if="form.errors.icon" class="field-error">{{ form.errors.icon }}</p>
+        <div>
+          <label class="label">{{ $t('common.labels.icon') }}</label>
+          <EmojiPicker v-model="form.icon" :emojis="CATEGORY_EMOJIS" :aria-label="$t('categories.iconLabel')" />
+          <p v-if="form.errors.icon" class="field-error">{{ form.errors.icon }}</p>
+        </div>
         <fieldset class="space-y-2">
-          <legend class="label mb-1">Attributes used by products in this category</legend>
+          <legend class="label mb-1">{{ $t('categories.attributesUsed') }}</legend>
           <label class="flex items-center gap-2 text-sm">
             <input v-model="form.hasColor" type="checkbox" class="size-4 rounded border-slate-300" />
-            Color
+            {{ $t('common.labels.color') }}
           </label>
           <label class="flex items-center gap-2 text-sm">
             <input v-model="form.hasPrint" type="checkbox" class="size-4 rounded border-slate-300" />
-            Print
+            {{ $t('common.labels.print') }}
           </label>
           <label class="flex items-center gap-2 text-sm">
             <input v-model="form.hasSize" type="checkbox" class="size-4 rounded border-slate-300" />
-            Size
+            {{ $t('common.labels.size') }}
           </label>
         </fieldset>
         <div class="flex justify-end gap-2">
-          <button type="button" class="btn-ghost" @click="dialog.open = false">Cancel</button>
+          <button type="button" class="btn-ghost" @click="dialog.open = false">{{ $t('common.actions.cancel') }}</button>
           <button type="submit" class="btn-primary" :disabled="form.processing">
-            {{ form.processing ? 'Saving…' : dialog.mode === 'create' ? 'Create' : 'Save' }}
+            {{ form.processing ? $t('common.actions.saving') : dialog.mode === 'create' ? $t('common.actions.create') : $t('common.actions.save') }}
           </button>
         </div>
       </form>

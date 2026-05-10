@@ -43,7 +43,7 @@ function clear() {
           class="text-brand-600 hover:text-brand-700 font-medium"
           @click="selectAll"
         >
-          all
+          {{ $t('common.actions.selectAll') }}
         </button>
         <span class="text-slate-300">·</span>
         <button
@@ -51,7 +51,7 @@ function clear() {
           class="text-slate-500 hover:text-slate-700 font-medium"
           @click="clear"
         >
-          none
+          {{ $t('common.actions.selectNone') }}
         </button>
       </div>
     </div>
@@ -73,7 +73,7 @@ function clear() {
           {{ option.name }}
         </slot>
       </button>
-      <p v-if="!options.length" class="text-sm text-slate-400 italic">No options available.</p>
+      <p v-if="!options.length" class="text-sm text-slate-400 italic">{{ $t('common.empty.noOptions') }}</p>
     </div>
   </fieldset>
 </template>

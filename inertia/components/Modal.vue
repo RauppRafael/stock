@@ -51,7 +51,7 @@ onBeforeUnmount(() => {
               <button
                 type="button"
                 class="text-slate-400 hover:text-slate-700"
-                aria-label="Close"
+                :aria-label="$t('common.actions.close')"
                 @click="emit('close')"
               >
                 ✕
