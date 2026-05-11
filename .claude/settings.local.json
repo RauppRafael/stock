@@ -25,7 +25,8 @@
       "Bash(npx tuyau *)",
       "Bash(tasklist /FI \"IMAGENAME eq node.exe\")",
       "PowerShell(node ace test unit)",
-      "Bash(npx tsc *)"
+      "Bash(npx tsc *)",
+      "Bash(npx eslint *)"
     ]
   }
 }

@@ -124,6 +124,8 @@
       "newAdjustment": "+ Ajustar estoque",
       "lowOnly": "Apenas estoque baixo / esgotado",
       "empty": "Nenhum estoque corresponde aos filtros atuais.",
+      "total": "Total",
+      "grandTotal": "Total geral",
       "columns": {
         "product": "Produto",
         "variant": "Variante",

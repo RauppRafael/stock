@@ -58,6 +58,35 @@ export default class StockController {
       })
     }
 
+    // The front-end groups rows by (product, location, color) via rowspan,
+    // which only works if rows that share a group are adjacent. Sort here so
+    // the page can render the grouping without a second pass.
+    stocks.sort((a, b) => {
+      const ca = a.variant?.product?.category?.name ?? ''
+      const cb = b.variant?.product?.category?.name ?? ''
+      if (ca !== cb) return ca.localeCompare(cb)
+      const pa = a.variant?.product?.name ?? ''
+      const pb = b.variant?.product?.name ?? ''
+      if (pa !== pb) return pa.localeCompare(pb)
+      const la = a.location?.name ?? ''
+      const lb = b.location?.name ?? ''
+      if (la !== lb) return la.localeCompare(lb)
+      // Same product + location → group by color. Null colors sort last so
+      // colored variants come before the "no color" bucket.
+      const cola = a.variant?.color?.name ?? null
+      const colb = b.variant?.color?.name ?? null
+      if (cola === null && colb !== null) return 1
+      if (cola !== null && colb === null) return -1
+      if (cola !== null && colb !== null && cola !== colb) return cola.localeCompare(colb)
+      // Same product + location + color → order by size (sortOrder, then name).
+      const sa = a.variant?.size?.sortOrder ?? 0
+      const sb = b.variant?.size?.sortOrder ?? 0
+      if (sa !== sb) return sa - sb
+      const sna = a.variant?.size?.name ?? ''
+      const snb = b.variant?.size?.name ?? ''
+      return sna.localeCompare(snb)
+    })
+
     const [categories, locations] = await Promise.all([
       Category.notTrashed().orderBy('name', 'asc'),
       Location.query().orderBy('name', 'asc'),

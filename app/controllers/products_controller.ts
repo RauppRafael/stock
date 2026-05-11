@@ -80,6 +80,22 @@ export default class ProductsController {
       })
       .firstOrFail()
 
+    // Preload returns variants in insertion order. Sort by color name → size
+    // sortOrder so the variants & stock table reads top-to-bottom in a
+    // predictable order. Size.sortOrder lives on the Size table so doing
+    // this in JS is simpler than a join in the preload callback.
+    product.variants.sort((a, b) => {
+      const cola = a.color?.name ?? null
+      const colb = b.color?.name ?? null
+      if (cola === null && colb !== null) return 1
+      if (cola !== null && colb === null) return -1
+      if (cola !== null && colb !== null && cola !== colb) return cola.localeCompare(colb)
+      const sa = a.size?.sortOrder ?? 0
+      const sb = b.size?.sortOrder ?? 0
+      if (sa !== sb) return sa - sb
+      return (a.size?.name ?? '').localeCompare(b.size?.name ?? '')
+    })
+
     const variantIds = product.variants.map((v) => v.id)
     const movements = variantIds.length
       ? await StockMovement.query()

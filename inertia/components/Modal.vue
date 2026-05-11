@@ -11,6 +11,10 @@ const emit = defineEmits<{ close: [] }>()
 const titleId = useId()
 const panel = ref<HTMLElement | null>(null)
 let lastFocused: HTMLElement | null = null
+// Drag-release outside the panel (e.g. selecting text that ends up over the
+// backdrop) would otherwise count as a backdrop click and close the modal.
+// We only close when the press *started* on the backdrop too.
+let downOnBackdrop = false
 
 /**
  * Selector for elements that should participate in the Tab focus trap.
@@ -65,6 +69,18 @@ watch(
   }
 )
 
+function onBackdropMouseDown(event: MouseEvent) {
+  downOnBackdrop = event.target === event.currentTarget
+}
+
+function onBackdropMouseUp(event: MouseEvent) {
+  const upOnBackdrop = event.target === event.currentTarget
+  if (downOnBackdrop && upOnBackdrop) {
+    emit('close')
+  }
+  downOnBackdrop = false
+}
+
 onMounted(() => window.addEventListener('keydown', onKey))
 onBeforeUnmount(() => {
   window.removeEventListener('keydown', onKey)
@@ -85,7 +101,8 @@ onBeforeUnmount(() => {
       <div v-if="open" class="fixed inset-0 z-50 bg-slate-900/50">
         <div
           class="flex min-h-full items-start sm:items-center justify-center p-4 sm:p-8"
-          @click.self="emit('close')"
+          @mousedown="onBackdropMouseDown"
+          @mouseup="onBackdropMouseUp"
         >
           <div
             ref="panel"

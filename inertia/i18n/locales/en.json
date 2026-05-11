@@ -124,6 +124,8 @@
       "newAdjustment": "+ Adjust stock",
       "lowOnly": "Low / out of stock only",
       "empty": "No stock matches the current filters.",
+      "total": "Total",
+      "grandTotal": "Grand total",
       "columns": {
         "product": "Product",
         "variant": "Variant",
