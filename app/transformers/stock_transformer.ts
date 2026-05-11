@@ -7,7 +7,11 @@ export default class StockTransformer extends BaseTransformer<Stock> {
   toObject() {
     const s = this.resource
     return {
-      ...this.pick(s, ['id', 'variantId', 'locationId', 'quantity']),
+      // `id` is null for rows synthesized by the stock index controller for
+      // (variant, location) pairs that have never been adjusted — they are
+      // not yet persisted so they have no primary key.
+      id: s.id ?? null,
+      ...this.pick(s, ['variantId', 'locationId', 'quantity']),
       variant: s.variant ? VariantTransformer.transform(s.variant).depth(6) : null,
       location: s.location ? LocationTransformer.transform(s.location).depth(6) : null,
     }

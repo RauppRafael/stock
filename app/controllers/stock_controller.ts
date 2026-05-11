@@ -25,28 +25,62 @@ export default class StockController {
   async index({ inertia, request }: HttpContext) {
     const filters = await stockIndexFiltersValidator.validate(request.qs())
 
-    const query = Stock.query()
-      .preload('location')
-      .preload('variant', (v) => {
-        v.preload('color')
-          .preload('size')
-          .preload('product', (p) => p.preload('category'))
-      })
-      // Always exclude stocks whose product is trashed — done at the SQL
-      // level so we don't pull rows we'll discard later.
-      .whereHas('variant', (v) => v.whereHas('product', (p) => p.whereNull('deleted_at')))
+    // Drive the table from the variant universe (not the stock table) so a
+    // variant that has never been adjusted still surfaces as a 0 row. We
+    // pull every variant matching the filters, every location in scope,
+    // and the existing stock rows for those (variant, location) pairs —
+    // then fill the gaps with synthesized 0-quantity Stock instances.
+    const variantsQuery = Variant.query()
+      .preload('color')
+      .preload('size')
+      .preload('product', (p) => p.preload('category'))
+      .whereHas('product', (p) => p.whereNull('deleted_at'))
 
-    if (filters.locationId) query.where('location_id', filters.locationId)
-    if (filters.productId) {
-      query.whereHas('variant', (v) => v.where('product_id', filters.productId!))
-    }
+    if (filters.productId) variantsQuery.where('product_id', filters.productId)
     if (filters.categoryId) {
-      query.whereHas('variant', (v) =>
-        v.whereHas('product', (p) => p.where('category_id', filters.categoryId!))
+      variantsQuery.whereHas('product', (p) =>
+        p.whereNull('deleted_at').where('category_id', filters.categoryId!)
       )
     }
 
-    let stocks = await query
+    const locationsQuery = Location.query()
+    if (filters.locationId) locationsQuery.where('id', filters.locationId)
+
+    const [variantsInScope, locationsInScope] = await Promise.all([variantsQuery, locationsQuery])
+
+    const variantIds = variantsInScope.map((v) => v.id)
+    const locationIds = locationsInScope.map((l) => l.id)
+
+    const existingStocks =
+      variantIds.length && locationIds.length
+        ? await Stock.query().whereIn('variant_id', variantIds).whereIn('location_id', locationIds)
+        : []
+
+    const stockByKey = new Map<string, Stock>()
+    for (const s of existingStocks) stockByKey.set(`${s.variantId}:${s.locationId}`, s)
+
+    let stocks: Stock[] = []
+    for (const v of variantsInScope) {
+      for (const l of locationsInScope) {
+        const key = `${v.id}:${l.id}`
+        const existing = stockByKey.get(key)
+        if (existing) {
+          existing.$setRelated('variant', v)
+          existing.$setRelated('location', l)
+          stocks.push(existing)
+        } else {
+          // Phantom row — id stays undefined and is serialised as null so the
+          // front-end can key off (variantId, locationId) instead.
+          const phantom = new Stock()
+          phantom.variantId = v.id
+          phantom.locationId = l.id
+          phantom.quantity = 0
+          phantom.$setRelated('variant', v)
+          phantom.$setRelated('location', l)
+          stocks.push(phantom)
+        }
+      }
+    }
 
     if (filters.lowOnly) {
       // Threshold lives on the product, so this stays in JS — moving it to

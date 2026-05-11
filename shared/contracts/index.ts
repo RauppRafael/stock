@@ -75,7 +75,10 @@ export const variantSchema = z.object({
 export type Variant = z.infer<typeof variantSchema>
 
 export const stockSchema = z.object({
-  id,
+  // Null when the row was synthesized server-side for a (variant, location)
+  // pair that has never been adjusted — it isn't persisted yet, so there's
+  // no primary key. Front-end keys off (variantId, locationId) instead.
+  id: id.nullable(),
   variantId: id,
   locationId: id,
   quantity: z.number().int(),

@@ -151,10 +151,15 @@ const grandTotal = computed(() => props.stocks.reduce((s, r) => s + r.quantity, 
 // group, so a CSS `tr:hover` only highlights them when that first row is the
 // one being hovered. Track the hovered leaf row in JS and decide per-cell
 // whether it should light up — that way hovering any row makes the whole
-// "logical row" feel cohesive.
-const hoveredRowId = ref<number | null>(null)
+// "logical row" feel cohesive. Rows may not have a real `id` (synthesized
+// zero-quantity rows for never-adjusted variants), so key by (variantId,
+// locationId) instead.
+function rowKey(row: StockRow) {
+  return `${row.variantId}-${row.locationId}`
+}
+const hoveredRowKey = ref<string | null>(null)
 function isColorHovered(cg: ColorGroup) {
-  return hoveredRowId.value != null && cg.rows.some((r) => r.id === hoveredRowId.value)
+  return hoveredRowKey.value != null && cg.rows.some((r) => rowKey(r) === hoveredRowKey.value)
 }
 function isLocationHovered(lg: LocationGroup) {
   return lg.colors.some(isColorHovered)
@@ -241,7 +246,7 @@ function rowClick(row: StockRow) {
                 <template v-for="(cg, cgIdx) in lg.colors" :key="cg.key">
                   <tr
                     v-for="(row, rIdx) in cg.rows"
-                    :key="row.id"
+                    :key="rowKey(row)"
                     class="cursor-pointer transition"
                     :class="{
                       'border-t-2 border-slate-200':
@@ -250,10 +255,10 @@ function rowClick(row: StockRow) {
                         (lgIdx > 0 || cgIdx > 0) &&
                         rIdx === 0 &&
                         !(pgIdx > 0 && lgIdx === 0 && cgIdx === 0 && rIdx === 0),
-                      'bg-slate-50': hoveredRowId === row.id,
+                      'bg-slate-50': hoveredRowKey === rowKey(row),
                     }"
-                    @mouseenter="hoveredRowId = row.id"
-                    @mouseleave="hoveredRowId = null"
+                    @mouseenter="hoveredRowKey = rowKey(row)"
+                    @mouseleave="hoveredRowKey = null"
                     @click="rowClick(row)"
                   >
                     <td
