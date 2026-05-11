@@ -11,8 +11,6 @@ import { middleware } from '#start/kernel'
 import { controllers } from '#generated/controllers'
 import router from '@adonisjs/core/services/router'
 
-router.on('/').renderInertia('home', {}).as('home')
-
 /**
  * Public auth — only login, no signup. Without per-user/per-tenant scoping,
  * a public signup route would let anyone create an account and edit
@@ -31,9 +29,15 @@ router
     router.post('logout', [controllers.Session, 'destroy'])
 
     /**
-     * Stock dashboard + adjustment flow
+     * Stock dashboard + adjustment flow. `/` is the canonical URL; `/stock`
+     * stays as an alias so existing bookmarks and the few in-app references
+     * (the filter-debounce `router.get('/stock', ...)` and the sidebar
+     * active-state match pattern) keep working. The alias route name is
+     * unused — it's only set because Adonis would otherwise auto-derive a
+     * name colliding with `stock.index`.
      */
-    router.get('/stock', [controllers.Stock, 'index']).as('stock.index')
+    router.get('/', [controllers.Stock, 'index']).as('stock.index')
+    router.get('/stock', [controllers.Stock, 'index']).as('stock.index.alias')
     router.get('/stock/adjust', [controllers.Stock, 'create']).as('stock.adjust.create')
     router.post('/stock/adjust', [controllers.Stock, 'adjust']).as('stock.adjust')
     router.post('/stock/adjust/bulk', [controllers.Stock, 'bulkAdjust']).as('stock.adjust.bulk')

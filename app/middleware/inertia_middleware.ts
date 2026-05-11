@@ -2,8 +2,27 @@ import type { HttpContext } from '@adonisjs/core/http'
 import type { NextFn } from '@adonisjs/core/types/http'
 import UserTransformer from '#transformers/user_transformer'
 import BaseInertiaMiddleware from '@adonisjs/inertia/inertia_middleware'
+import { InertiaHeaders } from '@adonisjs/inertia'
 
 export default class InertiaMiddleware extends BaseInertiaMiddleware {
+  /**
+   * The base implementation wraps validation errors under the request's
+   * `X-Inertia-Error-Bag` header even when there are no errors. That gives
+   * Inertia a non-empty `errors` prop (e.g. `{ category: {} }`), which it
+   * counts as "errors are present" and so it dispatches `onError` instead of
+   * `onSuccess`. We skip the wrap when the bag would be empty so success
+   * callbacks (e.g. modal-close after inline-create) actually fire.
+   */
+  getValidationErrors(ctx: HttpContext) {
+    const errors = super.getValidationErrors(ctx)
+    const errorBag = ctx.request.header(InertiaHeaders.ErrorBag)
+    if (errorBag && errorBag in errors) {
+      const bag = (errors as Record<string, Record<string, string>>)[errorBag]
+      if (Object.keys(bag).length === 0) return {}
+    }
+    return errors
+  }
+
   share(ctx: HttpContext) {
     /**
      * The share method is called everytime an Inertia page is rendered. In

@@ -6,12 +6,6 @@ import type { ApiDefinition } from './tree.d.ts'
 const placeholder: any = {}
 
 const routes = {
-  'home': {
-    methods: ["GET","HEAD"],
-    pattern: '/',
-    tokens: [{"old":"/","type":0,"val":"/","end":""}],
-    types: placeholder as Registry['home']['types'],
-  },
   'session.create': {
     methods: ["GET","HEAD"],
     pattern: '/login',
@@ -32,9 +26,15 @@ const routes = {
   },
   'stock.index': {
     methods: ["GET","HEAD"],
+    pattern: '/',
+    tokens: [{"old":"/","type":0,"val":"/","end":""}],
+    types: placeholder as Registry['stock.index']['types'],
+  },
+  'stock.index.alias': {
+    methods: ["GET","HEAD"],
     pattern: '/stock',
     tokens: [{"old":"/stock","type":0,"val":"stock","end":""}],
-    types: placeholder as Registry['stock.index']['types'],
+    types: placeholder as Registry['stock.index.alias']['types'],
   },
   'stock.adjust.create': {
     methods: ["GET","HEAD"],

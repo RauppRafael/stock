@@ -4,11 +4,11 @@ type ParamValue = string | number | bigint | boolean
 
 export type ScannedRoutes = {
   ALL: {
-    'home': { paramsTuple?: []; params?: {} }
     'session.create': { paramsTuple?: []; params?: {} }
     'session.store': { paramsTuple?: []; params?: {} }
     'session.destroy': { paramsTuple?: []; params?: {} }
     'stock.index': { paramsTuple?: []; params?: {} }
+    'stock.index.alias': { paramsTuple?: []; params?: {} }
     'stock.adjust.create': { paramsTuple?: []; params?: {} }
     'stock.adjust': { paramsTuple?: []; params?: {} }
     'stock.adjust.bulk': { paramsTuple?: []; params?: {} }
@@ -42,9 +42,9 @@ export type ScannedRoutes = {
     'sizes.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
   GET: {
-    'home': { paramsTuple?: []; params?: {} }
     'session.create': { paramsTuple?: []; params?: {} }
     'stock.index': { paramsTuple?: []; params?: {} }
+    'stock.index.alias': { paramsTuple?: []; params?: {} }
     'stock.adjust.create': { paramsTuple?: []; params?: {} }
     'stock.lookup.products': { paramsTuple: [ParamValue]; params: {'categoryId': ParamValue} }
     'stock.lookup.variants': { paramsTuple: [ParamValue]; params: {'productId': ParamValue} }
@@ -61,9 +61,9 @@ export type ScannedRoutes = {
     'sizes.index': { paramsTuple?: []; params?: {} }
   }
   HEAD: {
-    'home': { paramsTuple?: []; params?: {} }
     'session.create': { paramsTuple?: []; params?: {} }
     'stock.index': { paramsTuple?: []; params?: {} }
+    'stock.index.alias': { paramsTuple?: []; params?: {} }
     'stock.adjust.create': { paramsTuple?: []; params?: {} }
     'stock.lookup.products': { paramsTuple: [ParamValue]; params: {'categoryId': ParamValue} }
     'stock.lookup.variants': { paramsTuple: [ParamValue]; params: {'productId': ParamValue} }

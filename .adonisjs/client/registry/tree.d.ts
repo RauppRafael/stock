@@ -2,14 +2,15 @@
 import type { routes } from './index.ts'
 
 export interface ApiDefinition {
-  home: typeof routes['home']
   session: {
     create: typeof routes['session.create']
     store: typeof routes['session.store']
     destroy: typeof routes['session.destroy']
   }
   stock: {
-    index: typeof routes['stock.index']
+    index: typeof routes['stock.index'] & {
+      alias: typeof routes['stock.index.alias']
+    }
     adjust: typeof routes['stock.adjust'] & {
       create: typeof routes['stock.adjust.create']
       bulk: typeof routes['stock.adjust.bulk']

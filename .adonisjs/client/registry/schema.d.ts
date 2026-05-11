@@ -7,18 +7,6 @@ import type { InferInput, SimpleError } from '@vinejs/vine/types'
 export type ParamValue = string | number | bigint | boolean
 
 export interface Registry {
-  'home': {
-    methods: ["GET","HEAD"]
-    pattern: '/'
-    types: {
-      body: {}
-      paramsTuple: []
-      params: {}
-      query: {}
-      response: unknown
-      errorResponse: unknown
-    }
-  }
   'session.create': {
     methods: ["GET","HEAD"]
     pattern: '/login'
@@ -56,6 +44,18 @@ export interface Registry {
     }
   }
   'stock.index': {
+    methods: ["GET","HEAD"]
+    pattern: '/'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: ExtractQueryForGet<InferInput<(typeof import('#validators/stock').stockIndexFiltersValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/stock_controller').default['index']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/stock_controller').default['index']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'stock.index.alias': {
     methods: ["GET","HEAD"]
     pattern: '/stock'
     types: {

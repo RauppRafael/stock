@@ -130,6 +130,7 @@ function submitCategory() {
     .post(urlFor('categories.store'), {
       headers: { 'X-Inline-Create': '1' },
       preserveScroll: true,
+      preserveState: true,
       errorBag: 'category',
       onSuccess: () => {
         dialog.category = false
@@ -151,6 +152,7 @@ function submitColor() {
     .post(urlFor('colors.store'), {
       headers: { 'X-Inline-Create': '1' },
       preserveScroll: true,
+      preserveState: true,
       errorBag: 'color',
       onSuccess: () => {
         dialog.color = false
@@ -170,6 +172,7 @@ function submitSize() {
     .post(urlFor('sizes.store'), {
       headers: { 'X-Inline-Create': '1' },
       preserveScroll: true,
+      preserveState: true,
       errorBag: 'size',
       onSuccess: () => {
         dialog.size = false
