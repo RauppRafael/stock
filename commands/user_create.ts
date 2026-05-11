@@ -40,7 +40,12 @@ export default class UserCreate extends BaseCommand {
   }
 
   private printValidationError(error: unknown) {
-    if (error && typeof error === 'object' && 'messages' in error && Array.isArray(error.messages)) {
+    if (
+      error &&
+      typeof error === 'object' &&
+      'messages' in error &&
+      Array.isArray(error.messages)
+    ) {
       for (const m of error.messages) {
         this.logger.error(`${m.field}: ${m.message}`)
       }

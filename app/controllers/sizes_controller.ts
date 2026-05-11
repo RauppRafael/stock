@@ -15,6 +15,9 @@ export default class SizesController {
     const payload = await request.validateUsing(createSizeValidator)
     await Size.create(payload)
     session.flash('success', 'Size created.')
+    if (request.header('X-Inline-Create')) {
+      return response.redirect().back()
+    }
     return response.redirect().toRoute('sizes.index')
   }
 

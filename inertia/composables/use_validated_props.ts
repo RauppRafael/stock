@@ -23,11 +23,7 @@ export function useValidatedProps<S extends z.ZodTypeAny>(props: unknown, schema
   onMounted(() => {
     const result = schema.safeParse(props)
     if (!result.success) {
-      // eslint-disable-next-line no-console
-      console.error(
-        '[contracts] Page props failed schema validation:',
-        result.error.issues
-      )
+      console.error('[contracts] Page props failed schema validation:', result.error.issues)
     }
   })
 }

@@ -25,6 +25,13 @@ const stocksByVariant = computed(() => {
 })
 
 const totalOnHand = computed(() => props.stocks.reduce((sum, s) => sum + s.quantity, 0))
+
+// Drive column visibility off the category flags so categories without
+// color (or without size) collapse to a tighter table instead of rendering
+// dash-only cells.
+const hasColor = computed(() => props.product.category?.hasColor ?? false)
+const hasSize = computed(() => props.product.category?.hasSize ?? false)
+const columnCount = computed(() => 1 + (hasColor.value ? 1 : 0) + (hasSize.value ? 1 : 0))
 </script>
 
 <template>
@@ -65,18 +72,32 @@ const totalOnHand = computed(() => props.stocks.reduce((sum, s) => sum + s.quant
       <table class="w-full text-sm min-w-[640px]">
         <thead class="bg-slate-50 text-xs uppercase tracking-wider text-slate-500">
           <tr>
-            <th class="px-4 py-2 text-left">{{ $t('common.labels.variant') }}</th>
-            <th class="px-4 py-2 text-left">{{ $t('common.labels.sku') }}</th>
+            <th v-if="hasColor" class="px-4 py-2 text-left">{{ $t('common.labels.color') }}</th>
+            <th v-if="hasSize" class="px-4 py-2 text-left">{{ $t('common.labels.size') }}</th>
             <th class="px-4 py-2 text-left">{{ $t('products.show.stockByLocation') }}</th>
           </tr>
         </thead>
         <tbody class="divide-y divide-slate-100">
           <tr v-for="variant in variants" :key="variant.id">
-            <td class="px-4 py-3">
-              <div class="font-medium text-slate-800">{{ variant.displayName }}</div>
+            <td v-if="hasColor" class="px-4 py-3">
+              <span v-if="variant.color" class="inline-flex items-center gap-2">
+                <span
+                  class="size-4 rounded-full ring-1 ring-slate-200"
+                  :style="{ background: variant.color.hexCode ?? '#e2e8f0' }"
+                />
+                <span class="font-medium text-slate-800">{{ variant.color.name }}</span>
+              </span>
+              <span v-else class="text-slate-300">—</span>
             </td>
-            <td class="px-4 py-3">
-              <code class="text-xs text-slate-500">{{ variant.skuCode }}</code>
+            <td v-if="hasSize" class="px-4 py-3">
+              <span
+                v-if="variant.size"
+                class="inline-flex size-8 items-center justify-center rounded-md bg-slate-100 ring-1 ring-slate-200 text-xs font-semibold text-slate-700 tabular-nums"
+                :title="variant.size.name"
+              >
+                {{ variant.size.name }}
+              </span>
+              <span v-else class="text-slate-300">—</span>
             </td>
             <td class="px-4 py-3">
               <div class="flex flex-wrap gap-2">
@@ -85,6 +106,7 @@ const totalOnHand = computed(() => props.stocks.reduce((sum, s) => sum + s.quant
                   :key="s.id"
                   class="inline-flex items-center gap-2 rounded-md border border-slate-200 bg-slate-50 px-2 py-1 text-xs"
                 >
+                  <span v-if="s.location?.icon" class="leading-none">{{ s.location.icon }}</span>
                   <span class="text-slate-500">{{ s.location?.name }}</span>
                   <StockBadge
                     :quantity="s.quantity"
@@ -101,7 +123,7 @@ const totalOnHand = computed(() => props.stocks.reduce((sum, s) => sum + s.quant
             </td>
           </tr>
           <tr v-if="!variants.length">
-            <td colspan="3" class="px-4 py-10 text-center text-sm text-slate-400 italic">
+            <td :colspan="columnCount" class="px-4 py-10 text-center text-sm text-slate-400 italic">
               {{ $t('products.show.noVariants') }}
             </td>
           </tr>

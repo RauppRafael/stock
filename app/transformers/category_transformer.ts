@@ -9,7 +9,6 @@ export default class CategoryTransformer extends BaseTransformer<Category> {
       // MySQL returns BOOLEAN columns as 0/1 — coerce so the front-end can
       // rely on `=== true` checks, not just truthiness.
       hasColor: Boolean(c.hasColor),
-      hasPrint: Boolean(c.hasPrint),
       hasSize: Boolean(c.hasSize),
     }
   }

@@ -40,8 +40,6 @@
       "users": "Users",
       "color": "Color",
       "colors": "Colors",
-      "print": "Print",
-      "prints": "Prints",
       "size": "Size",
       "sizes": "Sizes",
       "variant": "Variant",
@@ -83,7 +81,6 @@
     "selectAProduct": "Select a product…",
     "selectALocation": "Select a location…",
     "selectAColor": "Select a color…",
-    "selectAPrint": "Select a print…",
     "selectASize": "Select a size…",
     "noAttributes": "no attributes",
     "dash": "—",
@@ -103,7 +100,6 @@
       "categories": "Categories",
       "locations": "Locations",
       "colors": "Colors",
-      "prints": "Prints",
       "sizes": "Sizes"
     },
     "toggle": "Toggle navigation"
@@ -228,16 +224,6 @@
     "empty": "No colors yet.",
     "codeLabel": "Code (used in SKUs, A–Z / 0–9, max 8)",
     "hexLabel": "Hex (optional)",
-    "deleteConfirm": "Delete “{name}”?"
-  },
-  "prints": {
-    "title": "Prints",
-    "description": "Reusable print attribute applied to product variants.",
-    "new": "+ New print",
-    "newTitle": "New print",
-    "editTitle": "Edit print",
-    "empty": "No prints yet.",
-    "codeLabel": "Code (used in SKUs, A–Z / 0–9, max 8)",
     "deleteConfirm": "Delete “{name}”?"
   },
   "sizes": {

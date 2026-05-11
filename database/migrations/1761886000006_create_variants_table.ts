@@ -21,13 +21,6 @@ export default class extends BaseSchema {
         .inTable('colors')
         .onDelete('RESTRICT')
       table
-        .integer('print_id')
-        .unsigned()
-        .nullable()
-        .references('id')
-        .inTable('prints')
-        .onDelete('RESTRICT')
-      table
         .integer('size_id')
         .unsigned()
         .nullable()
@@ -42,8 +35,8 @@ export default class extends BaseSchema {
 
       table.index(['product_id'])
       // Unique on the attribute combination. MySQL treats NULLs as distinct
-      // here, so the StockService is responsible for dedup at write time.
-      table.unique(['product_id', 'color_id', 'print_id', 'size_id'], {
+      // here, so the VariantGenerator is responsible for dedup at write time.
+      table.unique(['product_id', 'color_id', 'size_id'], {
         indexName: 'variants_combo_unique',
       })
     })

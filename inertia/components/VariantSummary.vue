@@ -49,13 +49,6 @@ const { t } = useI18n()
             <span class="text-slate-500">{{ $t('common.labels.color') }}:</span>
             <span class="font-medium">{{ variant.color.name }}</span>
           </span>
-          <span
-            v-if="variant.print"
-            class="inline-flex items-center gap-1.5 rounded-full bg-white border border-slate-200 px-2 py-0.5 text-slate-700 whitespace-nowrap"
-          >
-            <span class="text-slate-500">{{ $t('common.labels.print') }}:</span>
-            <span class="font-medium">{{ variant.print.name }}</span>
-          </span>
         </div>
       </div>
     </div>

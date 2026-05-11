@@ -6,10 +6,15 @@ const props = defineProps<{
   options: T[]
   modelValue: number[]
   description?: string
+  /** Show a dashed "+ Add" pill at the end that emits `add`. */
+  allowAdd?: boolean
+  /** Label for the add pill (defaults to a localized "+ New"). */
+  addLabel?: string
 }>()
 
 const emit = defineEmits<{
   'update:modelValue': [value: number[]]
+  add: []
 }>()
 
 const selected = computed(() => new Set(props.modelValue))
@@ -73,7 +78,16 @@ function clear() {
           {{ option.name }}
         </slot>
       </button>
-      <p v-if="!options.length" class="text-sm text-slate-400 italic">{{ $t('common.empty.noOptions') }}</p>
+      <button
+        v-if="allowAdd"
+        type="button"
+        class="px-3 py-1.5 text-sm rounded-full border border-dashed border-slate-300 text-slate-500 hover:border-brand-500 hover:text-brand-700 transition inline-flex items-center gap-1"
+        @click="emit('add')"
+      >
+        <span class="text-base leading-none">+</span>
+        {{ addLabel ?? $t('common.actions.create') }}
+      </button>
+      <p v-if="!options.length && !allowAdd" class="text-sm text-slate-400 italic">{{ $t('common.empty.noOptions') }}</p>
     </div>
   </fieldset>
 </template>

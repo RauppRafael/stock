@@ -90,11 +90,6 @@ router
     router.put('/colors/:id', [controllers.Colors, 'update']).as('colors.update')
     router.delete('/colors/:id', [controllers.Colors, 'destroy']).as('colors.destroy')
 
-    router.get('/prints', [controllers.Prints, 'index']).as('prints.index')
-    router.post('/prints', [controllers.Prints, 'store']).as('prints.store')
-    router.put('/prints/:id', [controllers.Prints, 'update']).as('prints.update')
-    router.delete('/prints/:id', [controllers.Prints, 'destroy']).as('prints.destroy')
-
     router.get('/sizes', [controllers.Sizes, 'index']).as('sizes.index')
     router.post('/sizes', [controllers.Sizes, 'store']).as('sizes.store')
     router.put('/sizes/:id', [controllers.Sizes, 'update']).as('sizes.update')

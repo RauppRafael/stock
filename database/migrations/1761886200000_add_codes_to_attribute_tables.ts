@@ -15,9 +15,6 @@ export default class extends BaseSchema {
     this.schema.alterTable('colors', (table) => {
       table.string('code', 8).nullable()
     })
-    this.schema.alterTable('prints', (table) => {
-      table.string('code', 8).nullable()
-    })
     this.schema.alterTable('sizes', (table) => {
       table.string('code', 8).nullable()
     })
@@ -25,7 +22,6 @@ export default class extends BaseSchema {
     this.defer(async (db) => {
       await this.backfill(db, 'products', 6)
       await this.backfill(db, 'colors', 5)
-      await this.backfill(db, 'prints', 5)
       await this.backfill(db, 'sizes', 4)
     })
   }
@@ -35,9 +31,6 @@ export default class extends BaseSchema {
       table.dropColumn('code')
     })
     this.schema.alterTable('colors', (table) => {
-      table.dropColumn('code')
-    })
-    this.schema.alterTable('prints', (table) => {
       table.dropColumn('code')
     })
     this.schema.alterTable('sizes', (table) => {

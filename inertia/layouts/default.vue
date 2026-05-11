@@ -54,7 +54,6 @@ const navGroups = [
     labelKey: 'nav.groups.attributes',
     items: [
       { labelKey: 'nav.items.colors', route: 'colors.index', matches: ['/colors'] },
-      { labelKey: 'nav.items.prints', route: 'prints.index', matches: ['/prints'] },
       { labelKey: 'nav.items.sizes', route: 'sizes.index', matches: ['/sizes'] },
     ],
   },

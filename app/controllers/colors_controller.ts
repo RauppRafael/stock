@@ -15,6 +15,9 @@ export default class ColorsController {
     const payload = await request.validateUsing(createColorValidator)
     await Color.create(payload)
     session.flash('success', 'Color created.')
+    if (request.header('X-Inline-Create')) {
+      return response.redirect().back()
+    }
     return response.redirect().toRoute('colors.index')
   }
 

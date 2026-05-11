@@ -29,15 +29,12 @@ export default class StockController {
       .preload('location')
       .preload('variant', (v) => {
         v.preload('color')
-          .preload('print')
           .preload('size')
           .preload('product', (p) => p.preload('category'))
       })
       // Always exclude stocks whose product is trashed — done at the SQL
       // level so we don't pull rows we'll discard later.
-      .whereHas('variant', (v) =>
-        v.whereHas('product', (p) => p.whereNull('deleted_at'))
-      )
+      .whereHas('variant', (v) => v.whereHas('product', (p) => p.whereNull('deleted_at')))
 
     if (filters.locationId) query.where('location_id', filters.locationId)
     if (filters.productId) {
@@ -56,7 +53,7 @@ export default class StockController {
       // SQL would require a JOIN we don't otherwise need.
       stocks = stocks.filter((s) => {
         const threshold = s.variant?.product?.lowStockThreshold
-        if (threshold == null) return s.quantity === 0
+        if (threshold === null || threshold === undefined) return s.quantity === 0
         return s.quantity <= threshold
       })
     }
@@ -101,7 +98,6 @@ export default class StockController {
       prefilledVariant = await Variant.query()
         .where('id', variantId)
         .preload('color')
-        .preload('print')
         .preload('size')
         .preload('product', (p) => p.preload('category'))
         .first()
@@ -153,10 +149,7 @@ export default class StockController {
     } else {
       const totalDelta = movements.reduce((sum, m) => sum + m.delta, 0)
       const sign = totalDelta >= 0 ? '+' : ''
-      session.flash(
-        'success',
-        `${movements.length} variant(s) updated (Δ ${sign}${totalDelta}).`
-      )
+      session.flash('success', `${movements.length} variant(s) updated (Δ ${sign}${totalDelta}).`)
     }
     return response.redirect().back()
   }
@@ -180,7 +173,6 @@ export default class StockController {
     const variants = await Variant.query()
       .where('product_id', productId)
       .preload('color')
-      .preload('print')
       .preload('size')
       .preload('product', (p) => p.preload('category'))
       .orderBy('id', 'asc')
@@ -201,7 +193,7 @@ export default class StockController {
   }
 
   /**
-   * Returns every variant of a product (optionally narrowed by color/print)
+   * Returns every variant of a product (optionally narrowed by color)
    * paired with the on-hand quantity at the given location. Used by the
    * adjust page to render a per-size editable grid in one shot. Variants
    * are ordered by size sortOrder so S/M/L line up consistently.
@@ -215,17 +207,15 @@ export default class StockController {
     const { productId, locationId } = await stockLookupGridParamsValidator.validate(
       ctx.request.params()
     )
-    const { colorId, printId } = await stockLookupGridQueryValidator.validate(ctx.request.qs())
+    const { colorId } = await stockLookupGridQueryValidator.validate(ctx.request.qs())
 
     const variantsQuery = Variant.query()
       .where('product_id', productId)
       .preload('color')
-      .preload('print')
       .preload('size')
       .preload('product', (p) => p.preload('category'))
 
     if (colorId !== undefined) variantsQuery.where('color_id', colorId)
-    if (printId !== undefined) variantsQuery.where('print_id', printId)
 
     const variants = await variantsQuery
     variants.sort((a, b) => {
@@ -237,9 +227,7 @@ export default class StockController {
 
     const variantIds = variants.map((v) => v.id)
     const stocks = variantIds.length
-      ? await Stock.query()
-          .where('location_id', locationId)
-          .whereIn('variant_id', variantIds)
+      ? await Stock.query().where('location_id', locationId).whereIn('variant_id', variantIds)
       : []
     const quantityByVariant: Record<number, number> = {}
     for (const s of stocks) quantityByVariant[s.variantId] = s.quantity

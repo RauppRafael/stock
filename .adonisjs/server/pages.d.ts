@@ -13,7 +13,6 @@ declare module '@adonisjs/inertia/types' {
     'catalog/categories/index': ExtractProps<(typeof import('../../inertia/pages/catalog/categories/index.vue'))['default']>
     'catalog/colors/index': ExtractProps<(typeof import('../../inertia/pages/catalog/colors/index.vue'))['default']>
     'catalog/locations/index': ExtractProps<(typeof import('../../inertia/pages/catalog/locations/index.vue'))['default']>
-    'catalog/prints/index': ExtractProps<(typeof import('../../inertia/pages/catalog/prints/index.vue'))['default']>
     'catalog/sizes/index': ExtractProps<(typeof import('../../inertia/pages/catalog/sizes/index.vue'))['default']>
     'errors/not_found': ExtractProps<(typeof import('../../inertia/pages/errors/not_found.vue'))['default']>
     'errors/server_error': ExtractProps<(typeof import('../../inertia/pages/errors/server_error.vue'))['default']>

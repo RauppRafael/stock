@@ -20,7 +20,6 @@ export default class StockMovementsController {
       .preload('variant', (v) =>
         v
           .preload('color')
-          .preload('print')
           .preload('size')
           .preload('product', (p) => p.preload('category'))
       )

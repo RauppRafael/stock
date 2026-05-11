@@ -3,7 +3,6 @@ import type { BelongsTo, HasMany } from '@adonisjs/lucid/types/relations'
 import { VariantSchema } from '#database/schema'
 import Product from '#models/product'
 import Color from '#models/color'
-import Print from '#models/print'
 import Size from '#models/size'
 import Stock from '#models/stock'
 import StockMovement from '#models/stock_movement'
@@ -15,9 +14,6 @@ export default class Variant extends VariantSchema {
 
   @belongsTo(() => Color)
   declare color: BelongsTo<typeof Color>
-
-  @belongsTo(() => Print)
-  declare print: BelongsTo<typeof Print>
 
   @belongsTo(() => Size)
   declare size: BelongsTo<typeof Size>
@@ -34,7 +30,6 @@ export default class Variant extends VariantSchema {
     return buildSkuCode({
       product: this.product,
       color: this.color ?? null,
-      print: this.print ?? null,
       size: this.size ?? null,
     })
   }
@@ -44,7 +39,6 @@ export default class Variant extends VariantSchema {
     const parts: string[] = []
     if (this.product) parts.push(this.product.name)
     if (this.color) parts.push(this.color.name)
-    if (this.print) parts.push(this.print.name)
     if (this.size) parts.push(this.size.name)
     return parts.join(' - ')
   }

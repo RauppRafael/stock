@@ -5,7 +5,6 @@ const fields = {
   name: vine.string().trim().minLength(1).maxLength(100),
   icon: vine.string().trim().minLength(1).maxLength(8).regex(EMOJI_PATTERN).nullable().optional(),
   hasColor: vine.boolean(),
-  hasPrint: vine.boolean(),
   hasSize: vine.boolean(),
 }
 

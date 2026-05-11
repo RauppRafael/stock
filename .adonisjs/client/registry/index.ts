@@ -198,30 +198,6 @@ const routes = {
     tokens: [{"old":"/colors/:id","type":0,"val":"colors","end":""},{"old":"/colors/:id","type":1,"val":"id","end":""}],
     types: placeholder as Registry['colors.destroy']['types'],
   },
-  'prints.index': {
-    methods: ["GET","HEAD"],
-    pattern: '/prints',
-    tokens: [{"old":"/prints","type":0,"val":"prints","end":""}],
-    types: placeholder as Registry['prints.index']['types'],
-  },
-  'prints.store': {
-    methods: ["POST"],
-    pattern: '/prints',
-    tokens: [{"old":"/prints","type":0,"val":"prints","end":""}],
-    types: placeholder as Registry['prints.store']['types'],
-  },
-  'prints.update': {
-    methods: ["PUT"],
-    pattern: '/prints/:id',
-    tokens: [{"old":"/prints/:id","type":0,"val":"prints","end":""},{"old":"/prints/:id","type":1,"val":"id","end":""}],
-    types: placeholder as Registry['prints.update']['types'],
-  },
-  'prints.destroy': {
-    methods: ["DELETE"],
-    pattern: '/prints/:id',
-    tokens: [{"old":"/prints/:id","type":0,"val":"prints","end":""},{"old":"/prints/:id","type":1,"val":"id","end":""}],
-    types: placeholder as Registry['prints.destroy']['types'],
-  },
   'sizes.index': {
     methods: ["GET","HEAD"],
     pattern: '/sizes',

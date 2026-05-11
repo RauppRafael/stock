@@ -1,15 +1,12 @@
 import type { HttpContext } from '@adonisjs/core/http'
-import db from '@adonisjs/lucid/services/db'
 import Category from '#models/category'
 import Color from '#models/color'
-import Print from '#models/print'
 import Size from '#models/size'
 import Product from '#models/product'
 import StockMovement from '#models/stock_movement'
 import VariantGenerator from '#services/variant_generator'
 import CategoryTransformer from '#transformers/category_transformer'
 import ColorTransformer from '#transformers/color_transformer'
-import PrintTransformer from '#transformers/print_transformer'
 import SizeTransformer from '#transformers/size_transformer'
 import ProductTransformer from '#transformers/product_transformer'
 import VariantTransformer from '#transformers/variant_transformer'
@@ -39,16 +36,14 @@ export default class ProductsController {
   }
 
   async create({ inertia }: HttpContext) {
-    const [categories, colors, prints, sizes] = await Promise.all([
+    const [categories, colors, sizes] = await Promise.all([
       Category.notTrashed().orderBy('name', 'asc'),
       Color.query().orderBy('name', 'asc'),
-      Print.query().orderBy('name', 'asc'),
       Size.query().orderBy('sort_order', 'asc'),
     ])
     return inertia.render('products/create', {
       categories: CategoryTransformer.transform(categories),
       colors: ColorTransformer.transform(colors),
-      prints: PrintTransformer.transform(prints),
       sizes: SizeTransformer.transform(sizes),
     })
   }
@@ -57,23 +52,16 @@ export default class ProductsController {
     const payload = await request.validateUsing(createProductValidator)
     const category = await Category.findOrFail(payload.categoryId)
 
-    const product = await db.transaction(async (trx) => {
-      const created = await Product.create(
-        {
-          name: payload.name,
-          code: payload.code,
-          categoryId: payload.categoryId,
-          description: payload.description ?? null,
-          lowStockThreshold: payload.lowStockThreshold ?? null,
-        },
-        { client: trx }
-      )
-      return created
+    const product = await Product.create({
+      name: payload.name,
+      code: payload.code,
+      categoryId: payload.categoryId,
+      description: payload.description ?? null,
+      lowStockThreshold: payload.lowStockThreshold ?? null,
     })
 
     await new VariantGenerator().generate(product, category, {
       colorIds: payload.colorIds,
-      printIds: payload.printIds,
       sizeIds: payload.sizeIds,
     })
 
@@ -87,7 +75,6 @@ export default class ProductsController {
       .preload('category')
       .preload('variants', (q) => {
         q.preload('color')
-          .preload('print')
           .preload('size')
           .preload('stocks', (s) => s.preload('location'))
       })
@@ -100,7 +87,6 @@ export default class ProductsController {
           .preload('variant', (v) =>
             v
               .preload('color')
-              .preload('print')
               .preload('size')
               .preload('product', (p) => p.preload('category'))
           )
@@ -122,12 +108,11 @@ export default class ProductsController {
     const product = await Product.notTrashed()
       .where('id', Number(params.id))
       .preload('category')
-      .preload('variants', (q) => q.preload('color').preload('print').preload('size'))
+      .preload('variants', (q) => q.preload('color').preload('size'))
       .firstOrFail()
 
-    const [colors, prints, sizes] = await Promise.all([
+    const [colors, sizes] = await Promise.all([
       Color.query().orderBy('name', 'asc'),
-      Print.query().orderBy('name', 'asc'),
       Size.query().orderBy('sort_order', 'asc'),
     ])
 
@@ -135,7 +120,6 @@ export default class ProductsController {
       product: ProductTransformer.transform(product),
       variants: VariantTransformer.transform(product.variants),
       colors: ColorTransformer.transform(colors),
-      prints: PrintTransformer.transform(prints),
       sizes: SizeTransformer.transform(sizes),
     })
   }
@@ -157,10 +141,9 @@ export default class ProductsController {
     })
     await product.save()
 
-    if (payload.colorIds || payload.printIds || payload.sizeIds) {
+    if (payload.colorIds || payload.sizeIds) {
       await new VariantGenerator().generate(product, product.category, {
         colorIds: payload.colorIds,
-        printIds: payload.printIds,
         sizeIds: payload.sizeIds,
       })
     }

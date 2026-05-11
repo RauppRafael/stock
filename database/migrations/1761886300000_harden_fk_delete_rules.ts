@@ -20,63 +20,62 @@ import { BaseSchema } from '@adonisjs/lucid/schema'
  * referenced row would leave history with dangling identifiers.
  */
 export default class extends BaseSchema {
+  /**
+   * MySQL refuses to modify a column's NOT NULL state inside the same
+   * ALTER TABLE that drops its FK if the FK's action conflicts with the
+   * new nullability (e.g. SET NULL on a column being made NOT NULL).
+   * To stay safe in both directions, every column-modify is split into
+   * its own `alterTable` call so Knex emits separate ALTER statements.
+   */
   async up() {
     this.schema.alterTable('variants', (table) => {
       table.dropForeign(['product_id'])
-      table
-        .foreign('product_id')
-        .references('id')
-        .inTable('products')
-        .onDelete('RESTRICT')
+    })
+    this.schema.alterTable('variants', (table) => {
+      table.foreign('product_id').references('id').inTable('products').onDelete('RESTRICT')
     })
 
     this.schema.alterTable('stocks', (table) => {
       table.dropForeign(['variant_id'])
-      table
-        .foreign('variant_id')
-        .references('id')
-        .inTable('variants')
-        .onDelete('RESTRICT')
+    })
+    this.schema.alterTable('stocks', (table) => {
+      table.foreign('variant_id').references('id').inTable('variants').onDelete('RESTRICT')
     })
 
     this.schema.alterTable('stock_movements', (table) => {
       table.dropForeign(['user_id'])
+    })
+    this.schema.alterTable('stock_movements', (table) => {
       table.integer('user_id').unsigned().nullable().alter()
-      table
-        .foreign('user_id')
-        .references('id')
-        .inTable('users')
-        .onDelete('SET NULL')
+    })
+    this.schema.alterTable('stock_movements', (table) => {
+      table.foreign('user_id').references('id').inTable('users').onDelete('SET NULL')
     })
   }
 
   async down() {
     this.schema.alterTable('stock_movements', (table) => {
       table.dropForeign(['user_id'])
+    })
+    this.schema.alterTable('stock_movements', (table) => {
       table.integer('user_id').unsigned().notNullable().alter()
-      table
-        .foreign('user_id')
-        .references('id')
-        .inTable('users')
-        .onDelete('RESTRICT')
+    })
+    this.schema.alterTable('stock_movements', (table) => {
+      table.foreign('user_id').references('id').inTable('users').onDelete('RESTRICT')
     })
 
     this.schema.alterTable('stocks', (table) => {
       table.dropForeign(['variant_id'])
-      table
-        .foreign('variant_id')
-        .references('id')
-        .inTable('variants')
-        .onDelete('CASCADE')
+    })
+    this.schema.alterTable('stocks', (table) => {
+      table.foreign('variant_id').references('id').inTable('variants').onDelete('CASCADE')
     })
 
     this.schema.alterTable('variants', (table) => {
       table.dropForeign(['product_id'])
-      table
-        .foreign('product_id')
-        .references('id')
-        .inTable('products')
-        .onDelete('CASCADE')
+    })
+    this.schema.alterTable('variants', (table) => {
+      table.foreign('product_id').references('id').inTable('products').onDelete('CASCADE')
     })
   }
 }

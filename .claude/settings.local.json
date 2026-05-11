@@ -23,7 +23,8 @@
       "Bash(node *)",
       "Bash(del *)",
       "Bash(npx tuyau *)",
-      "Bash(tasklist /FI \"IMAGENAME eq node.exe\")"
+      "Bash(tasklist /FI \"IMAGENAME eq node.exe\")",
+      "PowerShell(node ace test unit)"
     ]
   }
 }

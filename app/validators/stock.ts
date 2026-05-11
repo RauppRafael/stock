@@ -2,8 +2,16 @@ import vine from '@vinejs/vine'
 
 export const adjustStockValidator = vine.compile(
   vine.object({
-    variantId: vine.number().withoutDecimals().positive().exists({ table: 'variants', column: 'id' }),
-    locationId: vine.number().withoutDecimals().positive().exists({ table: 'locations', column: 'id' }),
+    variantId: vine
+      .number()
+      .withoutDecimals()
+      .positive()
+      .exists({ table: 'variants', column: 'id' }),
+    locationId: vine
+      .number()
+      .withoutDecimals()
+      .positive()
+      .exists({ table: 'locations', column: 'id' }),
     newQuantity: vine.number().withoutDecimals().min(0).max(1_000_000),
     reason: vine.string().trim().maxLength(1000).nullable().optional(),
   })
@@ -11,7 +19,11 @@ export const adjustStockValidator = vine.compile(
 
 export const bulkAdjustStockValidator = vine.compile(
   vine.object({
-    locationId: vine.number().withoutDecimals().positive().exists({ table: 'locations', column: 'id' }),
+    locationId: vine
+      .number()
+      .withoutDecimals()
+      .positive()
+      .exists({ table: 'locations', column: 'id' }),
     adjustments: vine
       .array(
         vine.object({
@@ -38,7 +50,6 @@ export const stockLookupGridParamsValidator = vine.compile(
 export const stockLookupGridQueryValidator = vine.compile(
   vine.object({
     colorId: vine.number().withoutDecimals().positive().optional(),
-    printId: vine.number().withoutDecimals().positive().optional(),
   })
 )
 

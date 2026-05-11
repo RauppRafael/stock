@@ -8,7 +8,7 @@ import { BaseModel, column } from '@adonisjs/lucid/orm'
 import { DateTime } from 'luxon'
 
 export class CategorySchema extends BaseModel {
-  static $columns = ['createdAt', 'deletedAt', 'hasColor', 'hasPrint', 'hasSize', 'icon', 'id', 'name', 'updatedAt'] as const
+  static $columns = ['createdAt', 'deletedAt', 'hasColor', 'hasSize', 'icon', 'id', 'name', 'updatedAt'] as const
   $columns = CategorySchema.$columns
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
@@ -16,8 +16,6 @@ export class CategorySchema extends BaseModel {
   declare deletedAt: DateTime | null
   @column()
   declare hasColor: boolean
-  @column()
-  declare hasPrint: boolean
   @column()
   declare hasSize: boolean
   @column()
@@ -56,21 +54,6 @@ export class LocationSchema extends BaseModel {
   declare description: string | null
   @column()
   declare icon: string | null
-  @column({ isPrimary: true })
-  declare id: number
-  @column()
-  declare name: string
-  @column.dateTime({ autoCreate: true, autoUpdate: true })
-  declare updatedAt: DateTime | null
-}
-
-export class PrintSchema extends BaseModel {
-  static $columns = ['code', 'createdAt', 'id', 'name', 'updatedAt'] as const
-  $columns = PrintSchema.$columns
-  @column()
-  declare code: string
-  @column.dateTime({ autoCreate: true })
-  declare createdAt: DateTime
   @column({ isPrimary: true })
   declare id: number
   @column()
@@ -177,7 +160,7 @@ export class UserSchema extends BaseModel {
 }
 
 export class VariantSchema extends BaseModel {
-  static $columns = ['colorId', 'createdAt', 'id', 'printId', 'productId', 'sizeId', 'updatedAt'] as const
+  static $columns = ['colorId', 'createdAt', 'id', 'productId', 'sizeId', 'updatedAt'] as const
   $columns = VariantSchema.$columns
   @column()
   declare colorId: number | null
@@ -185,8 +168,6 @@ export class VariantSchema extends BaseModel {
   declare createdAt: DateTime
   @column({ isPrimary: true })
   declare id: number
-  @column()
-  declare printId: number | null
   @column()
   declare productId: number
   @column()

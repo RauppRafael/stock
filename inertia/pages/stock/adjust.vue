@@ -41,7 +41,6 @@ const initialLocationId =
 type Selection = {
   productId: number
   colorId: number | null
-  printId: number | null
   locationId: number
 }
 
@@ -65,11 +64,6 @@ const selectedColor = computed(() => {
   if (!cId) return null
   return variants.value.find((v) => v.color?.id === cId)?.color ?? null
 })
-const selectedPrint = computed(() => {
-  const pId = selection.value?.printId
-  if (!pId) return null
-  return variants.value.find((v) => v.print?.id === pId)?.print ?? null
-})
 
 const pendingChanges = computed(() => {
   let n = 0
@@ -88,7 +82,6 @@ async function loadGrid(sel: Selection) {
     })
     const params = new URLSearchParams()
     if (sel.colorId) params.set('colorId', String(sel.colorId))
-    if (sel.printId) params.set('printId', String(sel.printId))
     const fullUrl = params.toString() ? `${url}?${params.toString()}` : url
     const res = await fetch(fullUrl, { headers: { Accept: 'application/json' } })
     const parsed = gridResponseSchema.safeParse(await res.json())
@@ -133,7 +126,6 @@ function onResolved(payload: { variant: Data.Variant; locationId: number }) {
   selection.value = {
     productId: payload.variant.productId,
     colorId: payload.variant.color?.id ?? null,
-    printId: payload.variant.print?.id ?? null,
     locationId: payload.locationId,
   }
 }
@@ -257,12 +249,6 @@ function submit() {
                   :style="{ background: selectedColor.hexCode }"
                 />
                 <span class="font-medium">{{ selectedColor.name }}</span>
-              </span>
-              <span
-                v-if="selectedPrint"
-                class="inline-flex items-center gap-1.5 rounded-full bg-white border border-slate-200 px-2 py-0.5 text-slate-700 whitespace-nowrap"
-              >
-                <span class="font-medium">{{ selectedPrint.name }}</span>
               </span>
             </div>
           </div>

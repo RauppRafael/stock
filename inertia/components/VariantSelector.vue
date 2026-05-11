@@ -3,6 +3,7 @@ import { computed, onMounted, ref, watch } from 'vue'
 import { urlFor } from '~/client'
 import type { Data } from '@generated/data'
 import { dataEnvelope, productSchema, variantSchema } from '@contracts'
+import CategoryPicker from '~/components/CategoryPicker.vue'
 
 // Response shapes for the JSON lookup endpoints. Validated at runtime so
 // any back-end shape change shows up here as a console error instead of
@@ -34,7 +35,6 @@ const categoryId = ref<number | null>(props.initialVariant?.product?.categoryId 
 const productId = ref<number | null>(props.initialVariant?.productId ?? null)
 
 const colorId = ref<number | null>(props.initialVariant?.color?.id ?? null)
-const printId = ref<number | null>(props.initialVariant?.print?.id ?? null)
 const sizeId = ref<number | null>(props.initialVariant?.size?.id ?? null)
 
 const products = ref<Data.Product[]>([])
@@ -58,7 +58,6 @@ watch(categoryId, async (next) => {
   productId.value = null
   variants.value = []
   colorId.value = null
-  printId.value = null
   sizeId.value = null
   if (!next) {
     products.value = []
@@ -77,14 +76,13 @@ watch(productId, async (next) => {
   if (!ready.value) return
   variants.value = []
   colorId.value = null
-  printId.value = null
   sizeId.value = null
   if (!next) return
   await loadVariants(next)
   autoPickFirstAttributes()
 })
 
-watch([colorId, printId, sizeId, locationId], () => {
+watch([colorId, sizeId, locationId], () => {
   if (!ready.value) return
   emitResolved()
 })
@@ -126,7 +124,7 @@ async function loadVariants(prodId: number) {
 }
 
 function uniqueAttribute<T extends { id: number; name: string }>(
-  attr: 'color' | 'print' | 'size'
+  attr: 'color' | 'size'
 ): T[] {
   const seen = new Map<number, T>()
   for (const v of variants.value) {
@@ -137,21 +135,17 @@ function uniqueAttribute<T extends { id: number; name: string }>(
 }
 
 const colorOptions = computed(() => uniqueAttribute<Data.Color>('color'))
-const printOptions = computed(() => uniqueAttribute<Data.Print>('print'))
 const sizeOptions = computed(() => uniqueAttribute<Data.Size>('size'))
 
 /**
  * Pre-pick the first available value for each attribute axis the category
  * uses, so the user lands on a fully-resolved variant after picking a
- * product instead of clicking through 1–3 more pickers.
+ * product instead of clicking through 1–2 more pickers.
  */
 function autoPickFirstAttributes() {
   if (!category.value) return
   if (category.value.hasColor && colorId.value === null) {
     colorId.value = colorOptions.value[0]?.id ?? null
-  }
-  if (category.value.hasPrint && printId.value === null) {
-    printId.value = printOptions.value[0]?.id ?? null
   }
   if (category.value.hasSize && sizeId.value === null) {
     sizeId.value = sizeOptions.value[0]?.id ?? null
@@ -164,16 +158,13 @@ function emitResolved() {
     return
   }
   const wantsColor = category.value.hasColor
-  const wantsPrint = category.value.hasPrint
   const wantsSize = category.value.hasSize
   if (wantsColor && !colorId.value) return emit('selectionCleared')
-  if (wantsPrint && !printId.value) return emit('selectionCleared')
   if (wantsSize && !sizeId.value) return emit('selectionCleared')
 
   const match = variants.value.find(
     (v) =>
       (wantsColor ? v.color?.id === colorId.value : true) &&
-      (wantsPrint ? v.print?.id === printId.value : true) &&
       (wantsSize ? v.size?.id === sizeId.value : true)
   )
   if (match) {
@@ -206,23 +197,7 @@ onMounted(async () => {
 
     <div v-if="locationId">
       <label class="label">{{ $t('common.labels.category') }}</label>
-      <div class="flex flex-wrap gap-2">
-        <button
-          v-for="cat in categories"
-          :key="cat.id"
-          type="button"
-          class="inline-flex items-center gap-2 rounded-xl border px-3 py-2 text-sm transition"
-          :class="
-            categoryId === cat.id
-              ? 'border-brand-600 bg-brand-50 text-brand-700 ring-1 ring-brand-600'
-              : 'border-slate-300 bg-white text-slate-700 hover:border-slate-400'
-          "
-          @click="categoryId = cat.id"
-        >
-          <span v-if="cat.icon" class="text-base leading-none">{{ cat.icon }}</span>
-          <span class="font-medium">{{ cat.name }}</span>
-        </button>
-      </div>
+      <CategoryPicker v-model="categoryId" :categories="categories" />
     </div>
 
     <div v-if="categoryId">
@@ -266,18 +241,6 @@ onMounted(async () => {
           </button>
         </div>
         <p v-else class="text-xs text-slate-400 italic">{{ $t('variantSelector.noColors') }}</p>
-      </div>
-
-      <div v-if="category.hasPrint">
-        <label class="label">{{ $t('common.labels.print') }}</label>
-        <select v-model.number="printId" class="select" :disabled="loadingVariants">
-          <option :value="null">
-            {{ loadingVariants ? $t('common.actions.loading') : $t('common.selectAPrint') }}
-          </option>
-          <option v-for="opt in printOptions" :key="opt.id" :value="opt.id">
-            {{ opt.name }}
-          </option>
-        </select>
       </div>
 
       <div v-if="category.hasSize && !hideSize">

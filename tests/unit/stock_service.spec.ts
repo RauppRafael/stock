@@ -19,10 +19,13 @@ async function makeFixture(): Promise<Fixture> {
   const category = await Category.create({
     name: 'Test Hoodie',
     hasColor: false,
-    hasPrint: false,
     hasSize: false,
   })
-  const product = await Product.create({ name: 'Test Product', code: 'TST', categoryId: category.id })
+  const product = await Product.create({
+    name: 'Test Product',
+    code: 'TST',
+    categoryId: category.id,
+  })
   const variant = await Variant.create({ productId: product.id })
   const location = await Location.create({ name: 'Test Warehouse' })
   const user = await User.create({
@@ -35,10 +38,7 @@ async function makeFixture(): Promise<Fixture> {
 
 test.group('StockService', (group) => {
   group.each.setup(async () => {
-    await Promise.all([
-      StockMovement.query().delete(),
-      Stock.query().delete(),
-    ])
+    await Promise.all([StockMovement.query().delete(), Stock.query().delete()])
     await Variant.query().delete()
     await Product.query().delete()
     await Category.query().delete()
@@ -74,7 +74,12 @@ test.group('StockService', (group) => {
     const { user, variant, location } = await makeFixture()
     const service = new StockService()
 
-    await service.adjust({ variantId: variant.id, locationId: location.id, newQuantity: 3, userId: user.id })
+    await service.adjust({
+      variantId: variant.id,
+      locationId: location.id,
+      newQuantity: 3,
+      userId: user.id,
+    })
     const movement = await service.adjust({
       variantId: variant.id,
       locationId: location.id,
@@ -94,7 +99,12 @@ test.group('StockService', (group) => {
     const { user, variant, location } = await makeFixture()
     const service = new StockService()
 
-    await service.adjust({ variantId: variant.id, locationId: location.id, newQuantity: 8, userId: user.id })
+    await service.adjust({
+      variantId: variant.id,
+      locationId: location.id,
+      newQuantity: 8,
+      userId: user.id,
+    })
     const movement = await service.adjust({
       variantId: variant.id,
       locationId: location.id,
@@ -132,7 +142,12 @@ test.group('StockService', (group) => {
     const { user, variant, location } = await makeFixture()
     const service = new StockService()
 
-    await service.adjust({ variantId: variant.id, locationId: location.id, newQuantity: 5, userId: user.id })
+    await service.adjust({
+      variantId: variant.id,
+      locationId: location.id,
+      newQuantity: 5,
+      userId: user.id,
+    })
     const stockBefore = await Stock.query()
       .where('variant_id', variant.id)
       .andWhere('location_id', location.id)
@@ -160,7 +175,9 @@ test.group('StockService', (group) => {
     assert.lengthOf(movementsAfter, 1, 'no new movement row should be written')
   })
 
-  test('rolls back when an outer caller wraps the service in a failing transaction', async ({ assert }) => {
+  test('rolls back when an outer caller wraps the service in a failing transaction', async ({
+    assert,
+  }) => {
     const { user, variant, location } = await makeFixture()
     const service = new StockService()
 

@@ -26,14 +26,16 @@ This is an **AdonisJS 7** monolith serving an **Inertia.js + Vue 3** SPA. Server
 
 ### Domain model (inventory)
 
-A clothing-brand inventory: `Product` belongs to a `Category` whose flags (`hasColor`, `hasPrint`, `hasSize`) decide which attributes its variants carry. Every `Variant` is the (product, color?, print?, size?) tuple used as the SKU grain. `Stock` tracks quantity per (variant, location). `StockMovement` is an append-only audit row written every time stock changes.
+A clothing-brand inventory: `Product` belongs to a `Category` whose flags (`hasColor`, `hasSize`) decide which attributes its variants carry. Every `Variant` is the (product, color?, size?) tuple used as the SKU grain. `Stock` tracks quantity per (variant, location). `StockMovement` is an append-only audit row written every time stock changes.
+
+Prints are intentionally **not** a separate entity. A "Fold Hoodie Plain" and a "Fold Hoodie Puff" are two distinct products in the catalog — the print is folded into the product's name and code, not modelled as a relation or variant axis.
 
 Key invariants:
 - All stock writes go through `app/services/stock_service.ts` inside a single DB transaction with `forUpdate()` on the stock row, so quantity + history can never drift.
-- Variant uniqueness on `(product_id, color_id, print_id, size_id)` is enforced via a DB unique index *plus* `app/services/variant_generator.ts`, which dedupes during the cartesian-product create flow (MySQL treats NULLs as distinct, so the index alone wouldn't catch hat-style "no-size" duplicates).
-- SKU is **derived data, not stored**. `Variant.skuCode` and `Variant.displayName` are `@computed()` getters in `app/models/variant.ts` that combine the preloaded `product/color/print/size` codes through `app/services/sku_builder.ts`. The SKU updates instantly when an attribute's `code` changes.
+- Variant uniqueness on `(product_id, color_id, size_id)` is enforced via a DB unique index *plus* `app/services/variant_generator.ts`, which dedupes during the cartesian-product create flow (MySQL treats NULLs as distinct, so the index alone wouldn't catch hat-style "no-size" duplicates).
+- SKU is **derived data, not stored**. `Variant.skuCode` and `Variant.displayName` are `@computed()` getters in `app/models/variant.ts` that combine the preloaded `product/color/size` codes through `app/services/sku_builder.ts`. The SKU updates instantly when an attribute's `code` changes.
 - `Category` and `Product` use a custom `withSoftDelete` mixin (`app/models/mixins/soft_delete.ts`). Use `Model.notTrashed()` / `model.trash()` / `model.restore()`. Hard delete is intentionally absent for these so movement history stays readable.
-- `Color`, `Print`, `Size`, and `Product` each have a short `code` field (uppercase `[A-Z0-9]+`, max 8/16 chars) — these compose the rendered SKU (e.g. `FLDH-NUDE-PL-S`).
+- `Color`, `Size`, and `Product` each have a short `code` field (uppercase `[A-Z0-9]+`, max 8/16 chars) — these compose the rendered SKU (e.g. `FLDH-PL-NUDE-S`, where `PL` is part of the product code itself).
 
 ### Backend layout (`app/`, `start/`, `config/`, `database/`, `providers/`)
 
@@ -69,7 +71,7 @@ Key invariants:
   - `QuantityStepper` — controlled number input with `−`/`+` buttons and a live "Was N → ±delta" preview underneath. `v-model:modelValue` plus a `current` prop for the baseline.
   - `Modal` — teleported dialog used by all attribute/location CRUD pages.
   - `ConfirmButton` — runs `confirm(message)` and only then calls `router.visit(...)` with the chosen method. Built deliberately as a click handler (not an Inertia `<Form>` wrapper) because Inertia's submit interception didn't reliably honour `event.preventDefault()` from the `@submit` listener — meaning a "Cancel" click could still mutate.
-- **Frontend domain types are auto-generated**. `@generated/data` exposes `Data.Category`, `Data.Product`, `Data.Variant`, `Data.Stock`, `Data.StockMovement`, `Data.User`, `Data.Color`, `Data.Print`, `Data.Size`, plus `Data.SharedProps`. They're inferred from each transformer's `toObject()` return type via `InferData`. Do **not** hand-write parallel TS interfaces — change the transformer if the page needs more fields.
+- **Frontend domain types are auto-generated**. `@generated/data` exposes `Data.Category`, `Data.Product`, `Data.Variant`, `Data.Stock`, `Data.StockMovement`, `Data.User`, `Data.Color`, `Data.Size`, plus `Data.SharedProps`. They're inferred from each transformer's `toObject()` return type via `InferData`. Do **not** hand-write parallel TS interfaces — change the transformer if the page needs more fields.
 
 ### Wire-shape contracts (`shared/contracts/`)
 

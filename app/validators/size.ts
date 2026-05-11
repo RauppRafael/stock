@@ -23,19 +23,11 @@ export const updateSizeValidator = vine.withMetaData<{ id: number }>().compile(
   vine.object({
     ...fields,
     name: fields.name.clone().unique(async (db, value, field) => {
-      const row = await db
-        .from('sizes')
-        .where('name', value)
-        .whereNot('id', field.meta.id)
-        .first()
+      const row = await db.from('sizes').where('name', value).whereNot('id', field.meta.id).first()
       return !row
     }),
     code: fields.code.clone().unique(async (db, value, field) => {
-      const row = await db
-        .from('sizes')
-        .where('code', value)
-        .whereNot('id', field.meta.id)
-        .first()
+      const row = await db.from('sizes').where('code', value).whereNot('id', field.meta.id).first()
       return !row
     }),
   })

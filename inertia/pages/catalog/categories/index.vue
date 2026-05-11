@@ -23,7 +23,6 @@ const form = useForm({
   name: '',
   icon: '',
   hasColor: false,
-  hasPrint: false,
   hasSize: false,
 })
 
@@ -38,7 +37,6 @@ function openEdit(cat: Data.Category) {
   form.name = cat.name
   form.icon = cat.icon ?? ''
   form.hasColor = cat.hasColor
-  form.hasPrint = cat.hasPrint
   form.hasSize = cat.hasSize
   dialog.mode = 'edit'
   dialog.editingId = cat.id
@@ -97,19 +95,13 @@ const columns = computed(() => [
             {{ $t('common.labels.color').toLowerCase() }}
           </span>
           <span
-            v-if="row.hasPrint"
-            class="badge bg-slate-100 text-slate-700"
-          >
-            {{ $t('common.labels.print').toLowerCase() }}
-          </span>
-          <span
             v-if="row.hasSize"
             class="badge bg-slate-100 text-slate-700"
           >
             {{ $t('common.labels.size').toLowerCase() }}
           </span>
           <span
-            v-if="!row.hasColor && !row.hasPrint && !row.hasSize"
+            v-if="!row.hasColor && !row.hasSize"
             class="text-slate-300 italic"
           >
             {{ $t('common.noAttributes') }}
@@ -156,10 +148,6 @@ const columns = computed(() => [
           <label class="flex items-center gap-2 text-sm">
             <input v-model="form.hasColor" type="checkbox" class="size-4 rounded border-slate-300" />
             {{ $t('common.labels.color') }}
-          </label>
-          <label class="flex items-center gap-2 text-sm">
-            <input v-model="form.hasPrint" type="checkbox" class="size-4 rounded border-slate-300" />
-            {{ $t('common.labels.print') }}
           </label>
           <label class="flex items-center gap-2 text-sm">
             <input v-model="form.hasSize" type="checkbox" class="size-4 rounded border-slate-300" />

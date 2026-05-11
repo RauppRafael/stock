@@ -17,7 +17,9 @@ export default class UserEdit extends BaseCommand {
   @flags.string({ description: 'New email address' })
   declare email?: string
 
-  @flags.string({ description: 'New password (min 8 chars). Use --reset-password for an interactive prompt.' })
+  @flags.string({
+    description: 'New password (min 8 chars). Use --reset-password for an interactive prompt.',
+  })
   declare password?: string
 
   @flags.boolean({ description: 'Prompt securely for a new password' })
@@ -34,7 +36,9 @@ export default class UserEdit extends BaseCommand {
       return
     }
 
-    this.logger.info(`Editing user #${user.id} <${user.email}>${user.fullName ? ` — ${user.fullName}` : ''}`)
+    this.logger.info(
+      `Editing user #${user.id} <${user.email}>${user.fullName ? ` — ${user.fullName}` : ''}`
+    )
 
     let nextPassword = this.password
     if (this.resetPassword && !nextPassword) {
@@ -81,7 +85,12 @@ export default class UserEdit extends BaseCommand {
   }
 
   private printValidationError(error: unknown) {
-    if (error && typeof error === 'object' && 'messages' in error && Array.isArray(error.messages)) {
+    if (
+      error &&
+      typeof error === 'object' &&
+      'messages' in error &&
+      Array.isArray(error.messages)
+    ) {
       for (const m of error.messages) {
         this.logger.error(`${m.field}: ${m.message}`)
       }

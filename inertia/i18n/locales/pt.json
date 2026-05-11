@@ -40,8 +40,6 @@
       "users": "Usuários",
       "color": "Cor",
       "colors": "Cores",
-      "print": "Estampa",
-      "prints": "Estampas",
       "size": "Tamanho",
       "sizes": "Tamanhos",
       "variant": "Variante",
@@ -83,7 +81,6 @@
     "selectAProduct": "Selecione um produto…",
     "selectALocation": "Selecione uma localização…",
     "selectAColor": "Selecione uma cor…",
-    "selectAPrint": "Selecione uma estampa…",
     "selectASize": "Selecione um tamanho…",
     "noAttributes": "sem atributos",
     "dash": "—",
@@ -103,7 +100,6 @@
       "categories": "Categorias",
       "locations": "Localizações",
       "colors": "Cores",
-      "prints": "Estampas",
       "sizes": "Tamanhos"
     },
     "toggle": "Alternar navegação"
@@ -229,16 +225,6 @@
     "empty": "Ainda não há cores.",
     "codeLabel": "Código (usado em SKUs, A–Z / 0–9, máx 8)",
     "hexLabel": "Hex (opcional)",
-    "deleteConfirm": "Excluir “{name}”?"
-  },
-  "prints": {
-    "title": "Estampas",
-    "description": "Atributo de estampa reutilizável aplicado às variantes de produto.",
-    "new": "+ Nova estampa",
-    "newTitle": "Nova estampa",
-    "editTitle": "Editar estampa",
-    "empty": "Ainda não há estampas.",
-    "codeLabel": "Código (usado em SKUs, A–Z / 0–9, máx 8)",
     "deleteConfirm": "Excluir “{name}”?"
   },
   "sizes": {

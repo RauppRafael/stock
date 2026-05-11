@@ -28,19 +28,11 @@ export const updateColorValidator = vine.withMetaData<{ id: number }>().compile(
   vine.object({
     ...fields,
     name: fields.name.clone().unique(async (db, value, field) => {
-      const row = await db
-        .from('colors')
-        .where('name', value)
-        .whereNot('id', field.meta.id)
-        .first()
+      const row = await db.from('colors').where('name', value).whereNot('id', field.meta.id).first()
       return !row
     }),
     code: fields.code.clone().unique(async (db, value, field) => {
-      const row = await db
-        .from('colors')
-        .where('code', value)
-        .whereNot('id', field.meta.id)
-        .first()
+      const row = await db.from('colors').where('code', value).whereNot('id', field.meta.id).first()
       return !row
     }),
   })

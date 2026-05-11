@@ -51,12 +51,6 @@ export interface ApiDefinition {
     update: typeof routes['colors.update']
     destroy: typeof routes['colors.destroy']
   }
-  prints: {
-    index: typeof routes['prints.index']
-    store: typeof routes['prints.store']
-    update: typeof routes['prints.update']
-    destroy: typeof routes['prints.destroy']
-  }
   sizes: {
     index: typeof routes['sizes.index']
     store: typeof routes['sizes.store']

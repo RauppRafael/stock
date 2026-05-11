@@ -11,11 +11,10 @@ const props = defineProps<{
   product: Data.Product
   variants: Data.Variant[]
   colors: Data.Color[]
-  prints: Data.Print[]
   sizes: Data.Size[]
 }>()
 
-function uniqueAttributeIds(attr: 'color' | 'print' | 'size'): number[] {
+function uniqueAttributeIds(attr: 'color' | 'size'): number[] {
   const ids = new Set<number>()
   for (const v of props.variants) {
     const value = v[attr]
@@ -30,7 +29,6 @@ const form = useForm({
   description: props.product.description ?? '',
   lowStockThreshold: props.product.lowStockThreshold,
   colorIds: uniqueAttributeIds('color'),
-  printIds: uniqueAttributeIds('print'),
   sizeIds: uniqueAttributeIds('size'),
 })
 
@@ -128,13 +126,6 @@ function submit() {
                 </span>
               </template>
             </AttributeMultiSelect>
-
-            <AttributeMultiSelect
-              v-if="category.hasPrint"
-              v-model="form.printIds"
-              :label="$t('common.labels.prints')"
-              :options="prints"
-            />
 
             <AttributeMultiSelect
               v-if="category.hasSize"

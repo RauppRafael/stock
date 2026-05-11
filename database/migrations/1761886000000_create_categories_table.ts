@@ -8,7 +8,6 @@ export default class extends BaseSchema {
       table.increments('id').notNullable()
       table.string('name', 100).notNullable().unique()
       table.boolean('has_color').notNullable().defaultTo(false)
-      table.boolean('has_print').notNullable().defaultTo(false)
       table.boolean('has_size').notNullable().defaultTo(false)
 
       table.timestamp('created_at').notNullable()

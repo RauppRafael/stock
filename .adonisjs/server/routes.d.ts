@@ -36,10 +36,6 @@ export type ScannedRoutes = {
     'colors.store': { paramsTuple?: []; params?: {} }
     'colors.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'colors.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
-    'prints.index': { paramsTuple?: []; params?: {} }
-    'prints.store': { paramsTuple?: []; params?: {} }
-    'prints.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
-    'prints.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'sizes.index': { paramsTuple?: []; params?: {} }
     'sizes.store': { paramsTuple?: []; params?: {} }
     'sizes.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
@@ -62,7 +58,6 @@ export type ScannedRoutes = {
     'categories.index': { paramsTuple?: []; params?: {} }
     'locations.index': { paramsTuple?: []; params?: {} }
     'colors.index': { paramsTuple?: []; params?: {} }
-    'prints.index': { paramsTuple?: []; params?: {} }
     'sizes.index': { paramsTuple?: []; params?: {} }
   }
   HEAD: {
@@ -82,7 +77,6 @@ export type ScannedRoutes = {
     'categories.index': { paramsTuple?: []; params?: {} }
     'locations.index': { paramsTuple?: []; params?: {} }
     'colors.index': { paramsTuple?: []; params?: {} }
-    'prints.index': { paramsTuple?: []; params?: {} }
     'sizes.index': { paramsTuple?: []; params?: {} }
   }
   POST: {
@@ -94,7 +88,6 @@ export type ScannedRoutes = {
     'categories.store': { paramsTuple?: []; params?: {} }
     'locations.store': { paramsTuple?: []; params?: {} }
     'colors.store': { paramsTuple?: []; params?: {} }
-    'prints.store': { paramsTuple?: []; params?: {} }
     'sizes.store': { paramsTuple?: []; params?: {} }
   }
   PUT: {
@@ -102,7 +95,6 @@ export type ScannedRoutes = {
     'categories.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'locations.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'colors.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
-    'prints.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'sizes.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
   DELETE: {
@@ -110,7 +102,6 @@ export type ScannedRoutes = {
     'categories.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'locations.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'colors.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
-    'prints.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'sizes.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
 }

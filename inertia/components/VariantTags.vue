@@ -21,19 +21,12 @@ defineProps<{
       <span class="font-medium">{{ variant.color.name }}</span>
     </span>
     <span
-      v-if="variant?.print"
-      class="inline-flex items-center gap-1 rounded-md bg-slate-100 text-slate-700 px-1.5 py-0.5 whitespace-nowrap"
-    >
-      <span class="text-slate-500">{{ $t('common.labels.print') }}:</span>
-      <span class="font-medium">{{ variant.print.name }}</span>
-    </span>
-    <span
       v-if="variant?.size"
       class="inline-flex items-center gap-1 rounded-md bg-slate-100 text-slate-700 px-1.5 py-0.5 whitespace-nowrap"
     >
       <span class="text-slate-500">{{ $t('common.labels.size') }}:</span>
       <span class="font-medium">{{ variant.size.name }}</span>
     </span>
-    <span v-if="!variant?.color && !variant?.print && !variant?.size" class="text-slate-300">—</span>
+    <span v-if="!variant?.color && !variant?.size" class="text-slate-300">—</span>
   </div>
 </template>

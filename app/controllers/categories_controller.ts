@@ -16,6 +16,13 @@ export default class CategoriesController {
     const payload = await request.validateUsing(createCategoryValidator)
     await Category.create(payload)
     session.flash('success', 'Category created.')
+    // When invoked from an inline-create modal (e.g. on the product create
+    // form) we want to return the user to where they were so their draft
+    // is preserved. The catalog page sends no header and gets the default
+    // redirect-to-index behaviour.
+    if (request.header('X-Inline-Create')) {
+      return response.redirect().back()
+    }
     return response.redirect().toRoute('categories.index')
   }
 

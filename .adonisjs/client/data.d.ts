@@ -9,7 +9,6 @@ import type { InferSharedProps } from '@adonisjs/inertia/types'
 import type CategoryTransformer from '#transformers/category_transformer'
 import type ColorTransformer from '#transformers/color_transformer'
 import type LocationTransformer from '#transformers/location_transformer'
-import type PrintTransformer from '#transformers/print_transformer'
 import type ProductTransformer from '#transformers/product_transformer'
 import type SizeTransformer from '#transformers/size_transformer'
 import type StockMovementTransformer from '#transformers/stock_movement_transformer'
@@ -30,10 +29,6 @@ export namespace Data {
   export type Location = InferData<LocationTransformer>
   export namespace Location {
     export type Variants = InferVariants<LocationTransformer>
-  }
-  export type Print = InferData<PrintTransformer>
-  export namespace Print {
-    export type Variants = InferVariants<PrintTransformer>
   }
   export type Product = InferData<ProductTransformer>
   export namespace Product {

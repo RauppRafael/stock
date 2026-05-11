@@ -13,9 +13,6 @@ export default class extends BaseSchema {
     this.schema.alterTable('colors', (table) => {
       table.string('code', 8).notNullable().unique().alter()
     })
-    this.schema.alterTable('prints', (table) => {
-      table.string('code', 8).notNullable().unique().alter()
-    })
     this.schema.alterTable('sizes', (table) => {
       table.string('code', 8).notNullable().unique().alter()
     })
@@ -34,9 +31,6 @@ export default class extends BaseSchema {
       table.string('code', 16).nullable().alter()
     })
     this.schema.alterTable('colors', (table) => {
-      table.string('code', 8).nullable().alter()
-    })
-    this.schema.alterTable('prints', (table) => {
       table.string('code', 8).nullable().alter()
     })
     this.schema.alterTable('sizes', (table) => {

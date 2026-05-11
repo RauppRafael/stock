@@ -391,54 +391,6 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/colors_controller').default['destroy']>>>
     }
   }
-  'prints.index': {
-    methods: ["GET","HEAD"]
-    pattern: '/prints'
-    types: {
-      body: {}
-      paramsTuple: []
-      params: {}
-      query: {}
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/prints_controller').default['index']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/prints_controller').default['index']>>>
-    }
-  }
-  'prints.store': {
-    methods: ["POST"]
-    pattern: '/prints'
-    types: {
-      body: ExtractBody<InferInput<(typeof import('#validators/print').createPrintValidator)>>
-      paramsTuple: []
-      params: {}
-      query: ExtractQuery<InferInput<(typeof import('#validators/print').createPrintValidator)>>
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/prints_controller').default['store']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/prints_controller').default['store']>>> | { status: 422; response: { errors: SimpleError[] } }
-    }
-  }
-  'prints.update': {
-    methods: ["PUT"]
-    pattern: '/prints/:id'
-    types: {
-      body: ExtractBody<InferInput<(typeof import('#validators/print').updatePrintValidator)>>
-      paramsTuple: [ParamValue]
-      params: { id: ParamValue }
-      query: ExtractQuery<InferInput<(typeof import('#validators/print').updatePrintValidator)>>
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/prints_controller').default['update']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/prints_controller').default['update']>>> | { status: 422; response: { errors: SimpleError[] } }
-    }
-  }
-  'prints.destroy': {
-    methods: ["DELETE"]
-    pattern: '/prints/:id'
-    types: {
-      body: {}
-      paramsTuple: [ParamValue]
-      params: { id: ParamValue }
-      query: {}
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/prints_controller').default['destroy']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/prints_controller').default['destroy']>>>
-    }
-  }
   'sizes.index': {
     methods: ["GET","HEAD"]
     pattern: '/sizes'

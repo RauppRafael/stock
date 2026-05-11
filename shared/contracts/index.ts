@@ -25,13 +25,6 @@ export const colorSchema = z.object({
 })
 export type Color = z.infer<typeof colorSchema>
 
-export const printSchema = z.object({
-  id,
-  name: z.string(),
-  code: z.string(),
-})
-export type Print = z.infer<typeof printSchema>
-
 export const sizeSchema = z.object({
   id,
   name: z.string(),
@@ -53,7 +46,6 @@ export const categorySchema = z.object({
   name: z.string(),
   icon: z.string().nullable(),
   hasColor: z.boolean(),
-  hasPrint: z.boolean(),
   hasSize: z.boolean(),
 })
 export type Category = z.infer<typeof categorySchema>
@@ -73,13 +65,11 @@ export const variantSchema = z.object({
   id,
   productId: id,
   colorId: id.nullable(),
-  printId: id.nullable(),
   sizeId: id.nullable(),
   skuCode: z.string().nullable(),
   displayName: z.string(),
   product: productSchema.nullable(),
   color: colorSchema.nullable(),
-  print: printSchema.nullable(),
   size: sizeSchema.nullable(),
 })
 export type Variant = z.infer<typeof variantSchema>
@@ -140,7 +130,7 @@ export function dataEnvelope<T extends z.ZodTypeAny>(schema: T) {
 
 /**
  * Per-size grid lookup payload — variants matching the (product, location,
- * color?, print?) tuple paired with the on-hand quantity at that location.
+ * color?) tuple paired with the on-hand quantity at that location.
  * Quantities are keyed by variant id and serialised as numeric strings on
  * the wire (JS object keys), so we accept either form.
  */
