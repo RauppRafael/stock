@@ -38,7 +38,11 @@ const navGroups = [
     labelKey: 'nav.groups.operations',
     items: [
       { labelKey: 'nav.items.stock', route: 'stock.index', matches: ['/stock'] },
-      { labelKey: 'nav.items.adjustStock', route: 'stock.adjust.create', matches: ['/stock/adjust'] },
+      {
+        labelKey: 'nav.items.adjustStock',
+        route: 'stock.adjust.create',
+        matches: ['/stock/adjust'],
+      },
       { labelKey: 'nav.items.movements', route: 'movements.index', matches: ['/movements'] },
     ],
   },
@@ -56,6 +60,10 @@ const navGroups = [
       { labelKey: 'nav.items.colors', route: 'colors.index', matches: ['/colors'] },
       { labelKey: 'nav.items.sizes', route: 'sizes.index', matches: ['/sizes'] },
     ],
+  },
+  {
+    labelKey: 'nav.groups.integrations',
+    items: [{ labelKey: 'nav.items.sync', route: 'sync.index', matches: ['/sync'] }],
   },
 ] as const
 
@@ -93,7 +101,9 @@ function isActive(item: { route: string }): boolean {
     <header
       class="lg:hidden sticky top-0 z-30 flex items-center justify-between bg-slate-900 text-slate-100 px-4 h-14 shadow-sm"
     >
-      <Link route="stock.index" class="text-base font-semibold tracking-tight">{{ $t('app.name') }}</Link>
+      <Link route="stock.index" class="text-base font-semibold tracking-tight">{{
+        $t('app.name')
+      }}</Link>
       <button
         type="button"
         class="p-2 -mr-2 rounded-md hover:bg-slate-800"
@@ -148,13 +158,17 @@ function isActive(item: { route: string }): boolean {
       :class="mobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'"
     >
       <div class="px-5 py-4 border-b border-slate-800">
-        <Link route="stock.index" class="block text-lg font-semibold tracking-tight">{{ $t('app.name') }}</Link>
+        <Link route="stock.index" class="block text-lg font-semibold tracking-tight">{{
+          $t('app.name')
+        }}</Link>
         <p class="text-xs text-slate-400 mt-0.5">{{ $t('app.tagline') }}</p>
       </div>
 
       <nav class="flex-1 px-3 py-4 space-y-6 overflow-y-auto">
         <div v-for="group in navGroups" :key="group.labelKey">
-          <div class="px-2 text-[11px] uppercase tracking-wider text-slate-500 mb-1.5 font-semibold">
+          <div
+            class="px-2 text-[11px] uppercase tracking-wider text-slate-500 mb-1.5 font-semibold"
+          >
             {{ $t(group.labelKey) }}
           </div>
           <ul class="space-y-0.5">
@@ -189,7 +203,9 @@ function isActive(item: { route: string }): boolean {
             <p class="text-xs text-slate-400 truncate">{{ page.props.user?.email }}</p>
           </div>
           <Form route="session.destroy">
-            <button type="submit" class="text-xs text-slate-400 hover:text-white">{{ $t('common.actions.logout') }}</button>
+            <button type="submit" class="text-xs text-slate-400 hover:text-white">
+              {{ $t('common.actions.logout') }}
+            </button>
           </Form>
         </div>
       </div>

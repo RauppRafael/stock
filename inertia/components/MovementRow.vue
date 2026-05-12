@@ -12,9 +12,7 @@ const props = defineProps<{
 
 const { t } = useI18n()
 
-const canAdjust = computed(
-  () => !!(props.movement.variantId && props.movement.locationId)
-)
+const canAdjust = computed(() => !!(props.movement.variantId && props.movement.locationId))
 
 function adjust() {
   if (!canAdjust.value) return
@@ -58,7 +56,10 @@ const deltaSign = computed(() => (props.movement.delta > 0 ? '+' : ''))
     </td>
     <td class="px-4 py-2.5">
       <div class="font-medium text-slate-900 whitespace-nowrap">
-        {{ movement.variant?.product?.name ?? t('movements.fallbackVariant', { id: movement.variantId }) }}
+        {{
+          movement.variant?.product?.name ??
+          t('movements.fallbackVariant', { id: movement.variantId })
+        }}
       </div>
       <div
         v-if="movement.variant?.product?.category?.name"

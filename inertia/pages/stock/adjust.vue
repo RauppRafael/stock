@@ -35,8 +35,7 @@ useValidatedProps(
 
 const gridResponseSchema = dataEnvelope(stockGridSchema)
 
-const initialLocationId =
-  props.prefilledLocationId ?? props.locations[0]?.id ?? null
+const initialLocationId = props.prefilledLocationId ?? props.locations[0]?.id ?? null
 
 type Selection = {
   productId: number
@@ -56,9 +55,7 @@ const selectedLocation = computed(
   () => props.locations.find((l) => l.id === selection.value?.locationId) ?? null
 )
 const selectedProductName = computed(() => variants.value[0]?.product?.name ?? null)
-const selectedCategoryIcon = computed(
-  () => variants.value[0]?.product?.category?.icon ?? null
-)
+const selectedCategoryIcon = computed(() => variants.value[0]?.product?.category?.icon ?? null)
 const selectedColor = computed(() => {
   const cId = selection.value?.colorId
   if (!cId) return null
@@ -185,10 +182,7 @@ function submit() {
 <template>
   <Head :title="$t('stock.adjust.title')" />
   <div class="p-4 sm:p-6 lg:p-8 max-w-5xl mx-auto">
-    <PageHeader
-      :title="$t('stock.adjust.title')"
-      :description="$t('stock.adjust.description')"
-    />
+    <PageHeader :title="$t('stock.adjust.title')" :description="$t('stock.adjust.description')" />
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
       <div class="card p-5">
@@ -211,10 +205,7 @@ function submit() {
           {{ $t('stock.adjust.stepQuantity') }}
         </h2>
 
-        <div
-          v-if="!selection"
-          class="text-sm text-slate-400 italic py-12 text-center"
-        >
+        <div v-if="!selection" class="text-sm text-slate-400 italic py-12 text-center">
           {{ $t('stock.adjust.pickToContinue') }}
         </div>
 
@@ -222,12 +213,17 @@ function submit() {
           {{ $t('stock.adjust.loadingGrid') }}
         </div>
 
-        <div v-else-if="variants.length === 0" class="text-sm text-slate-400 italic py-12 text-center">
+        <div
+          v-else-if="variants.length === 0"
+          class="text-sm text-slate-400 italic py-12 text-center"
+        >
           {{ $t('stock.adjust.noVariantsForSelection') }}
         </div>
 
         <div v-else class="space-y-5">
-          <div class="rounded-xl border border-slate-200 bg-gradient-to-br from-slate-50 to-white p-4">
+          <div
+            class="rounded-xl border border-slate-200 bg-gradient-to-br from-slate-50 to-white p-4"
+          >
             <p class="text-base font-semibold text-slate-900 inline-flex items-center gap-2">
               <span v-if="selectedCategoryIcon">{{ selectedCategoryIcon }}</span>
               {{ selectedProductName }}
@@ -265,14 +261,18 @@ function submit() {
                 >
                   {{ v.size?.name ?? '—' }}
                 </div>
-                <div class="flex flex-wrap items-baseline gap-x-2 gap-y-0.5 text-xs tabular-nums min-w-0">
+                <div
+                  class="flex flex-wrap items-baseline gap-x-2 gap-y-0.5 text-xs tabular-nums min-w-0"
+                >
                   <span>
                     <span class="text-slate-400">{{ $t('stock.adjust.initialLabel') }}:</span>
                     <span class="ml-1 text-slate-700 font-medium">{{ baselines[v.id] ?? 0 }}</span>
                   </span>
                   <span v-if="deltaLabelFor(v.id)">
                     <span class="text-slate-400">{{ $t('stock.adjust.changeLabel') }}:</span>
-                    <span class="ml-1 font-semibold" :class="deltaToneFor(v.id)">{{ deltaLabelFor(v.id) }}</span>
+                    <span class="ml-1 font-semibold" :class="deltaToneFor(v.id)">{{
+                      deltaLabelFor(v.id)
+                    }}</span>
                   </span>
                 </div>
               </div>

@@ -24,3 +24,8 @@ yarn-error.log
 
 # Platform specific
 .DS_Store
+
+# Shopify CLI scratch — one-time deploy artifact for setting scopes on the
+# dev.shopify.com credentials container. Not consumed at runtime.
+.shopify-cfg/
+.shopify/

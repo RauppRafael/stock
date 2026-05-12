@@ -58,4 +58,12 @@ export interface ApiDefinition {
     update: typeof routes['sizes.update']
     destroy: typeof routes['sizes.destroy']
   }
+  sync: {
+    index: typeof routes['sync.index']
+    diff: typeof routes['sync.diff']
+    link: typeof routes['sync.link']
+    unlink: typeof routes['sync.unlink']
+    push: typeof routes['sync.push']
+    pull: typeof routes['sync.pull']
+  }
 }

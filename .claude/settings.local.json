@@ -26,7 +26,15 @@
       "Bash(tasklist /FI \"IMAGENAME eq node.exe\")",
       "PowerShell(node ace test unit)",
       "Bash(npx tsc *)",
-      "Bash(npx eslint *)"
+      "Bash(npx eslint *)",
+      "Bash(npx vue-tsc *)",
+      "WebSearch",
+      "WebFetch(domain:shopify.dev)",
+      "WebFetch(domain:www.smackcoders.com)",
+      "WebFetch(domain:community.shopify.dev)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:community.shopify.com)",
+      "Bash(git show *)"
     ]
   }
 }

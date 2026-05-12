@@ -56,11 +56,13 @@ const variantCount = computed(() => {
 
 function submit() {
   if (form.processing) return
-  form.transform((data) => ({
-    ...data,
-    code: data.code.toUpperCase(),
-    description: data.description || null,
-  })).post(urlFor('products.store'))
+  form
+    .transform((data) => ({
+      ...data,
+      code: data.code.toUpperCase(),
+      description: data.description || null,
+    }))
+    .post(urlFor('products.store'))
 }
 
 /**
@@ -188,7 +190,10 @@ function submitSize() {
 <template>
   <Head :title="$t('products.create.title')" />
   <div class="p-4 sm:p-6 lg:p-8 max-w-3xl mx-auto">
-    <PageHeader :title="$t('products.create.title')" :description="$t('products.create.description')">
+    <PageHeader
+      :title="$t('products.create.title')"
+      :description="$t('products.create.description')"
+    >
       <template #actions>
         <Link route="products.index" class="btn-ghost">{{ $t('common.actions.cancel') }}</Link>
       </template>
@@ -239,7 +244,9 @@ function submitSize() {
 
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
-          <label for="lowStockThreshold" class="label">{{ $t('products.create.lowStockThreshold') }}</label>
+          <label for="lowStockThreshold" class="label">{{
+            $t('products.create.lowStockThreshold')
+          }}</label>
           <input
             id="lowStockThreshold"
             v-model.number="form.lowStockThreshold"
@@ -248,7 +255,9 @@ function submitSize() {
             class="input"
             :placeholder="$t('common.placeholders.optional')"
           />
-          <p v-if="form.errors.lowStockThreshold" class="field-error">{{ form.errors.lowStockThreshold }}</p>
+          <p v-if="form.errors.lowStockThreshold" class="field-error">
+            {{ form.errors.lowStockThreshold }}
+          </p>
         </div>
       </div>
 
@@ -268,8 +277,15 @@ function submitSize() {
         <hr class="border-slate-100" />
 
         <div>
-          <h2 class="text-sm font-semibold text-slate-700 uppercase tracking-wider mb-2">{{ $t('common.labels.variants') }}</h2>
-          <i18n-t keypath="products.create.variantsHint" tag="p" class="text-xs text-slate-500 mb-4" :plural="variantCount">
+          <h2 class="text-sm font-semibold text-slate-700 uppercase tracking-wider mb-2">
+            {{ $t('common.labels.variants') }}
+          </h2>
+          <i18n-t
+            keypath="products.create.variantsHint"
+            tag="p"
+            class="text-xs text-slate-500 mb-4"
+            :plural="variantCount"
+          >
             <template #count>
               <span class="font-semibold text-slate-700">{{ variantCount }}</span>
             </template>
@@ -323,7 +339,11 @@ function submitSize() {
       </div>
     </form>
 
-    <Modal :open="dialog.category" :title="$t('categories.newTitle')" @close="dialog.category = false">
+    <Modal
+      :open="dialog.category"
+      :title="$t('categories.newTitle')"
+      @close="dialog.category = false"
+    >
       <form class="space-y-4" @submit.prevent="submitCategory">
         <div>
           <label for="cat-name-inline" class="label">{{ $t('common.labels.name') }}</label>
@@ -347,18 +367,30 @@ function submitSize() {
         <fieldset class="space-y-2">
           <legend class="label mb-1">{{ $t('categories.attributesUsed') }}</legend>
           <label class="flex items-center gap-2 text-sm">
-            <input v-model="categoryForm.hasColor" type="checkbox" class="size-4 rounded border-slate-300" />
+            <input
+              v-model="categoryForm.hasColor"
+              type="checkbox"
+              class="size-4 rounded border-slate-300"
+            />
             {{ $t('common.labels.color') }}
           </label>
           <label class="flex items-center gap-2 text-sm">
-            <input v-model="categoryForm.hasSize" type="checkbox" class="size-4 rounded border-slate-300" />
+            <input
+              v-model="categoryForm.hasSize"
+              type="checkbox"
+              class="size-4 rounded border-slate-300"
+            />
             {{ $t('common.labels.size') }}
           </label>
         </fieldset>
         <div class="flex justify-end gap-2">
-          <button type="button" class="btn-ghost" @click="dialog.category = false">{{ $t('common.actions.cancel') }}</button>
+          <button type="button" class="btn-ghost" @click="dialog.category = false">
+            {{ $t('common.actions.cancel') }}
+          </button>
           <button type="submit" class="btn-primary" :disabled="categoryForm.processing">
-            {{ categoryForm.processing ? $t('common.actions.saving') : $t('common.actions.create') }}
+            {{
+              categoryForm.processing ? $t('common.actions.saving') : $t('common.actions.create')
+            }}
           </button>
         </div>
       </form>
@@ -402,7 +434,9 @@ function submitSize() {
           <p v-if="colorForm.errors.hexCode" class="field-error">{{ colorForm.errors.hexCode }}</p>
         </div>
         <div class="flex justify-end gap-2">
-          <button type="button" class="btn-ghost" @click="dialog.color = false">{{ $t('common.actions.cancel') }}</button>
+          <button type="button" class="btn-ghost" @click="dialog.color = false">
+            {{ $t('common.actions.cancel') }}
+          </button>
           <button type="submit" class="btn-primary" :disabled="colorForm.processing">
             {{ colorForm.processing ? $t('common.actions.saving') : $t('common.actions.create') }}
           </button>
@@ -446,10 +480,14 @@ function submitSize() {
             class="input"
             :data-invalid="sizeForm.errors.sortOrder ? 'true' : undefined"
           />
-          <p v-if="sizeForm.errors.sortOrder" class="field-error">{{ sizeForm.errors.sortOrder }}</p>
+          <p v-if="sizeForm.errors.sortOrder" class="field-error">
+            {{ sizeForm.errors.sortOrder }}
+          </p>
         </div>
         <div class="flex justify-end gap-2">
-          <button type="button" class="btn-ghost" @click="dialog.size = false">{{ $t('common.actions.cancel') }}</button>
+          <button type="button" class="btn-ghost" @click="dialog.size = false">
+            {{ $t('common.actions.cancel') }}
+          </button>
           <button type="submit" class="btn-primary" :disabled="sizeForm.processing">
             {{ sizeForm.processing ? $t('common.actions.saving') : $t('common.actions.create') }}
           </button>

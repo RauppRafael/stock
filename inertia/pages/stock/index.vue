@@ -4,12 +4,7 @@ import { Head, router } from '@inertiajs/vue3'
 import { Link } from '@adonisjs/inertia/vue'
 import { z } from 'zod'
 import type { Data } from '@generated/data'
-import {
-  categorySchema,
-  locationSchema,
-  productSchema,
-  stockSchema,
-} from '@contracts'
+import { categorySchema, locationSchema, productSchema, stockSchema } from '@contracts'
 import { useValidatedProps } from '~/composables/use_validated_props'
 import PageHeader from '~/components/PageHeader.vue'
 import StockBadge from '~/components/StockBadge.vue'
@@ -123,22 +118,19 @@ const groups = computed<ProductGroup[]>(() => {
   return out
 })
 
-function totalFor(group: { colors?: ColorGroup[]; locations?: LocationGroup[]; rows?: StockRow[] }) {
+function totalFor(group: {
+  colors?: ColorGroup[]
+  locations?: LocationGroup[]
+  rows?: StockRow[]
+}) {
   if (group.rows) return group.rows.reduce((s, r) => s + r.quantity, 0)
   if (group.colors) {
-    return group.colors.reduce(
-      (s, cg) => s + cg.rows.reduce((ss, r) => ss + r.quantity, 0),
-      0
-    )
+    return group.colors.reduce((s, cg) => s + cg.rows.reduce((ss, r) => ss + r.quantity, 0), 0)
   }
   if (group.locations) {
     return group.locations.reduce(
       (s, lg) =>
-        s +
-        lg.colors.reduce(
-          (ss, cg) => ss + cg.rows.reduce((sss, r) => sss + r.quantity, 0),
-          0
-        ),
+        s + lg.colors.reduce((ss, cg) => ss + cg.rows.reduce((sss, r) => sss + r.quantity, 0), 0),
       0
     )
   }
@@ -179,7 +171,9 @@ function rowClick(row: StockRow) {
   <div class="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto">
     <PageHeader :title="$t('stock.index.title')" :description="$t('stock.index.description')">
       <template #actions>
-        <Link route="stock.adjust.create" class="btn-primary">{{ $t('stock.index.newAdjustment') }}</Link>
+        <Link route="stock.adjust.create" class="btn-primary">{{
+          $t('stock.index.newAdjustment')
+        }}</Link>
       </template>
     </PageHeader>
 
@@ -208,7 +202,11 @@ function rowClick(row: StockRow) {
         </div>
         <div class="flex items-end">
           <label class="inline-flex items-center gap-2 text-sm text-slate-700">
-            <input v-model="filters.lowOnly" type="checkbox" class="size-4 rounded border-slate-300" />
+            <input
+              v-model="filters.lowOnly"
+              type="checkbox"
+              class="size-4 rounded border-slate-300"
+            />
             {{ $t('stock.index.lowOnly') }}
           </label>
         </div>
@@ -350,7 +348,10 @@ function rowClick(row: StockRow) {
               </td>
             </tr>
             <tr v-else class="bg-slate-50 border-t-2 border-slate-200">
-              <td colspan="4" class="px-4 py-3 text-right text-xs uppercase tracking-wide font-semibold text-slate-600">
+              <td
+                colspan="4"
+                class="px-4 py-3 text-right text-xs uppercase tracking-wide font-semibold text-slate-600"
+              >
                 {{ $t('stock.index.grandTotal') }}
               </td>
               <td class="px-4 py-3 text-right font-semibold text-slate-700">

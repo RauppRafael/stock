@@ -98,5 +98,17 @@ router
     router.post('/sizes', [controllers.Sizes, 'store']).as('sizes.store')
     router.put('/sizes/:id', [controllers.Sizes, 'update']).as('sizes.update')
     router.delete('/sizes/:id', [controllers.Sizes, 'destroy']).as('sizes.destroy')
+
+    /**
+     * Shopify sync. `index` renders the page shell instantly; the diff
+     * payload is fetched async from `sync.diff` so the user isn't blocked
+     * by the Shopify catalog walk. `link`/`push`/`pull` apply ticked rows.
+     */
+    router.get('/sync', [controllers.Sync, 'index']).as('sync.index')
+    router.get('/sync/diff', [controllers.Sync, 'diff']).as('sync.diff')
+    router.post('/sync/link', [controllers.Sync, 'applyLink']).as('sync.link')
+    router.post('/sync/unlink', [controllers.Sync, 'applyUnlink']).as('sync.unlink')
+    router.post('/sync/push', [controllers.Sync, 'applyPush']).as('sync.push')
+    router.post('/sync/pull', [controllers.Sync, 'applyPull']).as('sync.pull')
   })
   .use(middleware.auth())

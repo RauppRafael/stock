@@ -222,6 +222,42 @@ const routes = {
     tokens: [{"old":"/sizes/:id","type":0,"val":"sizes","end":""},{"old":"/sizes/:id","type":1,"val":"id","end":""}],
     types: placeholder as Registry['sizes.destroy']['types'],
   },
+  'sync.index': {
+    methods: ["GET","HEAD"],
+    pattern: '/sync',
+    tokens: [{"old":"/sync","type":0,"val":"sync","end":""}],
+    types: placeholder as Registry['sync.index']['types'],
+  },
+  'sync.diff': {
+    methods: ["GET","HEAD"],
+    pattern: '/sync/diff',
+    tokens: [{"old":"/sync/diff","type":0,"val":"sync","end":""},{"old":"/sync/diff","type":0,"val":"diff","end":""}],
+    types: placeholder as Registry['sync.diff']['types'],
+  },
+  'sync.link': {
+    methods: ["POST"],
+    pattern: '/sync/link',
+    tokens: [{"old":"/sync/link","type":0,"val":"sync","end":""},{"old":"/sync/link","type":0,"val":"link","end":""}],
+    types: placeholder as Registry['sync.link']['types'],
+  },
+  'sync.unlink': {
+    methods: ["POST"],
+    pattern: '/sync/unlink',
+    tokens: [{"old":"/sync/unlink","type":0,"val":"sync","end":""},{"old":"/sync/unlink","type":0,"val":"unlink","end":""}],
+    types: placeholder as Registry['sync.unlink']['types'],
+  },
+  'sync.push': {
+    methods: ["POST"],
+    pattern: '/sync/push',
+    tokens: [{"old":"/sync/push","type":0,"val":"sync","end":""},{"old":"/sync/push","type":0,"val":"push","end":""}],
+    types: placeholder as Registry['sync.push']['types'],
+  },
+  'sync.pull': {
+    methods: ["POST"],
+    pattern: '/sync/pull',
+    tokens: [{"old":"/sync/pull","type":0,"val":"sync","end":""},{"old":"/sync/pull","type":0,"val":"pull","end":""}],
+    types: placeholder as Registry['sync.pull']['types'],
+  },
 } as const satisfies Record<string, AdonisEndpoint>
 
 export { routes }

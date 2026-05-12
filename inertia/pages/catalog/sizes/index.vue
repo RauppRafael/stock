@@ -57,7 +57,12 @@ function submit() {
 const columns = computed(() => [
   { key: 'name', label: t('common.labels.name') },
   { key: 'code', label: t('common.labels.code'), width: '100px' },
-  { key: 'sortOrder', label: t('common.labels.sortOrder'), align: 'right' as const, width: '140px' },
+  {
+    key: 'sortOrder',
+    label: t('common.labels.sortOrder'),
+    align: 'right' as const,
+    width: '140px',
+  },
   { key: 'actions', label: '', align: 'right' as const, width: '180px' },
 ])
 </script>
@@ -71,7 +76,12 @@ const columns = computed(() => [
       </template>
     </PageHeader>
 
-    <DataTable :columns="columns" :rows="sizes" :row-key="(row) => row.id" :empty="$t('sizes.empty')">
+    <DataTable
+      :columns="columns"
+      :rows="sizes"
+      :row-key="(row) => row.id"
+      :empty="$t('sizes.empty')"
+    >
       <template #[`cell:name`]="{ row }">
         <span class="font-medium text-slate-900">{{ row.name }}</span>
       </template>
@@ -83,7 +93,9 @@ const columns = computed(() => [
       </template>
       <template #[`cell:actions`]="{ row }">
         <div class="flex justify-end gap-2">
-          <button type="button" class="btn-secondary" @click="openEdit(row)">{{ $t('common.actions.edit') }}</button>
+          <button type="button" class="btn-secondary" @click="openEdit(row)">
+            {{ $t('common.actions.edit') }}
+          </button>
           <ConfirmButton
             route="sizes.destroy"
             :params="{ id: row.id }"
@@ -136,9 +148,17 @@ const columns = computed(() => [
           <p v-if="form.errors.sortOrder" class="field-error">{{ form.errors.sortOrder }}</p>
         </div>
         <div class="flex justify-end gap-2">
-          <button type="button" class="btn-ghost" @click="dialog.open = false">{{ $t('common.actions.cancel') }}</button>
+          <button type="button" class="btn-ghost" @click="dialog.open = false">
+            {{ $t('common.actions.cancel') }}
+          </button>
           <button type="submit" class="btn-primary" :disabled="form.processing">
-            {{ form.processing ? $t('common.actions.saving') : dialog.mode === 'create' ? $t('common.actions.create') : $t('common.actions.save') }}
+            {{
+              form.processing
+                ? $t('common.actions.saving')
+                : dialog.mode === 'create'
+                  ? $t('common.actions.create')
+                  : $t('common.actions.save')
+            }}
           </button>
         </div>
       </form>

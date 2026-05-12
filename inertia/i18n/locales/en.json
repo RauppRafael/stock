@@ -90,7 +90,8 @@
     "groups": {
       "operations": "Operations",
       "catalog": "Catalog",
-      "attributes": "Attributes"
+      "attributes": "Attributes",
+      "integrations": "Integrations"
     },
     "items": {
       "stock": "Stock",
@@ -100,7 +101,8 @@
       "categories": "Categories",
       "locations": "Locations",
       "colors": "Colors",
-      "sizes": "Sizes"
+      "sizes": "Sizes",
+      "sync": "Shopify sync"
     },
     "toggle": "Toggle navigation"
   },
@@ -172,7 +174,8 @@
       "newProduct": "+ New product",
       "empty": "No products match these filters.",
       "lowThreshold": "Low threshold",
-      "archiveConfirm": "Archive “{name}”? Movement history is preserved."
+      "archiveConfirm": "Archive “{name}”? Movement history is preserved.",
+      "variantCount": "{count} SKU | {count} SKUs"
     },
     "show": {
       "totalOnHand": "Total on hand",
@@ -256,5 +259,73 @@
   "errors": {
     "notFound": "Page not found",
     "serverError": "Something went wrong."
+  },
+  "sync": {
+    "title": "Shopify sync",
+    "description": "Pair local variants with Shopify and reconcile inventory in both directions.",
+    "notConfigured": {
+      "title": "Shopify isn't configured",
+      "body": "Create an app in dev.shopify.com, install it on your store via Distribution → Custom distribution, then set SHOPIFY_SHOP_DOMAIN, SHOPIFY_CLIENT_ID, and SHOPIFY_CLIENT_SECRET in your .env. We exchange the client credentials for a 24h Admin API token at runtime."
+    },
+    "tabs": {
+      "link": "Link",
+      "push": "Push to Shopify",
+      "pull": "Pull from Shopify"
+    },
+    "link": {
+      "empty": "Nothing to do — no local variants.",
+      "emptyNoLocal": "Your local catalog is empty — create products first via /products/create, or run node ace db:seed. Shopify variants are listed but there's nothing local to pair them with yet.",
+      "intro": "Each local variant can mirror multiple Shopify variants (useful when Shopify has duplicate products with different photography). Add pairings; we match at runtime by Shopify variant ID.",
+      "currentLinks": "Linked to:",
+      "noLinks": "Not linked",
+      "addPairing": "+ Add Shopify variant",
+      "modalTitle": "Pick Shopify variant(s) to link to {name}",
+      "modalEmpty": "No unlinked Shopify variants remaining.",
+      "modalSearch": "Filter by product or variant title…",
+      "modalAdd": "Add {count} pairing(s)",
+      "modalAddNone": "Pick variants to add",
+      "pendingChip": "(pending)",
+      "applyButton": "Apply {count} pending pairing(s)",
+      "applyNone": "Add pairings first",
+      "unlinkConfirm": "Remove this Shopify pairing from {name}?",
+      "unlinkTitle": "Unlink"
+    },
+    "push": {
+      "empty": "Nothing to push — local and Shopify totals match for every linked variant.",
+      "intro": "Local totals that don't match one or more Shopify mirrors. Tick rows to write the local number to all mirrors of that variant.",
+      "columns": {
+        "variant": "Variant",
+        "sku": "SKU",
+        "local": "Local total",
+        "mirrors": "Shopify mirrors"
+      },
+      "applyButton": "Push {count} variant(s)",
+      "applyNone": "Tick rows first",
+      "targetSummary": "{count} mirror(s) will be set to {qty}"
+    },
+    "pull": {
+      "empty": "Nothing to pull — Shopify mirrors are all at their last-known quantity.",
+      "intro": "Shopify-side decreases (typically online orders) across one or more mirrors of each variant. Per-row, pick which local location absorbs the total decrement.",
+      "columns": {
+        "variant": "Variant",
+        "sku": "SKU",
+        "local": "Local total",
+        "deltas": "Per-mirror Δ",
+        "total": "Deduct",
+        "location": "Apply at"
+      },
+      "applyButton": "Pull {count} adjustment(s)",
+      "applyNone": "Tick rows first",
+      "pickLocation": "Pick a location…",
+      "deltaSold": "{title}: −{qty}",
+      "deltaNone": "{title}: no change",
+      "noBaseline": "{title}: new (baselining)",
+      "autoPushNote": "After applying, all mirrors of each variant will be re-pushed to the new local total."
+    },
+    "lastPullAt": "Last pull: {when}",
+    "lastPushAt": "Last push: {when}",
+    "never": "never",
+    "refresh": "Refresh",
+    "loadingTab": "Loading from Shopify…"
   }
 }

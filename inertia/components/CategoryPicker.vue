@@ -10,7 +10,7 @@ defineProps<{
 
 const emit = defineEmits<{
   'update:modelValue': [value: number | null]
-  add: []
+  'add': []
 }>()
 
 function pick(id: number) {

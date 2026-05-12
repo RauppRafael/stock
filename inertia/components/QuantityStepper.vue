@@ -52,9 +52,7 @@ const deltaLabel = computed(() => {
   <div :class="hideFooter ? '' : 'space-y-2'">
     <div
       class="grid grid-cols-[auto_1fr_auto] items-stretch gap-0 rounded-xl border bg-white"
-      :class="[
-        invalid ? 'border-rose-500' : 'border-slate-300',
-      ]"
+      :class="[invalid ? 'border-rose-500' : 'border-slate-300']"
     >
       <button
         type="button"
@@ -74,10 +72,12 @@ const deltaLabel = computed(() => {
         :max="max"
         class="no-spin w-full text-center font-semibold tabular-nums tracking-tight bg-transparent border-x border-slate-200 focus:outline-none focus:bg-brand-50/30 px-2"
         :class="compact ? 'text-xl' : 'text-3xl'"
-        @input="(e) => {
-          const value = (e.target as HTMLInputElement).value
-          emit('update:modelValue', value === '' ? null : Number(value))
-        }"
+        @input="
+          (e) => {
+            const value = (e.target as HTMLInputElement).value
+            emit('update:modelValue', value === '' ? null : Number(value))
+          }
+        "
       />
       <button
         type="button"

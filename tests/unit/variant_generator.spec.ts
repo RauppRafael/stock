@@ -6,6 +6,7 @@ import Size from '#models/size'
 import Product from '#models/product'
 import Stock from '#models/stock'
 import StockMovement from '#models/stock_movement'
+import ShopifyVariantLink from '#models/shopify_variant_link'
 import Variant from '#models/variant'
 
 type Fixture = {
@@ -53,10 +54,11 @@ async function makeFixture(flags: { hasColor: boolean; hasSize: boolean }): Prom
 
 test.group('VariantGenerator', (group) => {
   group.each.setup(async () => {
-    // Tear down in dependency order — stock_movements/stocks RESTRICT-FK
-    // their variants, so any rows left by a previous suite must go first.
+    // Tear down in dependency order — stock_movements/stocks/shopify_variant_links
+    // RESTRICT-FK their variants, so any rows left by a previous suite must go first.
     await StockMovement.query().delete()
     await Stock.query().delete()
+    await ShopifyVariantLink.query().delete()
     await Variant.query().delete()
     await Product.query().delete()
     await Color.query().delete()

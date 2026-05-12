@@ -40,6 +40,12 @@ export type ScannedRoutes = {
     'sizes.store': { paramsTuple?: []; params?: {} }
     'sizes.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'sizes.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'sync.index': { paramsTuple?: []; params?: {} }
+    'sync.diff': { paramsTuple?: []; params?: {} }
+    'sync.link': { paramsTuple?: []; params?: {} }
+    'sync.unlink': { paramsTuple?: []; params?: {} }
+    'sync.push': { paramsTuple?: []; params?: {} }
+    'sync.pull': { paramsTuple?: []; params?: {} }
   }
   GET: {
     'session.create': { paramsTuple?: []; params?: {} }
@@ -59,6 +65,8 @@ export type ScannedRoutes = {
     'locations.index': { paramsTuple?: []; params?: {} }
     'colors.index': { paramsTuple?: []; params?: {} }
     'sizes.index': { paramsTuple?: []; params?: {} }
+    'sync.index': { paramsTuple?: []; params?: {} }
+    'sync.diff': { paramsTuple?: []; params?: {} }
   }
   HEAD: {
     'session.create': { paramsTuple?: []; params?: {} }
@@ -78,6 +86,8 @@ export type ScannedRoutes = {
     'locations.index': { paramsTuple?: []; params?: {} }
     'colors.index': { paramsTuple?: []; params?: {} }
     'sizes.index': { paramsTuple?: []; params?: {} }
+    'sync.index': { paramsTuple?: []; params?: {} }
+    'sync.diff': { paramsTuple?: []; params?: {} }
   }
   POST: {
     'session.store': { paramsTuple?: []; params?: {} }
@@ -89,6 +99,10 @@ export type ScannedRoutes = {
     'locations.store': { paramsTuple?: []; params?: {} }
     'colors.store': { paramsTuple?: []; params?: {} }
     'sizes.store': { paramsTuple?: []; params?: {} }
+    'sync.link': { paramsTuple?: []; params?: {} }
+    'sync.unlink': { paramsTuple?: []; params?: {} }
+    'sync.push': { paramsTuple?: []; params?: {} }
+    'sync.pull': { paramsTuple?: []; params?: {} }
   }
   PUT: {
     'products.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }

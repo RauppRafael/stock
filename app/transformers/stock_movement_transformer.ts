@@ -17,6 +17,7 @@ export default class StockMovementTransformer extends BaseTransformer<StockMovem
         'delta',
         'reason',
         'userId',
+        'source',
       ]),
       createdAt: m.createdAt?.toISO() ?? null,
       variant: m.variant ? VariantTransformer.transform(m.variant).depth(6) : null,

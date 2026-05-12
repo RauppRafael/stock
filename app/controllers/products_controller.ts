@@ -19,7 +19,10 @@ export default class ProductsController {
     const categoryId = request.input('categoryId') ? Number(request.input('categoryId')) : undefined
     const search = request.input('search', '').toString().trim()
 
-    const query = Product.notTrashed().preload('category').orderBy('name', 'asc')
+    const query = Product.notTrashed()
+      .preload('category')
+      .withCount('variants')
+      .orderBy('name', 'asc')
     if (categoryId) query.where('category_id', categoryId)
     if (search) query.whereILike('name', `%${search}%`)
 
@@ -79,6 +82,13 @@ export default class ProductsController {
           .preload('stocks', (s) => s.preload('location'))
       })
       .firstOrFail()
+
+    // Wire the parent product onto each variant so the `skuCode` computed
+    // getter (which reads `this.product.code`) resolves without a redundant
+    // preload — we already have the product in scope.
+    for (const variant of product.variants) {
+      variant.$setRelated('product', product)
+    }
 
     // Preload returns variants in insertion order. Sort by color name → size
     // sortOrder so the variants & stock table reads top-to-bottom in a

@@ -14,7 +14,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   'update:modelValue': [value: number[]]
-  add: []
+  'add': []
 }>()
 
 const selected = computed(() => new Set(props.modelValue))
@@ -27,7 +27,10 @@ function toggle(id: number) {
 }
 
 function selectAll() {
-  emit('update:modelValue', props.options.map((o) => o.id))
+  emit(
+    'update:modelValue',
+    props.options.map((o) => o.id)
+  )
 }
 
 function clear() {
@@ -87,7 +90,9 @@ function clear() {
         <span class="text-base leading-none">+</span>
         {{ addLabel ?? $t('common.actions.create') }}
       </button>
-      <p v-if="!options.length && !allowAdd" class="text-sm text-slate-400 italic">{{ $t('common.empty.noOptions') }}</p>
+      <p v-if="!options.length && !allowAdd" class="text-sm text-slate-400 italic">
+        {{ $t('common.empty.noOptions') }}
+      </p>
     </div>
   </fieldset>
 </template>

@@ -439,4 +439,76 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/sizes_controller').default['destroy']>>>
     }
   }
+  'sync.index': {
+    methods: ["GET","HEAD"]
+    pattern: '/sync'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/sync_controller').default['index']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/sync_controller').default['index']>>>
+    }
+  }
+  'sync.diff': {
+    methods: ["GET","HEAD"]
+    pattern: '/sync/diff'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/sync_controller').default['diff']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/sync_controller').default['diff']>>>
+    }
+  }
+  'sync.link': {
+    methods: ["POST"]
+    pattern: '/sync/link'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/sync').syncLinkValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/sync').syncLinkValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/sync_controller').default['applyLink']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/sync_controller').default['applyLink']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'sync.unlink': {
+    methods: ["POST"]
+    pattern: '/sync/unlink'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/sync').syncUnlinkValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/sync').syncUnlinkValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/sync_controller').default['applyUnlink']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/sync_controller').default['applyUnlink']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'sync.push': {
+    methods: ["POST"]
+    pattern: '/sync/push'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/sync').syncPushValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/sync').syncPushValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/sync_controller').default['applyPush']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/sync_controller').default['applyPush']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'sync.pull': {
+    methods: ["POST"]
+    pattern: '/sync/pull'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/sync').syncPullValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/sync').syncPullValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/sync_controller').default['applyPull']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/sync_controller').default['applyPull']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
 }

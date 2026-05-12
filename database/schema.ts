@@ -8,7 +8,16 @@ import { BaseModel, column } from '@adonisjs/lucid/orm'
 import { DateTime } from 'luxon'
 
 export class CategorySchema extends BaseModel {
-  static $columns = ['createdAt', 'deletedAt', 'hasColor', 'hasSize', 'icon', 'id', 'name', 'updatedAt'] as const
+  static $columns = [
+    'createdAt',
+    'deletedAt',
+    'hasColor',
+    'hasSize',
+    'icon',
+    'id',
+    'name',
+    'updatedAt',
+  ] as const
   $columns = CategorySchema.$columns
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
@@ -63,7 +72,18 @@ export class LocationSchema extends BaseModel {
 }
 
 export class ProductSchema extends BaseModel {
-  static $columns = ['categoryId', 'code', 'createdAt', 'deletedAt', 'description', 'id', 'lowStockThreshold', 'name', 'updatedAt'] as const
+  static $columns = [
+    'categoryId',
+    'code',
+    'createdAt',
+    'deletedAt',
+    'description',
+    'id',
+    'imageUrl',
+    'lowStockThreshold',
+    'name',
+    'updatedAt',
+  ] as const
   $columns = ProductSchema.$columns
   @column()
   declare categoryId: number
@@ -78,11 +98,70 @@ export class ProductSchema extends BaseModel {
   @column({ isPrimary: true })
   declare id: number
   @column()
+  declare imageUrl: string | null
+  @column()
   declare lowStockThreshold: number | null
   @column()
   declare name: string
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   declare updatedAt: DateTime | null
+}
+
+export class ShopifySettingSchema extends BaseModel {
+  static $columns = [
+    'createdAt',
+    'id',
+    'lastPullAt',
+    'lastPullCursor',
+    'lastPushAt',
+    'shopifyLocationId',
+    'updatedAt',
+  ] as const
+  $columns = ShopifySettingSchema.$columns
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column({ isPrimary: true })
+  declare id: number
+  @column.dateTime()
+  declare lastPullAt: DateTime | null
+  @column()
+  declare lastPullCursor: string | null
+  @column.dateTime()
+  declare lastPushAt: DateTime | null
+  @column()
+  declare shopifyLocationId: string | null
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+}
+
+export class ShopifyVariantLinkSchema extends BaseModel {
+  static $columns = [
+    'createdAt',
+    'id',
+    'imageUrl',
+    'lastKnownQuantity',
+    'shopifyProductId',
+    'shopifyVariantId',
+    'updatedAt',
+    'variantId',
+  ] as const
+  $columns = ShopifyVariantLinkSchema.$columns
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column({ isPrimary: true })
+  declare id: number
+  @column()
+  declare imageUrl: string | null
+  @column()
+  declare lastKnownQuantity: number | null
+  @column()
+  declare shopifyProductId: string
+  @column()
+  declare shopifyVariantId: string
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+  @column()
+  declare variantId: number
 }
 
 export class SizeSchema extends BaseModel {
@@ -103,7 +182,18 @@ export class SizeSchema extends BaseModel {
 }
 
 export class StockMovementSchema extends BaseModel {
-  static $columns = ['createdAt', 'delta', 'id', 'locationId', 'newQuantity', 'previousQuantity', 'reason', 'userId', 'variantId'] as const
+  static $columns = [
+    'createdAt',
+    'delta',
+    'id',
+    'locationId',
+    'newQuantity',
+    'previousQuantity',
+    'reason',
+    'source',
+    'userId',
+    'variantId',
+  ] as const
   $columns = StockMovementSchema.$columns
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
@@ -119,6 +209,8 @@ export class StockMovementSchema extends BaseModel {
   declare previousQuantity: number
   @column()
   declare reason: string | null
+  @column()
+  declare source: string
   @column()
   declare userId: number | null
   @column()
@@ -160,7 +252,15 @@ export class UserSchema extends BaseModel {
 }
 
 export class VariantSchema extends BaseModel {
-  static $columns = ['colorId', 'createdAt', 'id', 'productId', 'sizeId', 'updatedAt'] as const
+  static $columns = [
+    'colorId',
+    'createdAt',
+    'id',
+    'imageUrl',
+    'productId',
+    'sizeId',
+    'updatedAt',
+  ] as const
   $columns = VariantSchema.$columns
   @column()
   declare colorId: number | null
@@ -168,6 +268,8 @@ export class VariantSchema extends BaseModel {
   declare createdAt: DateTime
   @column({ isPrimary: true })
   declare id: number
+  @column()
+  declare imageUrl: string | null
   @column()
   declare productId: number
   @column()

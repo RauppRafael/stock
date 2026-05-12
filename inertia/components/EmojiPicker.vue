@@ -29,11 +29,7 @@ function clear() {
         :key="emoji"
         type="button"
         class="size-8 rounded-md flex items-center justify-center transition leading-none"
-        :class="
-          modelValue === emoji
-            ? 'bg-brand-100 ring-2 ring-brand-500'
-            : 'hover:bg-slate-100'
-        "
+        :class="modelValue === emoji ? 'bg-brand-100 ring-2 ring-brand-500' : 'hover:bg-slate-100'"
         :title="emoji"
         @click="pick(emoji)"
       >

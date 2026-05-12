@@ -57,6 +57,8 @@ export const productSchema = z.object({
   description: z.string().nullable(),
   lowStockThreshold: z.number().int().nullable(),
   categoryId: id,
+  imageUrl: z.string().nullable(),
+  variantCount: z.number().int().nullable(),
   category: categorySchema.nullable(),
 })
 export type Product = z.infer<typeof productSchema>
@@ -68,6 +70,7 @@ export const variantSchema = z.object({
   sizeId: id.nullable(),
   skuCode: z.string().nullable(),
   displayName: z.string(),
+  imageUrl: z.string().nullable(),
   product: productSchema.nullable(),
   color: colorSchema.nullable(),
   size: sizeSchema.nullable(),
@@ -106,6 +109,7 @@ export const stockMovementSchema = z.object({
   delta: z.number().int(),
   reason: z.string().nullable(),
   userId: id.nullable(),
+  source: z.string(),
   createdAt: z.string().nullable(),
   variant: variantSchema.nullable(),
   location: locationSchema.nullable(),
@@ -142,3 +146,113 @@ export const stockGridSchema = z.object({
   quantities: z.record(z.string(), z.number().int()),
 })
 export type StockGrid = z.infer<typeof stockGridSchema>
+
+/**
+ * /sync page props. Diffs are rendered server-side from a single Shopify
+ * catalog walk. `configured: false` short-circuits the whole UI to a setup
+ * empty state. `link`/`push`/`pull` are nullable so a Shopify failure can
+ * still render the page (with a flashed error) instead of 500ing.
+ */
+/**
+ * A Shopify variant that's either already linked to a local variant or
+ * available as a candidate to link. Shared shape across Link/Push/Pull
+ * payloads.
+ */
+export const shopifyVariantInfoSchema = z.object({
+  shopifyVariantId: z.string(),
+  shopifyProductId: z.string(),
+  shopifyProductTitle: z.string(),
+  shopifyVariantTitle: z.string(),
+  options: z.array(z.object({ name: z.string(), value: z.string() })),
+  currentSku: z.string().nullable(),
+  imageUrl: z.string().nullable(),
+})
+
+/**
+ * Compact display data for a local variant — replaces the old flat
+ * `displayName` / `sku` fields so the UI can render a color swatch + size
+ * box matching the rest of the app.
+ */
+export const localVariantDisplaySchema = z.object({
+  productName: z.string(),
+  color: z
+    .object({
+      name: z.string(),
+      hexCode: z.string().nullable(),
+    })
+    .nullable(),
+  size: z.object({ name: z.string() }).nullable(),
+  imageUrl: z.string().nullable(),
+})
+
+export const syncLinkRowSchema = z.object({
+  localVariantId: id,
+  localProductId: id,
+  display: localVariantDisplaySchema,
+  // Current Shopify pairings for this local variant. Empty array = unlinked.
+  currentLinks: z.array(shopifyVariantInfoSchema),
+})
+
+export const syncLinkDiffSchema = z.object({
+  rows: z.array(syncLinkRowSchema),
+  // Shopify variants not yet linked to any local variant — pickable from the
+  // "Add Shopify pairing" modal.
+  candidates: z.array(shopifyVariantInfoSchema),
+})
+
+/**
+ * Push row — one local variant whose total disagrees with one or more of its
+ * Shopify mirrors. `targets` lists only the mirrors that disagree so the UI
+ * can show exactly what's being changed.
+ */
+export const syncPushTargetSchema = z.object({
+  shopifyVariantId: z.string(),
+  shopifyProductTitle: z.string(),
+  shopifyVariantTitle: z.string(),
+  shopifyQuantity: z.number().int().nullable(),
+})
+
+export const syncPushRowSchema = z.object({
+  localVariantId: id,
+  display: localVariantDisplaySchema,
+  localTotal: z.number().int(),
+  targets: z.array(syncPushTargetSchema),
+})
+
+/**
+ * Pull row — one local variant whose Shopify mirrors collectively decreased
+ * (sales). `totalDecrement` is the sum of negative deltas across all mirrors
+ * vs their last-known qty, applied to a local location chosen by the user.
+ */
+export const syncPullTargetSchema = z.object({
+  shopifyVariantId: z.string(),
+  shopifyProductTitle: z.string(),
+  shopifyVariantTitle: z.string(),
+  shopifyQuantity: z.number().int(),
+  lastKnownQuantity: z.number().int().nullable(),
+  delta: z.number().int(),
+})
+
+export const syncPullRowSchema = z.object({
+  localVariantId: id,
+  display: localVariantDisplaySchema,
+  localTotal: z.number().int(),
+  totalDecrement: z.number().int(),
+  targets: z.array(syncPullTargetSchema),
+})
+
+export const syncIndexSchema = z.object({
+  configured: z.boolean(),
+  link: z
+    .object({
+      rows: z.array(syncLinkRowSchema),
+      candidates: z.array(shopifyVariantInfoSchema),
+    })
+    .nullable(),
+  push: z.array(syncPushRowSchema).nullable(),
+  pull: z.array(syncPullRowSchema).nullable(),
+  locations: z.array(locationSchema),
+  lastPullAt: z.string().nullable(),
+  lastPushAt: z.string().nullable(),
+})
+export type SyncIndexProps = z.infer<typeof syncIndexSchema>

@@ -19,25 +19,35 @@ const props = defineProps<{
 const filters = reactive({ ...props.filters })
 
 let timer: ReturnType<typeof setTimeout> | null = null
-watch(filters, (next) => {
-  if (timer) clearTimeout(timer)
-  timer = setTimeout(() => {
-    router.get(
-      '/products',
-      {
-        ...(next.categoryId ? { categoryId: next.categoryId } : {}),
-        ...(next.search ? { search: next.search } : {}),
-      },
-      { preserveState: true, preserveScroll: true, replace: true }
-    )
-  }, 300)
-}, { deep: true })
+watch(
+  filters,
+  (next) => {
+    if (timer) clearTimeout(timer)
+    timer = setTimeout(() => {
+      router.get(
+        '/products',
+        {
+          ...(next.categoryId ? { categoryId: next.categoryId } : {}),
+          ...(next.search ? { search: next.search } : {}),
+        },
+        { preserveState: true, preserveScroll: true, replace: true }
+      )
+    }, 300)
+  },
+  { deep: true }
+)
 
 const columns = computed(() => [
   { key: 'name', label: t('common.labels.name') },
   { key: 'category', label: t('common.labels.category') },
   { key: 'description', label: t('common.labels.description') },
-  { key: 'threshold', label: t('products.index.lowThreshold'), align: 'right' as const, width: '140px' },
+  {
+    key: 'threshold',
+    label: t('products.index.lowThreshold'),
+    align: 'right' as const,
+    width: '140px',
+  },
+  { key: 'sku', label: t('common.labels.sku'), width: '200px' },
   { key: 'actions', label: '', align: 'right' as const, width: '180px' },
 ])
 </script>
@@ -47,14 +57,20 @@ const columns = computed(() => [
   <div class="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto">
     <PageHeader :title="$t('products.index.title')" :description="$t('products.index.description')">
       <template #actions>
-        <Link route="products.create" class="btn-primary">{{ $t('products.index.newProduct') }}</Link>
+        <Link route="products.create" class="btn-primary">{{
+          $t('products.index.newProduct')
+        }}</Link>
       </template>
     </PageHeader>
 
     <div class="card p-4 mb-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
       <div>
         <label class="label">{{ $t('common.labels.search') }}</label>
-        <input v-model="filters.search" :placeholder="$t('common.placeholders.searchByName')" class="input" />
+        <input
+          v-model="filters.search"
+          :placeholder="$t('common.placeholders.searchByName')"
+          class="input"
+        />
       </div>
       <div>
         <label class="label">{{ $t('common.labels.category') }}</label>
@@ -72,9 +88,21 @@ const columns = computed(() => [
       :empty="$t('products.index.empty')"
     >
       <template #[`cell:name`]="{ row }">
-        <Link route="products.show" :params="{ id: row.id }" class="font-medium text-slate-900 hover:text-brand-700">
+        <Link
+          route="products.show"
+          :params="{ id: row.id }"
+          class="font-medium text-slate-900 hover:text-brand-700"
+        >
           {{ row.name }}
         </Link>
+      </template>
+      <template #[`cell:sku`]="{ row }">
+        <div class="flex flex-col gap-0.5">
+          <code class="font-mono text-xs font-semibold text-slate-800">{{ row.code }}</code>
+          <span v-if="row.variantCount !== null" class="text-xs text-slate-500">
+            {{ $t('products.index.variantCount', { count: row.variantCount }, row.variantCount) }}
+          </span>
+        </div>
       </template>
       <template #[`cell:category`]="{ row }">
         {{ row.category?.name ?? '—' }}
@@ -83,12 +111,16 @@ const columns = computed(() => [
         <span class="text-xs text-slate-500 line-clamp-2">{{ row.description ?? '' }}</span>
       </template>
       <template #[`cell:threshold`]="{ row }">
-        <span v-if="row.lowStockThreshold !== null" class="tabular-nums">{{ row.lowStockThreshold }}</span>
+        <span v-if="row.lowStockThreshold !== null" class="tabular-nums">{{
+          row.lowStockThreshold
+        }}</span>
         <span v-else class="text-slate-300">—</span>
       </template>
       <template #[`cell:actions`]="{ row }">
         <div class="flex justify-end gap-2">
-          <Link route="products.edit" :params="{ id: row.id }" class="btn-secondary">{{ $t('common.actions.edit') }}</Link>
+          <Link route="products.edit" :params="{ id: row.id }" class="btn-secondary">{{
+            $t('common.actions.edit')
+          }}</Link>
           <ConfirmButton
             route="products.destroy"
             :params="{ id: row.id }"

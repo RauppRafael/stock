@@ -31,8 +31,9 @@ A clothing-brand inventory: `Product` belongs to a `Category` whose flags (`hasC
 Prints are intentionally **not** a separate entity. A "Fold Hoodie Plain" and a "Fold Hoodie Puff" are two distinct products in the catalog — the print is folded into the product's name and code, not modelled as a relation or variant axis.
 
 Key invariants:
+
 - All stock writes go through `app/services/stock_service.ts` inside a single DB transaction with `forUpdate()` on the stock row, so quantity + history can never drift.
-- Variant uniqueness on `(product_id, color_id, size_id)` is enforced via a DB unique index *plus* `app/services/variant_generator.ts`, which dedupes during the cartesian-product create flow (MySQL treats NULLs as distinct, so the index alone wouldn't catch hat-style "no-size" duplicates).
+- Variant uniqueness on `(product_id, color_id, size_id)` is enforced via a DB unique index _plus_ `app/services/variant_generator.ts`, which dedupes during the cartesian-product create flow (MySQL treats NULLs as distinct, so the index alone wouldn't catch hat-style "no-size" duplicates).
 - SKU is **derived data, not stored**. `Variant.skuCode` and `Variant.displayName` are `@computed()` getters in `app/models/variant.ts` that combine the preloaded `product/color/size` codes through `app/services/sku_builder.ts`. The SKU updates instantly when an attribute's `code` changes.
 - `Category` and `Product` use a custom `withSoftDelete` mixin (`app/models/mixins/soft_delete.ts`). Use `Model.notTrashed()` / `model.trash()` / `model.restore()`. Hard delete is intentionally absent for these so movement history stays readable.
 - `Color`, `Size`, and `Product` each have a short `code` field (uppercase `[A-Z0-9]+`, max 8/16 chars) — these compose the rendered SKU (e.g. `FLDH-PL-NUDE-S`, where `PL` is part of the product code itself).

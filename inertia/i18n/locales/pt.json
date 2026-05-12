@@ -90,7 +90,8 @@
     "groups": {
       "operations": "Operações",
       "catalog": "Catálogo",
-      "attributes": "Atributos"
+      "attributes": "Atributos",
+      "integrations": "Integrações"
     },
     "items": {
       "stock": "Estoque",
@@ -100,7 +101,8 @@
       "categories": "Categorias",
       "locations": "Localizações",
       "colors": "Cores",
-      "sizes": "Tamanhos"
+      "sizes": "Tamanhos",
+      "sync": "Sincronizar Shopify"
     },
     "toggle": "Alternar navegação"
   },
@@ -172,7 +174,8 @@
       "newProduct": "+ Novo produto",
       "empty": "Nenhum produto corresponde a esses filtros.",
       "lowThreshold": "Limite baixo",
-      "archiveConfirm": "Arquivar “{name}”? O histórico de movimentações é preservado."
+      "archiveConfirm": "Arquivar “{name}”? O histórico de movimentações é preservado.",
+      "variantCount": "{count} SKU | {count} SKUs"
     },
     "show": {
       "totalOnHand": "Total em estoque",
@@ -257,5 +260,73 @@
   "errors": {
     "notFound": "Página não encontrada",
     "serverError": "Algo deu errado."
+  },
+  "sync": {
+    "title": "Sincronização Shopify",
+    "description": "Pareie variantes locais com o Shopify e reconcilie o estoque nas duas direções.",
+    "notConfigured": {
+      "title": "Shopify não está configurado",
+      "body": "Crie um app em dev.shopify.com, instale-o na sua loja via Distribuição → Distribuição personalizada e defina SHOPIFY_SHOP_DOMAIN, SHOPIFY_CLIENT_ID e SHOPIFY_CLIENT_SECRET no seu .env. Trocamos as credenciais por um token Admin API de 24h em tempo de execução."
+    },
+    "tabs": {
+      "link": "Pareamento",
+      "push": "Enviar ao Shopify",
+      "pull": "Receber do Shopify"
+    },
+    "link": {
+      "empty": "Nada a fazer — sem variantes locais.",
+      "emptyNoLocal": "Seu catálogo local está vazio — crie produtos em /products/create ou rode node ace db:seed. Variantes do Shopify aparecem mas não há nada local para parear ainda.",
+      "intro": "Cada variante local pode espelhar várias variantes do Shopify (útil quando o Shopify tem produtos duplicados com fotos diferentes). Adicione pareamentos; o match em runtime é pelo ID da variante do Shopify.",
+      "currentLinks": "Pareada com:",
+      "noLinks": "Sem pareamento",
+      "addPairing": "+ Adicionar variante Shopify",
+      "modalTitle": "Escolha variante(s) Shopify para parear com {name}",
+      "modalEmpty": "Nenhuma variante Shopify disponível para parear.",
+      "modalSearch": "Filtrar por título do produto ou variante…",
+      "modalAdd": "Adicionar {count} pareamento(s)",
+      "modalAddNone": "Escolha variantes para adicionar",
+      "pendingChip": "(pendente)",
+      "applyButton": "Aplicar {count} pareamento(s) pendente(s)",
+      "applyNone": "Adicione pareamentos primeiro",
+      "unlinkConfirm": "Remover este pareamento Shopify de {name}?",
+      "unlinkTitle": "Desparear"
+    },
+    "push": {
+      "empty": "Nada a enviar — totais locais e Shopify já batem para toda variante pareada.",
+      "intro": "Totais locais que não batem com uma ou mais variantes espelhadas no Shopify. Marque linhas para escrever o número local em todas as variantes espelhadas.",
+      "columns": {
+        "variant": "Variante",
+        "sku": "SKU",
+        "local": "Total local",
+        "mirrors": "Espelhos Shopify"
+      },
+      "applyButton": "Enviar {count} variante(s)",
+      "applyNone": "Marque linhas primeiro",
+      "targetSummary": "{count} espelho(s) serão ajustados para {qty}"
+    },
+    "pull": {
+      "empty": "Nada a receber — espelhos Shopify estão nas quantidades de referência.",
+      "intro": "Reduções do lado Shopify (geralmente vendas) em um ou mais espelhos de cada variante. Por linha, escolha qual localização local absorve o decremento total.",
+      "columns": {
+        "variant": "Variante",
+        "sku": "SKU",
+        "local": "Total local",
+        "deltas": "Δ por espelho",
+        "total": "Deduzir",
+        "location": "Aplicar em"
+      },
+      "applyButton": "Aplicar {count} ajuste(s)",
+      "applyNone": "Marque linhas primeiro",
+      "pickLocation": "Escolha uma localização…",
+      "deltaSold": "{title}: −{qty}",
+      "deltaNone": "{title}: sem mudança",
+      "noBaseline": "{title}: novo (baselining)",
+      "autoPushNote": "Após aplicar, todos os espelhos de cada variante serão re-enviados para o novo total local."
+    },
+    "lastPullAt": "Última recepção: {when}",
+    "lastPushAt": "Último envio: {when}",
+    "never": "nunca",
+    "refresh": "Atualizar",
+    "loadingTab": "Carregando do Shopify…"
   }
 }

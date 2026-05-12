@@ -37,4 +37,17 @@ export default await Env.create(new URL('../', import.meta.url), {
   SEED_USER_EMAIL: Env.schema.string.optional({ format: 'email' }),
   SEED_USER_PASSWORD: Env.schema.string.optional(),
   SEED_USER_NAME: Env.schema.string.optional(),
+
+  // Shopify Admin API. Optional so the app boots without Shopify configured;
+  // the /sync page surfaces a "not configured" empty state when these are
+  // missing, instead of crashing on first request.
+  //
+  // Since Jan 2026 Shopify retired the legacy `shpat_` permanent token. New
+  // apps go through the Dev Dashboard and authenticate via the client
+  // credentials grant — we exchange the client_id + client_secret for a 24h
+  // access token at runtime (handled in `ShopifyClient.ensureAccessToken`).
+  SHOPIFY_SHOP_DOMAIN: Env.schema.string.optional(),
+  SHOPIFY_CLIENT_ID: Env.schema.string.optional(),
+  SHOPIFY_CLIENT_SECRET: Env.schema.string.optional(),
+  SHOPIFY_API_VERSION: Env.schema.string.optional(),
 })

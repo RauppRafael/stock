@@ -6,6 +6,7 @@ import Color from '#models/color'
 import Size from '#models/size'
 import Stock from '#models/stock'
 import StockMovement from '#models/stock_movement'
+import ShopifyVariantLink from '#models/shopify_variant_link'
 import { buildSkuCode } from '#services/sku_builder'
 
 export default class Variant extends VariantSchema {
@@ -23,6 +24,9 @@ export default class Variant extends VariantSchema {
 
   @hasMany(() => StockMovement)
   declare movements: HasMany<typeof StockMovement>
+
+  @hasMany(() => ShopifyVariantLink)
+  declare shopifyVariantLinks: HasMany<typeof ShopifyVariantLink>
 
   @computed()
   get skuCode(): string | null {

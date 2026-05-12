@@ -7,6 +7,7 @@ import Variant from '#models/variant'
 import Location from '#models/location'
 import Stock from '#models/stock'
 import StockMovement from '#models/stock_movement'
+import ShopifyVariantLink from '#models/shopify_variant_link'
 import User from '#models/user'
 
 type Fixture = {
@@ -39,6 +40,8 @@ async function makeFixture(): Promise<Fixture> {
 test.group('StockService', (group) => {
   group.each.setup(async () => {
     await Promise.all([StockMovement.query().delete(), Stock.query().delete()])
+    // Shopify links have a RESTRICT FK to variants — must clear before variants.
+    await ShopifyVariantLink.query().delete()
     await Variant.query().delete()
     await Product.query().delete()
     await Category.query().delete()

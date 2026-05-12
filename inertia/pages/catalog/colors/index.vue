@@ -72,11 +72,18 @@ const columns = computed(() => [
   <div class="p-4 sm:p-6 lg:p-8 max-w-4xl mx-auto">
     <PageHeader :title="$t('colors.title')" :description="$t('colors.description')">
       <template #actions>
-        <button type="button" class="btn-primary" @click="openCreate">{{ $t('colors.new') }}</button>
+        <button type="button" class="btn-primary" @click="openCreate">
+          {{ $t('colors.new') }}
+        </button>
       </template>
     </PageHeader>
 
-    <DataTable :columns="columns" :rows="colors" :row-key="(row) => row.id" :empty="$t('colors.empty')">
+    <DataTable
+      :columns="columns"
+      :rows="colors"
+      :row-key="(row) => row.id"
+      :empty="$t('colors.empty')"
+    >
       <template #[`cell:swatch`]="{ row }">
         <span
           v-if="row.hexCode"
@@ -96,7 +103,9 @@ const columns = computed(() => [
       </template>
       <template #[`cell:actions`]="{ row }">
         <div class="flex justify-end gap-2">
-          <button type="button" class="btn-secondary" @click="openEdit(row)">{{ $t('common.actions.edit') }}</button>
+          <button type="button" class="btn-secondary" @click="openEdit(row)">
+            {{ $t('common.actions.edit') }}
+          </button>
           <ConfirmButton
             route="colors.destroy"
             :params="{ id: row.id }"
@@ -148,9 +157,17 @@ const columns = computed(() => [
           <p v-if="form.errors.hexCode" class="field-error">{{ form.errors.hexCode }}</p>
         </div>
         <div class="flex justify-end gap-2">
-          <button type="button" class="btn-ghost" @click="dialog.open = false">{{ $t('common.actions.cancel') }}</button>
+          <button type="button" class="btn-ghost" @click="dialog.open = false">
+            {{ $t('common.actions.cancel') }}
+          </button>
           <button type="submit" class="btn-primary" :disabled="form.processing">
-            {{ form.processing ? $t('common.actions.saving') : dialog.mode === 'create' ? $t('common.actions.create') : $t('common.actions.save') }}
+            {{
+              form.processing
+                ? $t('common.actions.saving')
+                : dialog.mode === 'create'
+                  ? $t('common.actions.create')
+                  : $t('common.actions.save')
+            }}
           </button>
         </div>
       </form>

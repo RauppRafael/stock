@@ -17,7 +17,11 @@ const props = defineProps<{
   categories: Data.Category[]
 }>()
 
-const dialog = reactive({ open: false, mode: 'create' as 'create' | 'edit', editingId: null as number | null })
+const dialog = reactive({
+  open: false,
+  mode: 'create' as 'create' | 'edit',
+  editingId: null as number | null,
+})
 
 const form = useForm({
   name: '',
@@ -65,12 +69,11 @@ const columns = computed(() => [
 <template>
   <Head :title="$t('categories.title')" />
   <div class="p-4 sm:p-6 lg:p-8 max-w-5xl mx-auto">
-    <PageHeader
-      :title="$t('categories.title')"
-      :description="$t('categories.description')"
-    >
+    <PageHeader :title="$t('categories.title')" :description="$t('categories.description')">
       <template #actions>
-        <button type="button" class="btn-primary" @click="openCreate">{{ $t('categories.new') }}</button>
+        <button type="button" class="btn-primary" @click="openCreate">
+          {{ $t('categories.new') }}
+        </button>
       </template>
     </PageHeader>
 
@@ -88,29 +91,22 @@ const columns = computed(() => [
       </template>
       <template #[`cell:attributes`]="{ row }">
         <div class="flex flex-wrap gap-1.5 text-xs">
-          <span
-            v-if="row.hasColor"
-            class="badge bg-slate-100 text-slate-700"
-          >
+          <span v-if="row.hasColor" class="badge bg-slate-100 text-slate-700">
             {{ $t('common.labels.color').toLowerCase() }}
           </span>
-          <span
-            v-if="row.hasSize"
-            class="badge bg-slate-100 text-slate-700"
-          >
+          <span v-if="row.hasSize" class="badge bg-slate-100 text-slate-700">
             {{ $t('common.labels.size').toLowerCase() }}
           </span>
-          <span
-            v-if="!row.hasColor && !row.hasSize"
-            class="text-slate-300 italic"
-          >
+          <span v-if="!row.hasColor && !row.hasSize" class="text-slate-300 italic">
             {{ $t('common.noAttributes') }}
           </span>
         </div>
       </template>
       <template #[`cell:actions`]="{ row }">
         <div class="flex justify-end gap-2">
-          <button type="button" class="btn-secondary" @click="openEdit(row)">{{ $t('common.actions.edit') }}</button>
+          <button type="button" class="btn-secondary" @click="openEdit(row)">
+            {{ $t('common.actions.edit') }}
+          </button>
           <ConfirmButton
             route="categories.destroy"
             :params="{ id: row.id }"
@@ -140,13 +136,21 @@ const columns = computed(() => [
         </div>
         <div>
           <label class="label">{{ $t('common.labels.icon') }}</label>
-          <EmojiPicker v-model="form.icon" :emojis="CATEGORY_EMOJIS" :aria-label="$t('categories.iconLabel')" />
+          <EmojiPicker
+            v-model="form.icon"
+            :emojis="CATEGORY_EMOJIS"
+            :aria-label="$t('categories.iconLabel')"
+          />
           <p v-if="form.errors.icon" class="field-error">{{ form.errors.icon }}</p>
         </div>
         <fieldset class="space-y-2">
           <legend class="label mb-1">{{ $t('categories.attributesUsed') }}</legend>
           <label class="flex items-center gap-2 text-sm">
-            <input v-model="form.hasColor" type="checkbox" class="size-4 rounded border-slate-300" />
+            <input
+              v-model="form.hasColor"
+              type="checkbox"
+              class="size-4 rounded border-slate-300"
+            />
             {{ $t('common.labels.color') }}
           </label>
           <label class="flex items-center gap-2 text-sm">
@@ -155,9 +159,17 @@ const columns = computed(() => [
           </label>
         </fieldset>
         <div class="flex justify-end gap-2">
-          <button type="button" class="btn-ghost" @click="dialog.open = false">{{ $t('common.actions.cancel') }}</button>
+          <button type="button" class="btn-ghost" @click="dialog.open = false">
+            {{ $t('common.actions.cancel') }}
+          </button>
           <button type="submit" class="btn-primary" :disabled="form.processing">
-            {{ form.processing ? $t('common.actions.saving') : dialog.mode === 'create' ? $t('common.actions.create') : $t('common.actions.save') }}
+            {{
+              form.processing
+                ? $t('common.actions.saving')
+                : dialog.mode === 'create'
+                  ? $t('common.actions.create')
+                  : $t('common.actions.save')
+            }}
           </button>
         </div>
       </form>

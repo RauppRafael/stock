@@ -73,11 +73,18 @@ const columns = computed(() => [
   <div class="p-4 sm:p-6 lg:p-8 max-w-4xl mx-auto">
     <PageHeader :title="$t('locations.title')" :description="$t('locations.description')">
       <template #actions>
-        <button type="button" class="btn-primary" @click="openCreate">{{ $t('locations.new') }}</button>
+        <button type="button" class="btn-primary" @click="openCreate">
+          {{ $t('locations.new') }}
+        </button>
       </template>
     </PageHeader>
 
-    <DataTable :columns="columns" :rows="locations" :row-key="(row) => row.id" :empty="$t('locations.empty')">
+    <DataTable
+      :columns="columns"
+      :rows="locations"
+      :row-key="(row) => row.id"
+      :empty="$t('locations.empty')"
+    >
       <template #[`cell:icon`]="{ row }">
         <span class="text-2xl leading-none">{{ row.icon ?? '·' }}</span>
       </template>
@@ -89,7 +96,9 @@ const columns = computed(() => [
       </template>
       <template #[`cell:actions`]="{ row }">
         <div class="flex justify-end gap-2">
-          <button type="button" class="btn-secondary" @click="openEdit(row)">{{ $t('common.actions.edit') }}</button>
+          <button type="button" class="btn-secondary" @click="openEdit(row)">
+            {{ $t('common.actions.edit') }}
+          </button>
           <ConfirmButton
             route="locations.destroy"
             :params="{ id: row.id }"
@@ -118,7 +127,11 @@ const columns = computed(() => [
         </div>
         <div>
           <label class="label">{{ $t('common.labels.icon') }}</label>
-          <EmojiPicker v-model="form.icon" :emojis="LOCATION_EMOJIS" :aria-label="$t('locations.iconLabel')" />
+          <EmojiPicker
+            v-model="form.icon"
+            :emojis="LOCATION_EMOJIS"
+            :aria-label="$t('locations.iconLabel')"
+          />
           <p v-if="form.errors.icon" class="field-error">{{ form.errors.icon }}</p>
         </div>
         <div>
@@ -133,9 +146,17 @@ const columns = computed(() => [
           <p v-if="form.errors.description" class="field-error">{{ form.errors.description }}</p>
         </div>
         <div class="flex justify-end gap-2">
-          <button type="button" class="btn-ghost" @click="dialog.open = false">{{ $t('common.actions.cancel') }}</button>
+          <button type="button" class="btn-ghost" @click="dialog.open = false">
+            {{ $t('common.actions.cancel') }}
+          </button>
           <button type="submit" class="btn-primary" :disabled="form.processing">
-            {{ form.processing ? $t('common.actions.saving') : dialog.mode === 'create' ? $t('common.actions.create') : $t('common.actions.save') }}
+            {{
+              form.processing
+                ? $t('common.actions.saving')
+                : dialog.mode === 'create'
+                  ? $t('common.actions.create')
+                  : $t('common.actions.save')
+            }}
           </button>
         </div>
       </form>

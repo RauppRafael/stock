@@ -35,11 +35,13 @@ const form = useForm({
 const category = computed(() => props.product.category)
 
 function submit() {
-  form.transform((data) => ({
-    ...data,
-    code: data.code.toUpperCase(),
-    description: data.description || null,
-  })).put(urlFor('products.update', { id: props.product.id }))
+  form
+    .transform((data) => ({
+      ...data,
+      code: data.code.toUpperCase(),
+      description: data.description || null,
+    }))
+    .put(urlFor('products.update', { id: props.product.id }))
 }
 </script>
 
@@ -51,7 +53,9 @@ function submit() {
       :description="$t('products.edit.description')"
     >
       <template #actions>
-        <Link route="products.show" :params="{ id: product.id }" class="btn-ghost">{{ $t('common.actions.cancel') }}</Link>
+        <Link route="products.show" :params="{ id: product.id }" class="btn-ghost">{{
+          $t('common.actions.cancel')
+        }}</Link>
       </template>
     </PageHeader>
 
@@ -83,7 +87,9 @@ function submit() {
       </div>
 
       <div>
-        <label for="lowStockThreshold" class="label">{{ $t('products.show.lowStockThreshold') }}</label>
+        <label for="lowStockThreshold" class="label">{{
+          $t('products.show.lowStockThreshold')
+        }}</label>
         <input
           id="lowStockThreshold"
           v-model.number="form.lowStockThreshold"
@@ -102,7 +108,9 @@ function submit() {
       <template v-if="category">
         <hr class="border-slate-100" />
         <div>
-          <h2 class="text-sm font-semibold text-slate-700 uppercase tracking-wider mb-2">{{ $t('common.labels.variants') }}</h2>
+          <h2 class="text-sm font-semibold text-slate-700 uppercase tracking-wider mb-2">
+            {{ $t('common.labels.variants') }}
+          </h2>
           <p class="text-xs text-slate-500 mb-4">
             {{ $t('products.edit.variantsHint') }}
           </p>
@@ -138,7 +146,9 @@ function submit() {
       </template>
 
       <div class="flex justify-end gap-2">
-        <Link route="products.show" :params="{ id: product.id }" class="btn-ghost">{{ $t('common.actions.cancel') }}</Link>
+        <Link route="products.show" :params="{ id: product.id }" class="btn-ghost">{{
+          $t('common.actions.cancel')
+        }}</Link>
         <button type="submit" class="btn-primary" :disabled="form.processing">
           {{ form.processing ? $t('common.actions.saving') : $t('common.actions.saveChanges') }}
         </button>

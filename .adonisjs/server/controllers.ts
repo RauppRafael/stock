@@ -12,4 +12,5 @@ export const controllers = {
   Sizes: () => import('#controllers/sizes_controller'),
   Stock: () => import('#controllers/stock_controller'),
   StockMovements: () => import('#controllers/stock_movements_controller'),
+  Sync: () => import('#controllers/sync_controller'),
 }

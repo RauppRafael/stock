@@ -53,9 +53,7 @@ const { t } = useI18n()
       </div>
     </div>
 
-    <div
-      class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-sm"
-    >
+    <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-sm">
       <i18n-t keypath="variantSummary.atLocation" tag="span" class="text-slate-500">
         <template #location>
           <span class="font-medium text-slate-700 inline-flex items-center gap-1">

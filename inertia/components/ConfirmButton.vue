@@ -24,11 +24,7 @@ function ask() {
 </script>
 
 <template>
-  <button
-    type="button"
-    :class="variant === 'ghost' ? 'btn-ghost' : 'btn-danger'"
-    @click="ask"
-  >
+  <button type="button" :class="variant === 'ghost' ? 'btn-ghost' : 'btn-danger'" @click="ask">
     <slot>{{ label ?? $t('common.actions.delete') }}</slot>
   </button>
 </template>

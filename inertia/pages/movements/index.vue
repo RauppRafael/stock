@@ -61,9 +61,7 @@ watch(
     timer = setTimeout(() => {
       router.get(
         '/movements',
-        Object.fromEntries(
-          Object.entries(next).filter(([, v]) => v !== null && v !== '')
-        ),
+        Object.fromEntries(Object.entries(next).filter(([, v]) => v !== null && v !== '')),
         { preserveState: true, preserveScroll: true, replace: true }
       )
     }, 300)
@@ -86,12 +84,11 @@ function changePage(page: number) {
 <template>
   <Head :title="$t('movements.title')" />
   <div class="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto">
-    <PageHeader
-      :title="$t('movements.title')"
-      :description="$t('movements.description')"
-    >
+    <PageHeader :title="$t('movements.title')" :description="$t('movements.description')">
       <template #actions>
-        <Link route="stock.adjust.create" class="btn-secondary">{{ $t('movements.newAdjustment') }}</Link>
+        <Link route="stock.adjust.create" class="btn-secondary">{{
+          $t('movements.newAdjustment')
+        }}</Link>
       </template>
     </PageHeader>
 
@@ -127,7 +124,12 @@ function changePage(page: number) {
       </div>
       <div>
         <label class="label">{{ $t('movements.variantId') }}</label>
-        <input v-model.number="filters.variantId" type="number" class="input" :placeholder="$t('movements.variantIdPlaceholder')" />
+        <input
+          v-model.number="filters.variantId"
+          type="number"
+          class="input"
+          :placeholder="$t('movements.variantIdPlaceholder')"
+        />
       </div>
     </div>
 
@@ -161,7 +163,13 @@ function changePage(page: number) {
         class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 px-5 py-3 border-t border-slate-100 text-sm text-slate-600"
       >
         <span>
-          {{ $t('movements.pagination', { page: pagination.page, lastPage: pagination.lastPage, total: pagination.total }) }}
+          {{
+            $t('movements.pagination', {
+              page: pagination.page,
+              lastPage: pagination.lastPage,
+              total: pagination.total,
+            })
+          }}
         </span>
         <div class="flex gap-2">
           <button

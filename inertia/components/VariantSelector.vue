@@ -123,9 +123,7 @@ async function loadVariants(prodId: number) {
   }
 }
 
-function uniqueAttribute<T extends { id: number; name: string }>(
-  attr: 'color' | 'size'
-): T[] {
+function uniqueAttribute<T extends { id: number; name: string }>(attr: 'color' | 'size'): T[] {
   const seen = new Map<number, T>()
   for (const v of variants.value) {
     const value = v[attr] as T | null
@@ -219,7 +217,9 @@ onMounted(async () => {
     <template v-if="productId && category">
       <div v-if="category.hasColor">
         <label class="label">{{ $t('common.labels.color') }}</label>
-        <div v-if="loadingVariants" class="text-xs text-slate-400 italic">{{ $t('common.actions.loading') }}</div>
+        <div v-if="loadingVariants" class="text-xs text-slate-400 italic">
+          {{ $t('common.actions.loading') }}
+        </div>
         <div v-else-if="colorOptions.length" class="flex flex-wrap gap-2">
           <button
             v-for="opt in colorOptions"
