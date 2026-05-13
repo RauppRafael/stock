@@ -23,6 +23,12 @@ const props = defineProps<{
    * doesn't need the user to commit to one.
    */
   hideSize?: boolean
+  /**
+   * Narrow the product list to wildcards (or to non-wildcards) after the
+   * lookup endpoint returns. Used by the convert page to restrict the user
+   * to wildcards on the source side. `null` = show everything.
+   */
+  productFilter?: 'wildcard' | 'standard' | null
 }>()
 
 const emit = defineEmits<{
@@ -99,7 +105,13 @@ async function loadProducts(catId: number) {
       products.value = []
       return
     }
-    products.value = parsed.data.data as Data.Product[]
+    const all = parsed.data.data as Data.Product[]
+    products.value =
+      props.productFilter === 'wildcard'
+        ? all.filter((p) => p.isWildcard)
+        : props.productFilter === 'standard'
+          ? all.filter((p) => !p.isWildcard)
+          : all
   } finally {
     loadingProducts.value = false
   }

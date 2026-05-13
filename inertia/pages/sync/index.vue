@@ -43,6 +43,7 @@ type PushRow = {
   localVariantId: number
   display: LocalVariantDisplay
   localTotal: number
+  wildcardPool: number
   targets: PushTarget[]
 }
 type PullTarget = {
@@ -57,6 +58,7 @@ type PullRow = {
   localVariantId: number
   display: LocalVariantDisplay
   localTotal: number
+  wildcardPool: number
   totalDecrement: number
   targets: PullTarget[]
 }
@@ -525,7 +527,7 @@ SHOPIFY_API_VERSION=2025-10</pre
           class="inline-flex rounded-md border border-slate-200 overflow-hidden text-xs shrink-0"
         >
           <button
-            v-for="opt in (['all', 'linked', 'unlinked'] as LinkStatusFilter[])"
+            v-for="opt in ['all', 'linked', 'unlinked'] as LinkStatusFilter[]"
             :key="opt"
             type="button"
             class="px-3 py-1.5 transition"
@@ -712,7 +714,22 @@ SHOPIFY_API_VERSION=2025-10</pre
                     :image-url="row.display.imageUrl"
                   />
                 </td>
-                <td class="px-4 py-3 text-right text-sm tabular-nums">{{ row.localTotal }}</td>
+                <td class="px-4 py-3 text-right text-sm tabular-nums">
+                  <div>{{ row.localTotal }}</div>
+                  <div
+                    v-if="row.wildcardPool > 0"
+                    class="text-[10px] text-violet-700 mt-0.5 whitespace-nowrap"
+                    :title="
+                      $t('sync.wildcardPoolHint', {
+                        own: row.localTotal - row.wildcardPool,
+                        pool: row.wildcardPool,
+                        total: row.localTotal,
+                      })
+                    "
+                  >
+                    {{ row.localTotal - row.wildcardPool }} + 🃏 {{ row.wildcardPool }}
+                  </div>
+                </td>
                 <td class="px-4 py-3 text-sm space-y-1">
                   <div
                     v-for="tg in row.targets"
@@ -799,7 +816,22 @@ SHOPIFY_API_VERSION=2025-10</pre
                     :image-url="row.display.imageUrl"
                   />
                 </td>
-                <td class="px-4 py-3 text-right text-sm tabular-nums">{{ row.localTotal }}</td>
+                <td class="px-4 py-3 text-right text-sm tabular-nums">
+                  <div>{{ row.localTotal }}</div>
+                  <div
+                    v-if="row.wildcardPool > 0"
+                    class="text-[10px] text-violet-700 mt-0.5 whitespace-nowrap"
+                    :title="
+                      $t('sync.wildcardPoolHint', {
+                        own: row.localTotal - row.wildcardPool,
+                        pool: row.wildcardPool,
+                        total: row.localTotal,
+                      })
+                    "
+                  >
+                    {{ row.localTotal - row.wildcardPool }} + 🃏 {{ row.wildcardPool }}
+                  </div>
+                </td>
                 <td class="px-4 py-3 text-xs space-y-1">
                   <div
                     v-for="tg in row.targets"

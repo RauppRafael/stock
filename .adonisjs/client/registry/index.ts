@@ -54,6 +54,24 @@ const routes = {
     tokens: [{"old":"/stock/adjust/bulk","type":0,"val":"stock","end":""},{"old":"/stock/adjust/bulk","type":0,"val":"adjust","end":""},{"old":"/stock/adjust/bulk","type":0,"val":"bulk","end":""}],
     types: placeholder as Registry['stock.adjust.bulk']['types'],
   },
+  'stock.convert.create': {
+    methods: ["GET","HEAD"],
+    pattern: '/stock/convert',
+    tokens: [{"old":"/stock/convert","type":0,"val":"stock","end":""},{"old":"/stock/convert","type":0,"val":"convert","end":""}],
+    types: placeholder as Registry['stock.convert.create']['types'],
+  },
+  'stock.convert': {
+    methods: ["POST"],
+    pattern: '/stock/convert',
+    tokens: [{"old":"/stock/convert","type":0,"val":"stock","end":""},{"old":"/stock/convert","type":0,"val":"convert","end":""}],
+    types: placeholder as Registry['stock.convert']['types'],
+  },
+  'stock.lookup.wildcardTargets': {
+    methods: ["GET","HEAD"],
+    pattern: '/stock/lookup/wildcards/:wildcardVariantId/targets',
+    tokens: [{"old":"/stock/lookup/wildcards/:wildcardVariantId/targets","type":0,"val":"stock","end":""},{"old":"/stock/lookup/wildcards/:wildcardVariantId/targets","type":0,"val":"lookup","end":""},{"old":"/stock/lookup/wildcards/:wildcardVariantId/targets","type":0,"val":"wildcards","end":""},{"old":"/stock/lookup/wildcards/:wildcardVariantId/targets","type":1,"val":"wildcardVariantId","end":""},{"old":"/stock/lookup/wildcards/:wildcardVariantId/targets","type":0,"val":"targets","end":""}],
+    types: placeholder as Registry['stock.lookup.wildcardTargets']['types'],
+  },
   'stock.lookup.products': {
     methods: ["GET","HEAD"],
     pattern: '/stock/lookup/categories/:categoryId/products',

@@ -15,7 +15,11 @@ export interface ApiDefinition {
       create: typeof routes['stock.adjust.create']
       bulk: typeof routes['stock.adjust.bulk']
     }
+    convert: typeof routes['stock.convert'] & {
+      create: typeof routes['stock.convert.create']
+    }
     lookup: {
+      wildcardTargets: typeof routes['stock.lookup.wildcardTargets']
       products: typeof routes['stock.lookup.products']
       variants: typeof routes['stock.lookup.variants']
       quantity: typeof routes['stock.lookup.quantity']

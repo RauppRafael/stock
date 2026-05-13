@@ -1,9 +1,7 @@
 {
   "permissions": {
     "allow": [
-      "PowerShell(Get-ChildItem -Path D:\\\\projects\\\\stock\\\\inertia, D:\\\\projects\\\\stock\\\\start, D:\\\\projects\\\\stock\\\\config, D:\\\\projects\\\\stock\\\\database, D:\\\\projects\\\\stock\\\\providers, D:\\\\projects\\\\stock\\\\resources, D:\\\\projects\\\\stock\\\\tests -Recurse -File | ForEach-Object { $_.FullName })",
       "Bash(npm install *)",
-      "PowerShell($env:MYSQL_PWD='root'; & 'C:\\\\Program Files\\\\MySQL\\\\MySQL Server 8.0\\\\bin\\\\mysql.exe' -uroot -e \"CREATE DATABASE IF NOT EXISTS stock CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;\" 2>&1)",
       "PowerShell(node ace migration:run 2>&1)",
       "Bash(node ace *)",
       "Bash(npm run *)",
@@ -17,7 +15,6 @@
       "PowerShell(Get-Process *)",
       "PowerShell(Stop-Process *)",
       "Bash(curl -s -c - -b - http://localhost:3333/login -o /dev/null)",
-      "Bash(curl -s 'http://localhost:3333/stock' -H \"X-Inertia: true\" -H \"X-Requested-With: XMLHttpRequest\" -H \"Cookie: $\\(curl -s -c - -b - http://localhost:3333/login -o /dev/null)",
       "PowerShell(node ace test unit 2>&1 | Select-Object -Last 30)",
       "PowerShell(Get-Item *)",
       "Bash(node *)",

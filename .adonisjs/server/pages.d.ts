@@ -22,6 +22,7 @@ declare module '@adonisjs/inertia/types' {
     'products/index': ExtractProps<(typeof import('../../inertia/pages/products/index.vue'))['default']>
     'products/show': ExtractProps<(typeof import('../../inertia/pages/products/show.vue'))['default']>
     'stock/adjust': ExtractProps<(typeof import('../../inertia/pages/stock/adjust.vue'))['default']>
+    'stock/convert': ExtractProps<(typeof import('../../inertia/pages/stock/convert.vue'))['default']>
     'stock/index': ExtractProps<(typeof import('../../inertia/pages/stock/index.vue'))['default']>
     'sync/index': ExtractProps<(typeof import('../../inertia/pages/sync/index.vue'))['default']>
   }

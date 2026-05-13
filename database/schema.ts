@@ -80,9 +80,11 @@ export class ProductSchema extends BaseModel {
     'description',
     'id',
     'imageUrl',
+    'isWildcard',
     'lowStockThreshold',
     'name',
     'updatedAt',
+    'wildcardId',
   ] as const
   $columns = ProductSchema.$columns
   @column()
@@ -100,11 +102,15 @@ export class ProductSchema extends BaseModel {
   @column()
   declare imageUrl: string | null
   @column()
+  declare isWildcard: boolean
+  @column()
   declare lowStockThreshold: number | null
   @column()
   declare name: string
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   declare updatedAt: DateTime | null
+  @column()
+  declare wildcardId: number | null
 }
 
 export class ShopifySettingSchema extends BaseModel {

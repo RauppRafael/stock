@@ -128,6 +128,8 @@
       "empty": "No stock matches the current filters.",
       "total": "Total",
       "grandTotal": "Grand total",
+      "wildcardPoolChip": "+{pool}",
+      "wildcardPoolTooltip": "Inherits {pool} unit(s) from a wildcard at this location — effective total {total} on Shopify.",
       "columns": {
         "product": "Product",
         "variant": "Variant",
@@ -153,6 +155,24 @@
       "loadingGrid": "Loading sizes…",
       "initialLabel": "Initial",
       "changeLabel": "Change"
+    },
+    "convert": {
+      "title": "Convert wildcard",
+      "description": "Take stock from a wildcard (printless base) and turn it into a printed product. Both sides of the swap happen at the same location, in one transaction.",
+      "headerAction": "Convert wildcard",
+      "stepLocate": "1 · Pick wildcard + location",
+      "stepTarget": "2 · Pick target & quantity",
+      "wildcardHint": "Only wildcard products are listed here — those marked 🃏 in the catalog.",
+      "pickToContinue": "Pick a wildcard variant and location on the left to continue.",
+      "wildcardOnHand": "Wildcard on hand at this location",
+      "targetLabel": "Convert into",
+      "noTargets": "No printed products derive from this wildcard variant (or none with a matching color/size).",
+      "noTargetsAction": "No targets available",
+      "outOfStock": "No wildcard stock at this location",
+      "quantityLabel": "Quantity to convert",
+      "maxHint": "Up to {max} available.",
+      "reasonPlaceholder": "e.g. printed today, batch #42…",
+      "submit": "Convert {count} unit(s)"
     }
   },
   "movements": {
@@ -198,6 +218,36 @@
       "title": "Edit {name}",
       "description": "Add new attribute combinations to introduce more variants. Existing variants and stock are untouched.",
       "variantsHint": "Selecting additional values creates new variant combinations. Removing a value here does not remove the variant — it stays so its history is preserved."
+    },
+    "wildcard": {
+      "label": "Wildcard product",
+      "derivedFromTitle": "Derived from a wildcard",
+      "sectionTitle": "Wildcard relationship",
+      "sectionDescription": "A wildcard product is a printless base (e.g. a blank hoodie) whose stock acts as a shared pool for the printed products derived from it. On Shopify the wildcard's stock is folded into each printed product's quantity.",
+      "sectionDescriptionShort": "Pick how this product relates to wildcards. A wildcard's stock is pooled into the Shopify quantity of every printed product derived from it.",
+      "modes": {
+        "standaloneLabel": "Standalone product",
+        "standaloneHelp": "Its own stock only — no shared pool.",
+        "derivesLabel": "Derives from a wildcard",
+        "derivesHelp": "Inherits a wildcard's stock for matching color/size when syncing to Shopify.",
+        "wildcardLabel": "This is a wildcard (printless base)",
+        "wildcardHelp": "Stock acts as a shared pool for other products in this category. Not pushed to Shopify on its own."
+      },
+      "pickSource": "Pick a wildcard source…",
+      "isWildcardLabel": "This is a wildcard (printless base)",
+      "isWildcardHelp": "Wildcards aren't pushed to Shopify on their own. Other products in the same category can pick this one as their source.",
+      "lockedOff": "Locked: {count} product(s) currently derive from this wildcard. Remove the source on those products first to change this.",
+      "sourceLabel": "Wildcard source",
+      "noSource": "None — this product has its own stock only",
+      "noOptionsForCategory": "No wildcard products in this category yet.",
+      "banner": {
+        "wildcardTitle": "Wildcard product",
+        "wildcardBody": "This product's stock acts as a shared pool. When the printed products derived from it are pushed to Shopify, the wildcard's matching color/size stock is added to each printed quantity.",
+        "derivedTitle": "Derived from a wildcard",
+        "derivedBody": "This product's effective Shopify quantity includes the {source} wildcard's stock for matching color/size."
+      },
+      "derivativesHeader": "Printed products derived from this wildcard",
+      "convertCta": "Convert wildcard"
     }
   },
   "categories": {
@@ -336,6 +386,8 @@
     "lastPushAt": "Last push: {when}",
     "never": "never",
     "refresh": "Refresh",
-    "loadingTab": "Loading from Shopify…"
+    "loadingTab": "Loading from Shopify…",
+    "wildcardPoolChip": "+{pool} from wildcard",
+    "wildcardPoolHint": "{own} own + {pool} from a wildcard of matching color/size = {total} effective on Shopify."
   }
 }

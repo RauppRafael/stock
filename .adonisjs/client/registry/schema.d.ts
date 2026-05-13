@@ -103,6 +103,42 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/stock_controller').default['bulkAdjust']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
+  'stock.convert.create': {
+    methods: ["GET","HEAD"]
+    pattern: '/stock/convert'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/stock_controller').default['createConversion']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/stock_controller').default['createConversion']>>>
+    }
+  }
+  'stock.convert': {
+    methods: ["POST"]
+    pattern: '/stock/convert'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/stock').convertWildcardValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/stock').convertWildcardValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/stock_controller').default['convert']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/stock_controller').default['convert']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'stock.lookup.wildcardTargets': {
+    methods: ["GET","HEAD"]
+    pattern: '/stock/lookup/wildcards/:wildcardVariantId/targets'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { wildcardVariantId: ParamValue }
+      query: ExtractQueryForGet<InferInput<(typeof import('#validators/stock').wildcardTargetsParamsValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/stock_controller').default['wildcardTargets']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/stock_controller').default['wildcardTargets']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
   'stock.lookup.products': {
     methods: ["GET","HEAD"]
     pattern: '/stock/lookup/categories/:categoryId/products'

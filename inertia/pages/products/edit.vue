@@ -4,15 +4,20 @@ import { Head, useForm } from '@inertiajs/vue3'
 import { Link } from '@adonisjs/inertia/vue'
 import { urlFor } from '~/client'
 import type { Data } from '@generated/data'
+import { useI18n } from 'vue-i18n'
 import PageHeader from '~/components/PageHeader.vue'
 import AttributeMultiSelect from '~/components/AttributeMultiSelect.vue'
+import WildcardModePicker from '~/components/WildcardModePicker.vue'
 
 const props = defineProps<{
   product: Data.Product
   variants: Data.Variant[]
   colors: Data.Color[]
   sizes: Data.Size[]
+  wildcards: Data.Product[]
 }>()
+
+const { t } = useI18n()
 
 function uniqueAttributeIds(attr: 'color' | 'size'): number[] {
   const ids = new Set<number>()
@@ -30,9 +35,20 @@ const form = useForm({
   lowStockThreshold: props.product.lowStockThreshold,
   colorIds: uniqueAttributeIds('color'),
   sizeIds: uniqueAttributeIds('size'),
+  isWildcard: props.product.isWildcard,
+  wildcardId: props.product.wildcardId,
 })
 
 const category = computed(() => props.product.category)
+
+// `wildcards` is server-narrowed to same-category, not-self.
+const derivativesCount = computed(() => props.product.derivativesCount ?? 0)
+const wildcardLockedOff = computed(() => props.product.isWildcard && derivativesCount.value > 0)
+const lockedReason = computed(() =>
+  wildcardLockedOff.value
+    ? t('products.wildcard.lockedOff', { count: derivativesCount.value })
+    : undefined
+)
 
 function submit() {
   form
@@ -106,6 +122,31 @@ function submit() {
       </div>
 
       <template v-if="category">
+        <hr class="border-slate-100" />
+        <div class="space-y-3">
+          <div class="flex items-baseline gap-2">
+            <span aria-hidden="true">🃏</span>
+            <h2 class="text-sm font-semibold text-slate-700">
+              {{ $t('products.wildcard.sectionTitle') }}
+            </h2>
+          </div>
+          <p class="text-xs text-slate-500">
+            {{ $t('products.wildcard.sectionDescriptionShort') }}
+          </p>
+
+          <WildcardModePicker
+            :is-wildcard="form.isWildcard"
+            :wildcard-id="form.wildcardId"
+            :wildcards="wildcards"
+            :locked-wildcard="wildcardLockedOff"
+            :locked-reason="lockedReason"
+            :error-is-wildcard="form.errors.isWildcard"
+            :error-wildcard-id="form.errors.wildcardId"
+            @update:is-wildcard="form.isWildcard = $event"
+            @update:wildcard-id="form.wildcardId = $event"
+          />
+        </div>
+
         <hr class="border-slate-100" />
         <div>
           <h2 class="text-sm font-semibold text-slate-700 uppercase tracking-wider mb-2">

@@ -5,6 +5,7 @@ import Product from '#models/product'
 import Stock from '#models/stock'
 import Variant from '#models/variant'
 import StockService from '#services/stock_service'
+import WildcardService, { WildcardServiceError } from '#services/wildcard_service'
 import StockTransformer from '#transformers/stock_transformer'
 import CategoryTransformer from '#transformers/category_transformer'
 import LocationTransformer from '#transformers/location_transformer'
@@ -13,12 +14,14 @@ import VariantTransformer from '#transformers/variant_transformer'
 import {
   adjustStockValidator,
   bulkAdjustStockValidator,
+  convertWildcardValidator,
   stockIndexFiltersValidator,
   stockLookupCategoryParamsValidator,
   stockLookupGridParamsValidator,
   stockLookupGridQueryValidator,
   stockLookupProductParamsValidator,
   stockLookupVariantParamsValidator,
+  wildcardTargetsParamsValidator,
 } from '#validators/stock'
 
 export default class StockController {
@@ -133,11 +136,21 @@ export default class StockController {
         .orderBy('name', 'asc')
     }
 
+    // Wildcard pool contribution per (printed variant, location) — i.e.
+    // for each printed variant in scope, how much stock its source wildcard
+    // holds in a matching (color, size) variant at the same location.
+    // Computed server-side so it stays accurate even when the operator
+    // filtered to a single non-wildcard product (which would otherwise hide
+    // the wildcard's own rows entirely). The math lives on WildcardService
+    // so it can be unit-tested in isolation.
+    const pools = await new WildcardService().computePoolMap(variantsInScope, locationIds)
+
     return inertia.render('stock/index', {
       stocks: StockTransformer.transform(stocks),
       categories: CategoryTransformer.transform(categories),
       locations: LocationTransformer.transform(locations),
       products: ProductTransformer.transform(products),
+      pools,
       filters: {
         categoryId: filters.categoryId ?? null,
         productId: filters.productId ?? null,
@@ -253,6 +266,98 @@ export default class StockController {
     return ctx.response.json({
       data: { quantity: stock?.quantity ?? 0 },
     })
+  }
+
+  /**
+   * Render the convert-wildcard page. Optionally prefilled when the caller
+   * passes a wildcard variant + location (e.g. clicking a wildcard row on
+   * the stock page).
+   */
+  async createConversion({ inertia, request }: HttpContext) {
+    const variantId = request.input('variantId') ? Number(request.input('variantId')) : null
+    const locationId = request.input('locationId') ? Number(request.input('locationId')) : null
+
+    const [categories, locations] = await Promise.all([
+      Category.notTrashed().orderBy('name', 'asc'),
+      Location.query().orderBy('name', 'asc'),
+    ])
+
+    let prefilledVariant: Variant | null = null
+    if (variantId) {
+      const v = await Variant.query()
+        .where('id', variantId)
+        .preload('color')
+        .preload('size')
+        .preload('product', (p) => p.preload('category'))
+        .first()
+      // Only honor the prefill when it's actually a wildcard variant —
+      // otherwise the page would land in an unresolvable state and the
+      // operator would have to clear it manually.
+      if (v?.product?.isWildcard) prefilledVariant = v
+    }
+
+    return inertia.render('stock/convert', {
+      categories: CategoryTransformer.transform(categories),
+      locations: LocationTransformer.transform(locations),
+      prefilledVariant: prefilledVariant ? VariantTransformer.transform(prefilledVariant) : null,
+      prefilledLocationId: locationId,
+    })
+  }
+
+  /**
+   * Apply a wildcard → printed conversion. The service writes both
+   * StockMovements atomically; we only translate its errors into a flash
+   * for the redirect-back path.
+   */
+  async convert({ request, response, session, auth }: HttpContext) {
+    const payload = await request.validateUsing(convertWildcardValidator)
+    const user = auth.getUserOrFail()
+
+    try {
+      const result = await new WildcardService().convert({
+        wildcardVariantId: payload.wildcardVariantId,
+        targetVariantId: payload.targetVariantId,
+        locationId: payload.locationId,
+        quantity: payload.quantity,
+        userId: user.id,
+      })
+      session.flash(
+        'success',
+        `Converted ${payload.quantity} unit(s) — wildcard ${result.wildcardMovement.previousQuantity}→${result.wildcardMovement.newQuantity}, printed ${result.targetMovement.previousQuantity}→${result.targetMovement.newQuantity}.`
+      )
+      return response.redirect().toRoute('stock.index')
+    } catch (error) {
+      const message =
+        error instanceof WildcardServiceError
+          ? error.message
+          : error instanceof Error
+            ? error.message
+            : 'Conversion failed.'
+      session.flash('error', message)
+      return response.redirect().back()
+    }
+  }
+
+  /**
+   * JSON: for a given wildcard variant, list the printed products + their
+   * matching variant id that can be the target of a conversion. Used by
+   * the convert page's "target picker".
+   */
+  async wildcardTargets(ctx: HttpContext) {
+    const { wildcardVariantId } = await wildcardTargetsParamsValidator.validate(
+      ctx.request.params()
+    )
+    const matches = await new WildcardService().targetsForWildcardVariant(wildcardVariantId)
+    // Resolve product transformers explicitly so the front-end sees the
+    // same { data: [...] } envelope it already validates for other lookups.
+    const resolvedProducts = await ctx.serialize.withoutWrapping(
+      ProductTransformer.transform(matches.map((m) => m.product))
+    )
+    const targets = resolvedProducts.map((p: { id: number }, i: number) => ({
+      product: p,
+      targetVariantId: matches[i].targetVariantId,
+    }))
+    return ctx.response.json({ data: targets })
   }
 
   /**

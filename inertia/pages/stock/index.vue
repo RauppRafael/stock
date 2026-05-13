@@ -16,6 +16,13 @@ const props = defineProps<{
   categories: Data.Category[]
   locations: Data.Location[]
   products: Data.Product[]
+  /**
+   * Map of `${variantId}:${locationId}` → wildcard pool quantity. Only
+   * populated for printed-product variants whose source wildcard holds
+   * stock of matching color/size at that location. Empty when there are no
+   * wildcards in play.
+   */
+  pools: Record<string, number>
   filters: {
     categoryId: number | null
     productId: number | null
@@ -31,6 +38,7 @@ useValidatedProps(
     categories: z.array(categorySchema),
     locations: z.array(locationSchema),
     products: z.array(productSchema),
+    pools: z.record(z.string(), z.number().int()),
     filters: z.object({
       categoryId: z.number().int().nullable(),
       productId: z.number().int().nullable(),
@@ -39,6 +47,10 @@ useValidatedProps(
     }),
   })
 )
+
+function poolFor(row: StockRow): number {
+  return props.pools[`${row.variantId}:${row.locationId}`] ?? 0
+}
 
 const filters = reactive({ ...props.filters })
 
@@ -171,6 +183,10 @@ function rowClick(row: StockRow) {
   <div class="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto">
     <PageHeader :title="$t('stock.index.title')" :description="$t('stock.index.description')">
       <template #actions>
+        <Link route="stock.convert.create" class="btn-secondary">
+          <span aria-hidden="true" class="mr-1">🃏</span>
+          {{ $t('stock.convert.headerAction') }}
+        </Link>
         <Link route="stock.adjust.create" class="btn-primary">{{
           $t('stock.index.newAdjustment')
         }}</Link>
@@ -265,8 +281,24 @@ function rowClick(row: StockRow) {
                       class="px-4 py-3 align-top border-r border-slate-100 transition"
                       :class="{ 'bg-slate-50': isProductHovered(pg) }"
                     >
-                      <div class="font-medium text-slate-900 whitespace-nowrap">
+                      <div
+                        class="font-medium text-slate-900 whitespace-nowrap inline-flex items-center gap-1.5"
+                      >
+                        <span
+                          v-if="pg.product.isWildcard"
+                          class="text-base leading-none"
+                          aria-hidden="true"
+                          :title="$t('products.wildcard.label')"
+                          >🃏</span
+                        >
                         {{ pg.product.name }}
+                      </div>
+                      <div
+                        v-if="pg.product.wildcardSource"
+                        class="text-[10px] text-violet-700 mt-0.5 inline-flex items-center gap-0.5 whitespace-nowrap"
+                        :title="$t('products.wildcard.derivedFromTitle')"
+                      >
+                        🃏 <span class="font-mono">{{ pg.product.wildcardSource.code }}</span>
                       </div>
                       <div
                         class="text-xs text-slate-400 inline-flex items-center gap-1 whitespace-nowrap"
@@ -323,7 +355,7 @@ function rowClick(row: StockRow) {
                         <span class="font-semibold text-slate-700">{{ totalFor(cg) }}</span>
                       </div>
                     </td>
-                    <td class="px-4 py-3">
+                    <td class="px-4 py-1.5">
                       <span
                         v-if="row.variant?.size"
                         class="inline-flex items-center gap-1 text-xs rounded-md bg-slate-100 text-slate-700 px-1.5 py-0.5 whitespace-nowrap font-medium"
@@ -332,11 +364,26 @@ function rowClick(row: StockRow) {
                       </span>
                       <span v-else class="text-slate-300 text-xs">—</span>
                     </td>
-                    <td class="px-4 py-3 text-right">
-                      <StockBadge
-                        :quantity="row.quantity"
-                        :threshold="row.variant?.product?.lowStockThreshold ?? null"
-                      />
+                    <td class="px-4 py-1.5 text-right">
+                      <div class="inline-flex items-center gap-1.5">
+                        <span
+                          v-if="poolFor(row) > 0"
+                          class="text-[10px] text-violet-700 inline-flex items-center gap-0.5 whitespace-nowrap"
+                          :title="
+                            $t('stock.index.wildcardPoolTooltip', {
+                              pool: poolFor(row),
+                              total: row.quantity + poolFor(row),
+                            })
+                          "
+                        >
+                          🃏
+                          {{ $t('stock.index.wildcardPoolChip', { pool: poolFor(row) }) }}
+                        </span>
+                        <StockBadge
+                          :quantity="row.quantity"
+                          :threshold="row.variant?.product?.lowStockThreshold ?? null"
+                        />
+                      </div>
                     </td>
                   </tr>
                 </template>

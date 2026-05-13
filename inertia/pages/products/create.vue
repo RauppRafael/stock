@@ -10,6 +10,7 @@ import AttributeMultiSelect from '~/components/AttributeMultiSelect.vue'
 import CategoryPicker from '~/components/CategoryPicker.vue'
 import Modal from '~/components/Modal.vue'
 import EmojiPicker from '~/components/EmojiPicker.vue'
+import WildcardModePicker from '~/components/WildcardModePicker.vue'
 import { CATEGORY_EMOJIS } from '~/components/emoji_sets'
 
 const { t } = useI18n()
@@ -18,6 +19,8 @@ const props = defineProps<{
   categories: Data.Category[]
   colors: Data.Color[]
   sizes: Data.Size[]
+  wildcards: Data.Product[]
+  prefilledCategoryId: number | null
 }>()
 
 function categoryAttrs(c: Data.Category): string {
@@ -31,12 +34,35 @@ function categoryAttrs(c: Data.Category): string {
 const form = useForm({
   name: '',
   code: '',
-  categoryId: null as number | null,
+  categoryId: props.prefilledCategoryId,
   description: '',
   lowStockThreshold: null as number | null,
   colorIds: [] as number[],
   sizeIds: [] as number[],
+  isWildcard: false,
+  wildcardId: null as number | null,
 })
+
+/**
+ * Wildcards eligible as this product's source: same category, soft-delete
+ * filter already applied server-side. Recomputed when the operator changes
+ * the category — picking a wildcard from category A then switching to B
+ * silently invalidates the choice, so we clear it.
+ */
+const wildcardOptions = computed<Data.Product[]>(() => {
+  if (form.isWildcard) return []
+  if (!form.categoryId) return []
+  return props.wildcards.filter((w) => w.categoryId === form.categoryId)
+})
+
+watch(
+  () => form.categoryId,
+  () => {
+    if (form.wildcardId && !wildcardOptions.value.some((w) => w.id === form.wildcardId)) {
+      form.wildcardId = null
+    }
+  }
+)
 
 const selectedCategory = computed<Data.Category | null>(
   () => props.categories.find((c) => c.id === form.categoryId) ?? null
@@ -272,6 +298,31 @@ function submitSize() {
         />
         <p v-if="form.errors.description" class="field-error">{{ form.errors.description }}</p>
       </div>
+
+      <template v-if="selectedCategory">
+        <hr class="border-slate-100" />
+        <div class="space-y-3">
+          <div class="flex items-baseline gap-2">
+            <span aria-hidden="true">🃏</span>
+            <h2 class="text-sm font-semibold text-slate-700">
+              {{ $t('products.wildcard.sectionTitle') }}
+            </h2>
+          </div>
+          <p class="text-xs text-slate-500">
+            {{ $t('products.wildcard.sectionDescriptionShort') }}
+          </p>
+
+          <WildcardModePicker
+            :is-wildcard="form.isWildcard"
+            :wildcard-id="form.wildcardId"
+            :wildcards="wildcardOptions"
+            :error-is-wildcard="form.errors.isWildcard"
+            :error-wildcard-id="form.errors.wildcardId"
+            @update:is-wildcard="form.isWildcard = $event"
+            @update:wildcard-id="form.wildcardId = $event"
+          />
+        </div>
+      </template>
 
       <template v-if="selectedCategory">
         <hr class="border-slate-100" />

@@ -12,6 +12,7 @@ const props = defineProps<{
   variants: Data.Variant[]
   stocks: Data.Stock[]
   movements: Data.StockMovement[]
+  derivatives: Data.Product[]
 }>()
 
 const stocksByVariant = computed(() => {
@@ -45,6 +46,43 @@ const columnCount = computed(() => 2 + (hasColor.value ? 1 : 0) + (hasSize.value
         }}</Link>
       </template>
     </PageHeader>
+
+    <div
+      v-if="product.isWildcard"
+      class="mb-6 rounded-xl border border-violet-200 bg-violet-50/60 px-4 py-3 text-sm text-violet-900 flex items-start gap-3"
+    >
+      <span class="text-xl leading-none" aria-hidden="true">🃏</span>
+      <div>
+        <p class="font-semibold">{{ $t('products.wildcard.banner.wildcardTitle') }}</p>
+        <p class="text-xs text-violet-700 mt-0.5">
+          {{ $t('products.wildcard.banner.wildcardBody') }}
+        </p>
+      </div>
+    </div>
+
+    <div
+      v-else-if="product.wildcardSource"
+      class="mb-6 rounded-xl border border-violet-200 bg-violet-50/60 px-4 py-3 text-sm text-violet-900 flex items-start gap-3"
+    >
+      <span class="text-xl leading-none" aria-hidden="true">🃏</span>
+      <div>
+        <p class="font-semibold">
+          {{ $t('products.wildcard.banner.derivedTitle') }}
+        </p>
+        <p class="text-xs text-violet-700 mt-0.5">
+          <i18n-t keypath="products.wildcard.banner.derivedBody" tag="span">
+            <template #source>
+              <Link
+                route="products.show"
+                :params="{ id: product.wildcardSource.id }"
+                class="font-medium underline hover:text-violet-700"
+                >{{ product.wildcardSource.name }}</Link
+              >
+            </template>
+          </i18n-t>
+        </p>
+      </div>
+    </div>
 
     <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 mb-6">
       <div class="card p-4">
@@ -152,6 +190,37 @@ const columnCount = computed(() => 2 + (hasColor.value ? 1 : 0) + (hasSize.value
           </tbody>
         </table>
       </div>
+    </div>
+
+    <div v-if="product.isWildcard && derivatives.length" class="card overflow-hidden mb-8">
+      <header class="px-5 py-3 border-b border-slate-100 flex items-center justify-between">
+        <h2 class="font-semibold text-slate-800 inline-flex items-center gap-2">
+          <span aria-hidden="true">🃏</span>
+          {{ $t('products.wildcard.derivativesHeader') }}
+        </h2>
+        <Link route="stock.convert.create" class="btn-secondary text-xs">{{
+          $t('products.wildcard.convertCta')
+        }}</Link>
+      </header>
+      <ul class="divide-y divide-slate-100">
+        <li
+          v-for="d in derivatives"
+          :key="d.id"
+          class="px-5 py-3 flex items-center justify-between"
+        >
+          <Link
+            route="products.show"
+            :params="{ id: d.id }"
+            class="text-sm font-medium text-slate-800 hover:text-brand-700"
+          >
+            {{ d.name }}
+            <span class="text-xs text-slate-400 font-mono ml-2">{{ d.code }}</span>
+          </Link>
+          <span class="text-xs text-slate-400">{{
+            $t('products.index.variantCount', { count: d.variantCount ?? 0 }, d.variantCount ?? 0)
+          }}</span>
+        </li>
+      </ul>
     </div>
 
     <div class="card overflow-hidden">

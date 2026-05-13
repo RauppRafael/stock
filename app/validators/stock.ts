@@ -80,3 +80,36 @@ export const stockLookupProductParamsValidator = vine.compile(
     productId: vine.number().withoutDecimals().positive(),
   })
 )
+
+/**
+ * Convert-page payload. We re-check the business invariants inside
+ * `WildcardService.convert` (so the service is safe even when called
+ * directly), but enforcing positive ints + existence here gets the obvious
+ * mistakes out of the way before we open a transaction.
+ */
+export const convertWildcardValidator = vine.compile(
+  vine.object({
+    wildcardVariantId: vine
+      .number()
+      .withoutDecimals()
+      .positive()
+      .exists({ table: 'variants', column: 'id' }),
+    targetVariantId: vine
+      .number()
+      .withoutDecimals()
+      .positive()
+      .exists({ table: 'variants', column: 'id' }),
+    locationId: vine
+      .number()
+      .withoutDecimals()
+      .positive()
+      .exists({ table: 'locations', column: 'id' }),
+    quantity: vine.number().withoutDecimals().min(1).max(1_000_000),
+  })
+)
+
+export const wildcardTargetsParamsValidator = vine.compile(
+  vine.object({
+    wildcardVariantId: vine.number().withoutDecimals().positive(),
+  })
+)

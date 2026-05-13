@@ -1,7 +1,12 @@
 import { test } from '@japa/runner'
-import ShopifySyncService, { ShopifySyncError } from '#services/shopify_sync_service'
+import ShopifySyncService, {
+  type LocalSnapshot,
+  ShopifySyncError,
+} from '#services/shopify_sync_service'
 import ShopifyClient, { type ShopifyLocation, type ShopifyProduct } from '#services/shopify_client'
 import Category from '#models/category'
+import Color from '#models/color'
+import Size from '#models/size'
 import Product from '#models/product'
 import Variant from '#models/variant'
 import Location from '#models/location'
@@ -131,7 +136,14 @@ test.group('ShopifySyncService', (group) => {
     await Promise.all([StockMovement.query().delete(), Stock.query().delete()])
     await ShopifyVariantLink.query().delete()
     await Variant.query().delete()
+    // Derivatives must go before wildcards (self-FK is RESTRICT). The
+    // `is_wildcard`/`wildcard_id` columns were added partway through this
+    // feature's life; tests that don't touch wildcards effectively run the
+    // first delete as a no-op.
+    await Product.query().whereNotNull('wildcard_id').delete()
     await Product.query().delete()
+    await Color.query().delete()
+    await Size.query().delete()
     await Category.query().delete()
     await Location.query().delete()
     await User.query().delete()
@@ -421,6 +433,237 @@ test.group('ShopifySyncService', (group) => {
     )
     const settings = await ShopifySetting.findOrFail(1)
     assert.isNull(settings.lastPushAt, 'lastPushAt must not be set when the push fails')
+  })
+
+  test('computeEffectiveTotals folds wildcard pool into matching printed variants', async ({
+    assert,
+  }) => {
+    // Pure-logic test for the math that decides what gets pushed to
+    // Shopify. We assemble a `LocalSnapshot` by hand so no Shopify fixture
+    // is needed — but we still need real Color/Size rows because the
+    // variants table FKs to them.
+    const category = await Category.create({
+      name: 'Hoodie',
+      hasColor: true,
+      hasSize: true,
+    })
+    const black = await Color.create({ name: 'Black', code: 'BLK' })
+    const sizeM = await Size.create({ name: 'M', code: 'M', sortOrder: 1 })
+    const wildcardProduct = await Product.create({
+      name: 'Hoodie Blank',
+      code: 'HDBLK',
+      categoryId: category.id,
+      isWildcard: true,
+    })
+    const printedProduct = await Product.create({
+      name: 'Hoodie Plain',
+      code: 'HDPL',
+      categoryId: category.id,
+      wildcardId: wildcardProduct.id,
+    })
+    const wildcardVariant = await Variant.create({
+      productId: wildcardProduct.id,
+      colorId: black.id,
+      sizeId: sizeM.id,
+    })
+    const printedVariant = await Variant.create({
+      productId: printedProduct.id,
+      colorId: black.id,
+      sizeId: sizeM.id,
+    })
+
+    const variants = await Variant.query()
+      .whereIn('id', [wildcardVariant.id, printedVariant.id])
+      .preload('product')
+    const totalByVariantId = new Map<number, number>([
+      [wildcardVariant.id, 10],
+      [printedVariant.id, 4],
+    ])
+    const snapshot: LocalSnapshot = { variants, totalByVariantId }
+
+    const result = new ShopifySyncService().computeEffectiveTotals(snapshot)
+
+    assert.equal(result.effectiveByVariantId.get(printedVariant.id), 14)
+    assert.equal(result.wildcardPoolByVariantId.get(printedVariant.id), 10)
+    // Wildcards must be pinned to 0 so a stray ShopifyVariantLink on a
+    // wildcard variant can't leak the blank stock through applyPush.
+    assert.equal(result.effectiveByVariantId.get(wildcardVariant.id), 0)
+    assert.equal(result.wildcardPoolByVariantId.get(wildcardVariant.id), 0)
+  })
+
+  test('computeEffectiveTotals shares the same pool across multiple derivatives', async ({
+    assert,
+  }) => {
+    // Critical invariant: two printed products derived from the same
+    // wildcard each see the full pool. Shopify oversell on shared pools is
+    // accepted as the v1 behaviour — push math is correct, pull reconciles.
+    const category = await Category.create({
+      name: 'Hoodie',
+      hasColor: true,
+      hasSize: true,
+    })
+    const black = await Color.create({ name: 'Black', code: 'BLK' })
+    const sizeM = await Size.create({ name: 'M', code: 'M', sortOrder: 1 })
+    const wildcardProduct = await Product.create({
+      name: 'Hoodie Blank',
+      code: 'HDBLK',
+      categoryId: category.id,
+      isWildcard: true,
+    })
+    const printedA = await Product.create({
+      name: 'Hoodie Plain',
+      code: 'HDPL',
+      categoryId: category.id,
+      wildcardId: wildcardProduct.id,
+    })
+    const printedB = await Product.create({
+      name: 'Hoodie Puff',
+      code: 'HDPF',
+      categoryId: category.id,
+      wildcardId: wildcardProduct.id,
+    })
+    const wildcardVariant = await Variant.create({
+      productId: wildcardProduct.id,
+      colorId: black.id,
+      sizeId: sizeM.id,
+    })
+    const printedAVariant = await Variant.create({
+      productId: printedA.id,
+      colorId: black.id,
+      sizeId: sizeM.id,
+    })
+    const printedBVariant = await Variant.create({
+      productId: printedB.id,
+      colorId: black.id,
+      sizeId: sizeM.id,
+    })
+
+    const variants = await Variant.query()
+      .whereIn('id', [wildcardVariant.id, printedAVariant.id, printedBVariant.id])
+      .preload('product')
+    const snapshot: LocalSnapshot = {
+      variants,
+      totalByVariantId: new Map<number, number>([
+        [wildcardVariant.id, 10],
+        [printedAVariant.id, 4],
+        [printedBVariant.id, 2],
+      ]),
+    }
+
+    const result = new ShopifySyncService().computeEffectiveTotals(snapshot)
+
+    assert.equal(result.effectiveByVariantId.get(printedAVariant.id), 14)
+    assert.equal(result.effectiveByVariantId.get(printedBVariant.id), 12)
+    assert.equal(result.wildcardPoolByVariantId.get(printedAVariant.id), 10)
+    assert.equal(result.wildcardPoolByVariantId.get(printedBVariant.id), 10)
+  })
+
+  test('computeEffectiveTotals contributes zero when no wildcard variant matches', async ({
+    assert,
+  }) => {
+    // Printed variant in a (color, size) the wildcard doesn't carry — the
+    // operator added a print-only colour, say. The printed variant must
+    // collapse to own-stock only, NOT inherit a different colour's pool.
+    const category = await Category.create({
+      name: 'Hoodie',
+      hasColor: true,
+      hasSize: true,
+    })
+    const black = await Color.create({ name: 'Black', code: 'BLK' })
+    const red = await Color.create({ name: 'Red', code: 'RED' })
+    const sizeM = await Size.create({ name: 'M', code: 'M', sortOrder: 1 })
+    const wildcardProduct = await Product.create({
+      name: 'Hoodie Blank',
+      code: 'HDBLK',
+      categoryId: category.id,
+      isWildcard: true,
+    })
+    const printedProduct = await Product.create({
+      name: 'Hoodie Plain',
+      code: 'HDPL',
+      categoryId: category.id,
+      wildcardId: wildcardProduct.id,
+    })
+    const wildcardVariant = await Variant.create({
+      productId: wildcardProduct.id,
+      colorId: black.id,
+      sizeId: sizeM.id,
+    })
+    const printedVariant = await Variant.create({
+      productId: printedProduct.id,
+      colorId: red.id, // ← different colour, no match
+      sizeId: sizeM.id,
+    })
+
+    const variants = await Variant.query()
+      .whereIn('id', [wildcardVariant.id, printedVariant.id])
+      .preload('product')
+    const snapshot: LocalSnapshot = {
+      variants,
+      totalByVariantId: new Map<number, number>([
+        [wildcardVariant.id, 10],
+        [printedVariant.id, 3],
+      ]),
+    }
+
+    const result = new ShopifySyncService().computeEffectiveTotals(snapshot)
+
+    assert.equal(result.effectiveByVariantId.get(printedVariant.id), 3)
+    assert.equal(result.wildcardPoolByVariantId.get(printedVariant.id), 0)
+  })
+
+  test('computeEffectiveTotals falls back to 0 own stock when totalByVariantId omits a variant', async ({
+    assert,
+  }) => {
+    // The aggregation SQL only returns rows for variants with at least one
+    // Stock row, so untouched variants are simply absent from the map.
+    // The fold must treat absence as own=0, not undefined — otherwise the
+    // Shopify push would write NaN.
+    const category = await Category.create({
+      name: 'Hoodie',
+      hasColor: true,
+      hasSize: true,
+    })
+    const black = await Color.create({ name: 'Black', code: 'BLK' })
+    const sizeM = await Size.create({ name: 'M', code: 'M', sortOrder: 1 })
+    const wildcardProduct = await Product.create({
+      name: 'Hoodie Blank',
+      code: 'HDBLK',
+      categoryId: category.id,
+      isWildcard: true,
+    })
+    const printedProduct = await Product.create({
+      name: 'Hoodie Plain',
+      code: 'HDPL',
+      categoryId: category.id,
+      wildcardId: wildcardProduct.id,
+    })
+    const wildcardVariant = await Variant.create({
+      productId: wildcardProduct.id,
+      colorId: black.id,
+      sizeId: sizeM.id,
+    })
+    const printedVariant = await Variant.create({
+      productId: printedProduct.id,
+      colorId: black.id,
+      sizeId: sizeM.id,
+    })
+
+    const variants = await Variant.query()
+      .whereIn('id', [wildcardVariant.id, printedVariant.id])
+      .preload('product')
+    const snapshot: LocalSnapshot = {
+      variants,
+      totalByVariantId: new Map<number, number>([
+        [wildcardVariant.id, 5],
+        // printedVariant is intentionally absent from totals.
+      ]),
+    }
+
+    const result = new ShopifySyncService().computeEffectiveTotals(snapshot)
+
+    assert.equal(result.effectiveByVariantId.get(printedVariant.id), 5)
+    assert.equal(result.wildcardPoolByVariantId.get(printedVariant.id), 5)
   })
 
   test('applyLink baselines new links to the current Shopify quantity', async ({ assert }) => {

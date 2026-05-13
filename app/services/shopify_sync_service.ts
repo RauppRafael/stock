@@ -92,7 +92,18 @@ export type PushDiffTarget = {
 export type PushDiffRow = {
   localVariantId: number
   display: LocalVariantDisplay
+  /**
+   * Effective total that will be written to every Shopify mirror — this is
+   * the printed variant's own stock plus any wildcard pool contribution
+   * (sum of stock on the corresponding wildcard variant of matching
+   * color/size). Wildcards themselves are never pushed independently.
+   */
   localTotal: number
+  /**
+   * Contribution from wildcard variants, broken out so the UI can show
+   * "2 own + 10 wildcard". Always 0 for products without a `wildcardId`.
+   */
+  wildcardPool: number
   targets: PushDiffTarget[]
 }
 
@@ -108,7 +119,14 @@ export type PullDiffTarget = {
 export type PullDiffRow = {
   localVariantId: number
   display: LocalVariantDisplay
+  /**
+   * Effective local total exposed to Shopify (own + wildcard pool), so the
+   * "Local total" column on the Pull tab agrees with what Shopify currently
+   * advertises rather than the operator wondering why Shopify saw 10 while
+   * we hold 2 directly on the variant.
+   */
   localTotal: number
+  wildcardPool: number
   totalDecrement: number
   targets: PullDiffTarget[]
 }
@@ -132,6 +150,25 @@ export type ShopifySnapshot = {
 export type LocalSnapshot = {
   variants: Variant[]
   totalByVariantId: Map<number, number>
+}
+
+/**
+ * Per-variant Shopify-effective totals.
+ *
+ * Pure printed/standalone products → same as `totalByVariantId`.
+ *
+ * Products with a `wildcardId` → own total plus the on-hand of the
+ * wildcard's variant that matches on (colorId, sizeId). When the wildcard
+ * doesn't carry a matching variant (e.g. operator added a print-only color
+ * to the printed product), the contribution is 0 and we fall back to own
+ * total — the right behaviour, since the customer can't buy a "color we
+ * don't have a blank for" through the shared pool anyway.
+ *
+ * Wildcards' own variants get a 0 here; the service never pushes them.
+ */
+export type EffectiveTotals = {
+  effectiveByVariantId: Map<number, number>
+  wildcardPoolByVariantId: Map<number, number>
 }
 
 /**
@@ -261,6 +298,60 @@ export default class ShopifySyncService {
     return { variants, totalByVariantId }
   }
 
+  /**
+   * Build a `variantId → effective Shopify quantity` map by folding any
+   * wildcard pool into each printed variant of matching (color, size). The
+   * map is the single source of truth for "what should Shopify show for
+   * this variant" — used by both diff and apply paths.
+   *
+   * Wildcards themselves are pinned to 0 so a stray Shopify link on a
+   * wildcard variant doesn't accidentally write the blank stock anywhere.
+   *
+   * Public so unit tests can exercise the math without standing up a
+   * Shopify fixture — it's a pure function of `LocalSnapshot`.
+   */
+  computeEffectiveTotals(local: LocalSnapshot): EffectiveTotals {
+    // Bucket wildcard variants by (productId, colorId, sizeId) so the
+    // printed-side lookup is one hash hit per variant rather than a scan.
+    const wildcardByKey = new Map<string, number>()
+    for (const v of local.variants) {
+      if (!v.product?.isWildcard) continue
+      const key = this.poolKey(v.productId, v.colorId, v.sizeId)
+      const total = local.totalByVariantId.get(v.id) ?? 0
+      wildcardByKey.set(key, total)
+    }
+
+    const effectiveByVariantId = new Map<number, number>()
+    const wildcardPoolByVariantId = new Map<number, number>()
+    for (const v of local.variants) {
+      if (v.product?.isWildcard) {
+        // Wildcards aren't pushed independently. Keeping 0 here means even
+        // if a future link pointed at a wildcard variant, applyPush would
+        // write 0 — strictly worse than wrong-direction silence but safer
+        // than leaking the blank stock through as if it were a real SKU.
+        effectiveByVariantId.set(v.id, 0)
+        wildcardPoolByVariantId.set(v.id, 0)
+        continue
+      }
+      const own = local.totalByVariantId.get(v.id) ?? 0
+      const sourceProductId = v.product?.wildcardId ?? null
+      if (!sourceProductId) {
+        effectiveByVariantId.set(v.id, own)
+        wildcardPoolByVariantId.set(v.id, 0)
+        continue
+      }
+      const poolKey = this.poolKey(sourceProductId, v.colorId, v.sizeId)
+      const pool = wildcardByKey.get(poolKey) ?? 0
+      effectiveByVariantId.set(v.id, own + pool)
+      wildcardPoolByVariantId.set(v.id, pool)
+    }
+    return { effectiveByVariantId, wildcardPoolByVariantId }
+  }
+
+  private poolKey(productId: number, colorId: number | null, sizeId: number | null): string {
+    return `${productId}|${colorId ?? 'x'}|${sizeId ?? 'x'}`
+  }
+
   private shopifyInfo(
     v: ShopifyVariant & { productId: string; productTitle: string }
   ): ShopifyVariantInfo {
@@ -319,7 +410,12 @@ export default class ShopifySyncService {
       }
     }
 
-    const rows: LinkDiffRow[] = resolvedLocal.variants.map((v) => ({
+    // Wildcards never get their own Shopify presence — they contribute as a
+    // shared pool to their printed derivatives instead. Hide them from the
+    // link picker so the operator doesn't accidentally pair one.
+    const linkableVariants = resolvedLocal.variants.filter((v) => !v.product?.isWildcard)
+
+    const rows: LinkDiffRow[] = linkableVariants.map((v) => ({
       localVariantId: v.id,
       localProductId: v.productId,
       display: this.displayFor(v),
@@ -356,19 +452,25 @@ export default class ShopifySyncService {
 
   /**
    * For each local variant with at least one link, list the linked Shopify
-   * variants whose quantity disagrees with the local total. Variants whose
-   * mirrors all already match are omitted.
+   * variants whose quantity disagrees with the *effective* local total
+   * (own + wildcard pool). Variants whose mirrors all already match are
+   * omitted. Wildcard variants themselves are skipped — they never push
+   * directly; their stock travels via printed variants of matching axes.
    */
   async buildPushDiff(local?: LocalSnapshot, shopify?: ShopifySnapshot): Promise<PushDiffRow[]> {
     const [resolvedLocal, resolvedShopify] = await Promise.all([
       local ? Promise.resolve(local) : this.snapshotLocal(),
       shopify ? Promise.resolve(shopify) : this.snapshotShopify(),
     ])
+    const { effectiveByVariantId, wildcardPoolByVariantId } =
+      this.computeEffectiveTotals(resolvedLocal)
     const rows: PushDiffRow[] = []
     for (const v of resolvedLocal.variants) {
+      if (v.product?.isWildcard) continue
       const links = v.shopifyVariantLinks ?? []
       if (!links.length) continue
-      const localTotal = resolvedLocal.totalByVariantId.get(v.id) ?? 0
+      const localTotal = effectiveByVariantId.get(v.id) ?? 0
+      const wildcardPool = wildcardPoolByVariantId.get(v.id) ?? 0
       const targets: PushDiffTarget[] = []
       for (const link of links) {
         const sv = resolvedShopify.variantByGid.get(link.shopifyVariantId)
@@ -386,6 +488,7 @@ export default class ShopifySyncService {
         localVariantId: v.id,
         display: { ...this.displayFor(v), imageUrl: v.imageUrl ?? links[0]?.imageUrl ?? null },
         localTotal,
+        wildcardPool,
         targets,
       })
     }
@@ -404,11 +507,21 @@ export default class ShopifySyncService {
       local ? Promise.resolve(local) : this.snapshotLocal(),
       shopify ? Promise.resolve(shopify) : this.snapshotShopify(),
     ])
+    const { effectiveByVariantId, wildcardPoolByVariantId } =
+      this.computeEffectiveTotals(resolvedLocal)
     const rows: PullDiffRow[] = []
     for (const v of resolvedLocal.variants) {
+      if (v.product?.isWildcard) continue
       const links = v.shopifyVariantLinks ?? []
       if (!links.length) continue
-      const localTotal = resolvedLocal.totalByVariantId.get(v.id) ?? 0
+      // "Local total" displayed on the pull tab is the effective total
+      // (own + pool) so it matches what Shopify currently shows; the actual
+      // deduction still targets only the printed variant's own stock at the
+      // operator-picked location, which is the v1 behaviour. If the printed
+      // variant's own stock is exhausted while the wildcard pool is full,
+      // the operator must convert first (the convert page surfaces this).
+      const localTotal = effectiveByVariantId.get(v.id) ?? 0
+      const wildcardPool = wildcardPoolByVariantId.get(v.id) ?? 0
       const targets: PullDiffTarget[] = []
       let totalDecrement = 0
       for (const link of links) {
@@ -431,6 +544,7 @@ export default class ShopifySyncService {
         localVariantId: v.id,
         display: { ...this.displayFor(v), imageUrl: v.imageUrl ?? links[0]?.imageUrl ?? null },
         localTotal,
+        wildcardPool,
         totalDecrement,
         targets,
       })
@@ -573,15 +687,40 @@ export default class ShopifySyncService {
     const shopify = shopifySnapshot ?? (await this.snapshotShopify())
 
     return this.withSyncLock(async (trx) => {
+      // Preload the parent product so we can check `isWildcard` / `wildcardId`
+      // when computing effective totals. Without this preload, the fold below
+      // would treat every variant as a standalone printed product.
       const variants = await Variant.query({ client: trx })
         .whereIn('id', variantIds)
+        .preload('product')
         .preload('shopifyVariantLinks')
 
-      const totals = await Stock.query({ client: trx })
-        .whereIn('variant_id', variantIds)
-        .select('variant_id')
-        .sum('quantity as total')
-        .groupBy('variant_id')
+      // The effective Shopify total for a printed variant is its own stock
+      // plus the wildcard pool for matching (color, size). We need the
+      // wildcard variants' stock too — query them via the products' linked
+      // wildcard ids. Loading both sets in one go (instead of per-variant
+      // round-trips) keeps the apply path O(2) regardless of selection size.
+      const wildcardProductIds = Array.from(
+        new Set(
+          variants
+            .map((v) => v.product?.wildcardId ?? null)
+            .filter((id): id is number => id !== null)
+        )
+      )
+      const wildcardVariants = wildcardProductIds.length
+        ? await Variant.query({ client: trx })
+            .whereIn('product_id', wildcardProductIds)
+            .preload('product')
+        : []
+      const allVariants = [...variants, ...wildcardVariants]
+      const allIds = allVariants.map((v) => v.id)
+      const totals = allIds.length
+        ? await Stock.query({ client: trx })
+            .whereIn('variant_id', allIds)
+            .select('variant_id')
+            .sum('quantity as total')
+            .groupBy('variant_id')
+        : []
       const totalByVariantId = new Map<number, number>()
       for (const row of totals) {
         totalByVariantId.set(
@@ -589,11 +728,19 @@ export default class ShopifySyncService {
           Number(row.$extras.total ?? 0)
         )
       }
+      const { effectiveByVariantId } = this.computeEffectiveTotals({
+        variants: allVariants,
+        totalByVariantId,
+      })
 
       const items: Array<{ inventoryItemId: string; quantity: number }> = []
       const linkUpdates: Array<{ linkId: number; quantity: number }> = []
       for (const v of variants) {
-        const localTotal = totalByVariantId.get(v.id) ?? 0
+        // Skip wildcards even if the caller asked for them — the diff layer
+        // hides them, but a hand-rolled API client could still smuggle one
+        // through `variantIds`. Refusing here keeps invariants tight.
+        if (v.product?.isWildcard) continue
+        const localTotal = effectiveByVariantId.get(v.id) ?? 0
         for (const link of v.shopifyVariantLinks ?? []) {
           const sv = shopify.variantByGid.get(link.shopifyVariantId)
           if (!sv) continue

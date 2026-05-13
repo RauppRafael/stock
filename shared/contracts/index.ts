@@ -50,6 +50,13 @@ export const categorySchema = z.object({
 })
 export type Category = z.infer<typeof categorySchema>
 
+export const wildcardSourceSummarySchema = z.object({
+  id,
+  name: z.string(),
+  code: z.string(),
+})
+export type WildcardSourceSummary = z.infer<typeof wildcardSourceSummarySchema>
+
 export const productSchema = z.object({
   id,
   name: z.string(),
@@ -58,7 +65,16 @@ export const productSchema = z.object({
   lowStockThreshold: z.number().int().nullable(),
   categoryId: id,
   imageUrl: z.string().nullable(),
+  isWildcard: z.boolean(),
+  // The blank a printed product derives from. Null when this product is a
+  // standalone catalog item or is itself a wildcard.
+  wildcardId: id.nullable(),
+  // Slim summary, only present when the back-end preloaded `wildcardSource`.
+  wildcardSource: wildcardSourceSummarySchema.nullable(),
   variantCount: z.number().int().nullable(),
+  // Number of printed products derived from this wildcard. Null when not
+  // loaded; 0 when loaded with no derivatives.
+  derivativesCount: z.number().int().nullable(),
   category: categorySchema.nullable(),
 })
 export type Product = z.infer<typeof productSchema>
@@ -216,7 +232,10 @@ export const syncPushTargetSchema = z.object({
 export const syncPushRowSchema = z.object({
   localVariantId: id,
   display: localVariantDisplaySchema,
+  // Effective total written to every linked Shopify mirror — printed
+  // variant's own stock plus any wildcard pool contribution.
   localTotal: z.number().int(),
+  wildcardPool: z.number().int(),
   targets: z.array(syncPushTargetSchema),
 })
 
@@ -238,6 +257,7 @@ export const syncPullRowSchema = z.object({
   localVariantId: id,
   display: localVariantDisplaySchema,
   localTotal: z.number().int(),
+  wildcardPool: z.number().int(),
   totalDecrement: z.number().int(),
   targets: z.array(syncPullTargetSchema),
 })

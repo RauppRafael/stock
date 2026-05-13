@@ -12,6 +12,9 @@ export type ScannedRoutes = {
     'stock.adjust.create': { paramsTuple?: []; params?: {} }
     'stock.adjust': { paramsTuple?: []; params?: {} }
     'stock.adjust.bulk': { paramsTuple?: []; params?: {} }
+    'stock.convert.create': { paramsTuple?: []; params?: {} }
+    'stock.convert': { paramsTuple?: []; params?: {} }
+    'stock.lookup.wildcardTargets': { paramsTuple: [ParamValue]; params: {'wildcardVariantId': ParamValue} }
     'stock.lookup.products': { paramsTuple: [ParamValue]; params: {'categoryId': ParamValue} }
     'stock.lookup.variants': { paramsTuple: [ParamValue]; params: {'productId': ParamValue} }
     'stock.lookup.quantity': { paramsTuple: [ParamValue,ParamValue]; params: {'variantId': ParamValue,'locationId': ParamValue} }
@@ -52,6 +55,8 @@ export type ScannedRoutes = {
     'stock.index': { paramsTuple?: []; params?: {} }
     'stock.index.alias': { paramsTuple?: []; params?: {} }
     'stock.adjust.create': { paramsTuple?: []; params?: {} }
+    'stock.convert.create': { paramsTuple?: []; params?: {} }
+    'stock.lookup.wildcardTargets': { paramsTuple: [ParamValue]; params: {'wildcardVariantId': ParamValue} }
     'stock.lookup.products': { paramsTuple: [ParamValue]; params: {'categoryId': ParamValue} }
     'stock.lookup.variants': { paramsTuple: [ParamValue]; params: {'productId': ParamValue} }
     'stock.lookup.quantity': { paramsTuple: [ParamValue,ParamValue]; params: {'variantId': ParamValue,'locationId': ParamValue} }
@@ -73,6 +78,8 @@ export type ScannedRoutes = {
     'stock.index': { paramsTuple?: []; params?: {} }
     'stock.index.alias': { paramsTuple?: []; params?: {} }
     'stock.adjust.create': { paramsTuple?: []; params?: {} }
+    'stock.convert.create': { paramsTuple?: []; params?: {} }
+    'stock.lookup.wildcardTargets': { paramsTuple: [ParamValue]; params: {'wildcardVariantId': ParamValue} }
     'stock.lookup.products': { paramsTuple: [ParamValue]; params: {'categoryId': ParamValue} }
     'stock.lookup.variants': { paramsTuple: [ParamValue]; params: {'productId': ParamValue} }
     'stock.lookup.quantity': { paramsTuple: [ParamValue,ParamValue]; params: {'variantId': ParamValue,'locationId': ParamValue} }
@@ -94,6 +101,7 @@ export type ScannedRoutes = {
     'session.destroy': { paramsTuple?: []; params?: {} }
     'stock.adjust': { paramsTuple?: []; params?: {} }
     'stock.adjust.bulk': { paramsTuple?: []; params?: {} }
+    'stock.convert': { paramsTuple?: []; params?: {} }
     'products.store': { paramsTuple?: []; params?: {} }
     'categories.store': { paramsTuple?: []; params?: {} }
     'locations.store': { paramsTuple?: []; params?: {} }

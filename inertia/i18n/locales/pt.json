@@ -128,6 +128,8 @@
       "empty": "Nenhum estoque corresponde aos filtros atuais.",
       "total": "Total",
       "grandTotal": "Total geral",
+      "wildcardPoolChip": "+{pool}",
+      "wildcardPoolTooltip": "Herda {pool} unidade(s) de um liso nesta localização — total efetivo {total} no Shopify.",
       "columns": {
         "product": "Produto",
         "variant": "Variante",
@@ -153,6 +155,24 @@
       "loadingGrid": "Carregando tamanhos…",
       "initialLabel": "Inicial",
       "changeLabel": "Alteração"
+    },
+    "convert": {
+      "title": "Converter liso",
+      "description": "Pegue estoque de um liso (base sem estampa) e transforme em um produto estampado. Ambos os lados acontecem na mesma localização, em uma única transação.",
+      "headerAction": "Converter liso",
+      "stepLocate": "1 · Escolher liso + localização",
+      "stepTarget": "2 · Escolher alvo e quantidade",
+      "wildcardHint": "Apenas produtos lisos aparecem aqui — os marcados com 🃏 no catálogo.",
+      "pickToContinue": "Escolha uma variante lisa e uma localização à esquerda para continuar.",
+      "wildcardOnHand": "Liso em estoque nesta localização",
+      "targetLabel": "Converter em",
+      "noTargets": "Nenhum produto estampado deriva deste liso (ou nenhum com cor/tamanho correspondente).",
+      "noTargetsAction": "Sem alvos disponíveis",
+      "outOfStock": "Sem estoque do liso nesta localização",
+      "quantityLabel": "Quantidade a converter",
+      "maxHint": "Até {max} disponíveis.",
+      "reasonPlaceholder": "ex. estampado hoje, lote #42…",
+      "submit": "Converter {count} unidade(s)"
     }
   },
   "movements": {
@@ -198,6 +218,36 @@
       "title": "Editar {name}",
       "description": "Adicione novas combinações de atributos para introduzir mais variantes. Variantes e estoque existentes não são afetados.",
       "variantsHint": "Selecionar valores adicionais cria novas combinações de variantes. Remover um valor aqui não remove a variante — ela permanece para que seu histórico seja preservado."
+    },
+    "wildcard": {
+      "label": "Produto liso",
+      "derivedFromTitle": "Derivado de um liso",
+      "sectionTitle": "Relação com liso",
+      "sectionDescription": "Um produto liso é uma base sem estampa (ex. um moletom em branco) cujo estoque funciona como um pool compartilhado para os produtos estampados derivados dele. No Shopify, o estoque do liso é somado à quantidade de cada produto estampado.",
+      "sectionDescriptionShort": "Defina como este produto se relaciona com lisos. O estoque de um liso é somado à quantidade no Shopify de cada produto estampado derivado dele.",
+      "modes": {
+        "standaloneLabel": "Produto independente",
+        "standaloneHelp": "Apenas seu próprio estoque — sem pool compartilhado.",
+        "derivesLabel": "Deriva de um liso",
+        "derivesHelp": "Herda o estoque de um liso para cor/tamanho correspondente ao sincronizar com o Shopify.",
+        "wildcardLabel": "Este é um liso (base sem estampa)",
+        "wildcardHelp": "O estoque atua como pool compartilhado para outros produtos desta categoria. Não é enviado ao Shopify sozinho."
+      },
+      "pickSource": "Escolha um liso de origem…",
+      "isWildcardLabel": "Este é um liso (base sem estampa)",
+      "isWildcardHelp": "Lisos não são enviados ao Shopify por conta própria. Outros produtos na mesma categoria podem escolhê-lo como sua origem.",
+      "lockedOff": "Bloqueado: {count} produto(s) atualmente derivam deste liso. Remova a origem nesses produtos primeiro para alterar.",
+      "sourceLabel": "Origem liso",
+      "noSource": "Nenhuma — este produto tem apenas seu próprio estoque",
+      "noOptionsForCategory": "Ainda não há produtos lisos nesta categoria.",
+      "banner": {
+        "wildcardTitle": "Produto liso",
+        "wildcardBody": "O estoque deste produto atua como um pool compartilhado. Quando os produtos estampados derivados são enviados ao Shopify, o estoque liso de cor/tamanho correspondente é somado a cada quantidade estampada.",
+        "derivedTitle": "Derivado de um liso",
+        "derivedBody": "A quantidade efetiva deste produto no Shopify inclui o estoque do liso {source} para cor/tamanho correspondente."
+      },
+      "derivativesHeader": "Produtos estampados derivados deste liso",
+      "convertCta": "Converter liso"
     }
   },
   "categories": {
@@ -337,6 +387,8 @@
     "lastPushAt": "Último envio: {when}",
     "never": "nunca",
     "refresh": "Atualizar",
-    "loadingTab": "Carregando do Shopify…"
+    "loadingTab": "Carregando do Shopify…",
+    "wildcardPoolChip": "+{pool} do liso",
+    "wildcardPoolHint": "{own} próprio + {pool} de um liso de cor/tamanho correspondente = {total} efetivo no Shopify."
   }
 }

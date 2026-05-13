@@ -88,13 +88,30 @@ const columns = computed(() => [
       :empty="$t('products.index.empty')"
     >
       <template #[`cell:name`]="{ row }">
-        <Link
-          route="products.show"
-          :params="{ id: row.id }"
-          class="font-medium text-slate-900 hover:text-brand-700"
-        >
-          {{ row.name }}
-        </Link>
+        <div class="flex flex-col gap-0.5">
+          <Link
+            route="products.show"
+            :params="{ id: row.id }"
+            class="font-medium text-slate-900 hover:text-brand-700 inline-flex items-center gap-1.5"
+          >
+            <span
+              v-if="row.isWildcard"
+              class="inline-flex items-center text-base leading-none"
+              :title="$t('products.wildcard.label')"
+              aria-hidden="true"
+              >🃏</span
+            >
+            {{ row.name }}
+          </Link>
+          <span
+            v-if="row.wildcardSource"
+            class="text-[10px] text-violet-700 inline-flex items-center gap-1"
+            :title="$t('products.wildcard.derivedFromTitle')"
+          >
+            🃏
+            <span class="font-mono">{{ row.wildcardSource.code }}</span>
+          </span>
+        </div>
       </template>
       <template #[`cell:sku`]="{ row }">
         <div class="flex flex-col gap-0.5">

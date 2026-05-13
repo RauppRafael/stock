@@ -12,4 +12,15 @@ export default class Product extends compose(ProductSchema, withSoftDelete) {
 
   @hasMany(() => Variant)
   declare variants: HasMany<typeof Variant>
+
+  /**
+   * When this product is printed-from-a-wildcard, `wildcardSource` is the
+   * blank it derives from. Mirror relation on the blank side is
+   * `derivatives` — every printed product pointing at this wildcard.
+   */
+  @belongsTo(() => Product, { foreignKey: 'wildcardId' })
+  declare wildcardSource: BelongsTo<typeof Product>
+
+  @hasMany(() => Product, { foreignKey: 'wildcardId' })
+  declare derivatives: HasMany<typeof Product>
 }

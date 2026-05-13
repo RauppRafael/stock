@@ -41,6 +41,14 @@ router
     router.get('/stock/adjust', [controllers.Stock, 'create']).as('stock.adjust.create')
     router.post('/stock/adjust', [controllers.Stock, 'adjust']).as('stock.adjust')
     router.post('/stock/adjust/bulk', [controllers.Stock, 'bulkAdjust']).as('stock.adjust.bulk')
+    router.get('/stock/convert', [controllers.Stock, 'createConversion']).as('stock.convert.create')
+    router.post('/stock/convert', [controllers.Stock, 'convert']).as('stock.convert')
+    router
+      .get('/stock/lookup/wildcards/:wildcardVariantId/targets', [
+        controllers.Stock,
+        'wildcardTargets',
+      ])
+      .as('stock.lookup.wildcardTargets')
     router
       .get('/stock/lookup/categories/:categoryId/products', [
         controllers.Stock,
