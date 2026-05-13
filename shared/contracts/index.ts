@@ -175,6 +175,7 @@ export const shopifyVariantInfoSchema = z.object({
  */
 export const localVariantDisplaySchema = z.object({
   productName: z.string(),
+  category: z.object({ id, name: z.string() }).nullable(),
   color: z
     .object({
       name: z.string(),
@@ -252,6 +253,7 @@ export const syncIndexSchema = z.object({
   push: z.array(syncPushRowSchema).nullable(),
   pull: z.array(syncPullRowSchema).nullable(),
   locations: z.array(locationSchema),
+  categories: z.array(categorySchema),
   lastPullAt: z.string().nullable(),
   lastPushAt: z.string().nullable(),
 })

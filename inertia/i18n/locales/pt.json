@@ -323,6 +323,16 @@
       "noBaseline": "{title}: novo (baselining)",
       "autoPushNote": "Após aplicar, todos os espelhos de cada variante serão re-enviados para o novo total local."
     },
+    "filters": {
+      "searchPlaceholder": "Pesquisar variantes, produtos, espelhos…",
+      "allCategories": "Todas as categorias",
+      "noMatches": "Nenhuma linha corresponde aos filtros atuais.",
+      "linkStatus": {
+        "all": "Todas",
+        "linked": "Vinculadas",
+        "unlinked": "Não vinculadas"
+      }
+    },
     "lastPullAt": "Última recepção: {when}",
     "lastPushAt": "Último envio: {when}",
     "never": "nunca",

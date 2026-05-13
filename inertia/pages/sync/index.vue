@@ -22,6 +22,7 @@ type ShopifyVariantInfo = {
 }
 type LocalVariantDisplay = {
   productName: string
+  category: { id: number; name: string } | null
   color: { name: string; hexCode: string | null } | null
   size: { name: string } | null
   imageUrl: string | null
@@ -65,6 +66,7 @@ type DiffPayload = {
   push?: PushRow[] | null
   pull?: PullRow[] | null
   locations?: Data.Location[]
+  categories?: Data.Category[]
   lastPullAt?: string | null
   lastPushAt?: string | null
 }
@@ -79,8 +81,61 @@ const link = shallowRef<{ rows: LinkRow[]; candidates: ShopifyVariantInfo[] } | 
 const push = shallowRef<PushRow[] | null>(null)
 const pull = shallowRef<PullRow[] | null>(null)
 const locations = shallowRef<Data.Location[]>([])
+const categories = shallowRef<Data.Category[]>([])
 const lastPullAt = ref<string | null>(null)
 const lastPushAt = ref<string | null>(null)
+
+/**
+ * Filter state. `search` and `categoryId` apply across all three tabs;
+ * `linkStatus` only narrows the Link tab (rows whose `currentLinks` array
+ * is empty vs. non-empty). Filtering runs client-side against the diff
+ * payload — small catalogs render instantly, and we avoid round-tripping
+ * to Shopify just to narrow a view.
+ */
+const search = ref('')
+const filterCategoryId = ref<number | null>(null)
+type LinkStatusFilter = 'all' | 'linked' | 'unlinked'
+const linkStatus = ref<LinkStatusFilter>('all')
+
+function clearFilters() {
+  search.value = ''
+  filterCategoryId.value = null
+  linkStatus.value = 'all'
+}
+
+const hasActiveFilters = computed(() => {
+  return (
+    search.value.trim().length > 0 ||
+    filterCategoryId.value !== null ||
+    (tab.value === 'link' && linkStatus.value !== 'all')
+  )
+})
+
+/**
+ * Match a display block against the active search + category filters.
+ * Search is case-insensitive across product name, color name, size name,
+ * and any linked Shopify product/variant title for that row.
+ */
+function matchesDisplayFilters(
+  display: LocalVariantDisplay,
+  extraSearchHaystack: string[] = []
+): boolean {
+  if (filterCategoryId.value !== null && display.category?.id !== filterCategoryId.value) {
+    return false
+  }
+  const q = search.value.trim().toLowerCase()
+  if (!q) return true
+  const haystack = [
+    display.productName,
+    display.color?.name ?? '',
+    display.size?.name ?? '',
+    display.category?.name ?? '',
+    ...extraSearchHaystack,
+  ]
+    .join(' ')
+    .toLowerCase()
+  return haystack.includes(q)
+}
 
 /**
  * Per-local-variant array of Shopify GIDs pending to be linked. Each row
@@ -95,7 +150,26 @@ const pickerForVariantId = ref<number | null>(null)
 const pickerSelected = ref<Set<string>>(new Set())
 const pickerSearch = ref('')
 
-const linkRows = computed(() => link.value?.rows ?? [])
+/**
+ * The raw, unfiltered row lists — used for the per-tab counts and to drive
+ * the per-row pick state, which is keyed by `localVariantId` regardless of
+ * whether a row is currently filtered out.
+ */
+const allLinkRows = computed(() => link.value?.rows ?? [])
+const allPushRows = computed(() => push.value ?? [])
+const allPullRows = computed(() => pull.value ?? [])
+
+const linkRows = computed(() => {
+  return allLinkRows.value.filter((row) => {
+    if (linkStatus.value === 'linked' && row.currentLinks.length === 0) return false
+    if (linkStatus.value === 'unlinked' && row.currentLinks.length > 0) return false
+    const linkedTitles = row.currentLinks.flatMap((l) => [
+      l.shopifyProductTitle,
+      l.shopifyVariantTitle,
+    ])
+    return matchesDisplayFilters(row.display, linkedTitles)
+  })
+})
 const linkCandidates = computed(() => {
   const list = link.value?.candidates ?? []
   return [...list].sort((a, b) => {
@@ -104,8 +178,22 @@ const linkCandidates = computed(() => {
     return a.shopifyVariantTitle.localeCompare(b.shopifyVariantTitle)
   })
 })
-const pushRows = computed(() => push.value ?? [])
-const pullRows = computed(() => pull.value ?? [])
+const pushRows = computed(() => {
+  return allPushRows.value.filter((row) =>
+    matchesDisplayFilters(
+      row.display,
+      row.targets.flatMap((t) => [t.shopifyProductTitle, t.shopifyVariantTitle])
+    )
+  )
+})
+const pullRows = computed(() => {
+  return allPullRows.value.filter((row) =>
+    matchesDisplayFilters(
+      row.display,
+      row.targets.flatMap((t) => [t.shopifyProductTitle, t.shopifyVariantTitle])
+    )
+  )
+})
 
 const pickedLinkCount = computed(() =>
   Object.values(linkPending).reduce((sum, ids) => sum + ids.length, 0)
@@ -147,6 +235,7 @@ async function loadDiff() {
     push.value = data.push ?? null
     pull.value = data.pull ?? null
     locations.value = data.locations ?? []
+    categories.value = data.categories ?? []
     lastPullAt.value = data.lastPullAt ?? null
     lastPushAt.value = data.lastPushAt ?? null
 
@@ -397,18 +486,66 @@ SHOPIFY_API_VERSION=2025-10</pre
           @click="tab = t"
         >
           {{ $t(`sync.tabs.${t}`) }}
+          <!-- Badges count unfiltered totals so the operator can see "5 to push"
+               regardless of an active filter. -->
           <span
-            v-if="t === 'push' && pushRows.length"
+            v-if="t === 'push' && allPushRows.length"
             class="ml-1.5 inline-flex items-center justify-center min-w-[1.25rem] h-5 px-1 rounded-full bg-sky-100 text-sky-800 text-[10px] font-semibold"
           >
-            {{ pushRows.length }}
+            {{ allPushRows.length }}
           </span>
           <span
-            v-else-if="t === 'pull' && pullRows.length"
+            v-else-if="t === 'pull' && allPullRows.length"
             class="ml-1.5 inline-flex items-center justify-center min-w-[1.25rem] h-5 px-1 rounded-full bg-violet-100 text-violet-800 text-[10px] font-semibold"
           >
-            {{ pullRows.length }}
+            {{ allPullRows.length }}
           </span>
+        </button>
+      </div>
+
+      <!-- Filter bar: search + category apply across all tabs; link-status
+           is shown only on the Link tab. Filtering happens client-side.
+           Explicit widths because `.input`/`.select` both set `w-full`, so
+           without caps the search input swallows the row. -->
+      <div class="card p-3 mb-4 flex flex-wrap items-center gap-2">
+        <input
+          v-model="search"
+          type="search"
+          class="input flex-1 min-w-[14rem] basis-64"
+          :placeholder="$t('sync.filters.searchPlaceholder')"
+        />
+        <select v-model.number="filterCategoryId" class="select w-auto max-w-xs">
+          <option :value="null">{{ $t('sync.filters.allCategories') }}</option>
+          <option v-for="c in categories" :key="c.id" :value="c.id">
+            {{ c.icon ? `${c.icon} ` : '' }}{{ c.name }}
+          </option>
+        </select>
+        <div
+          v-if="tab === 'link'"
+          class="inline-flex rounded-md border border-slate-200 overflow-hidden text-xs shrink-0"
+        >
+          <button
+            v-for="opt in (['all', 'linked', 'unlinked'] as LinkStatusFilter[])"
+            :key="opt"
+            type="button"
+            class="px-3 py-1.5 transition"
+            :class="
+              linkStatus === opt
+                ? 'bg-brand-600 text-white'
+                : 'bg-white text-slate-600 hover:bg-slate-50'
+            "
+            @click="linkStatus = opt"
+          >
+            {{ $t(`sync.filters.linkStatus.${opt}`) }}
+          </button>
+        </div>
+        <button
+          v-if="hasActiveFilters"
+          type="button"
+          class="btn-ghost text-xs shrink-0"
+          @click="clearFilters"
+        >
+          {{ $t('common.actions.clear') }}
         </button>
       </div>
 
@@ -418,6 +555,12 @@ SHOPIFY_API_VERSION=2025-10</pre
 
         <div v-if="loading && !link" class="card p-6 text-center text-sm text-slate-400 italic">
           {{ $t('sync.loadingTab') }}
+        </div>
+        <div
+          v-else-if="!linkRows.length && hasActiveFilters"
+          class="card p-6 text-center text-sm text-slate-400 italic"
+        >
+          {{ $t('sync.filters.noMatches') }}
         </div>
         <div
           v-else-if="!linkRows.length"
@@ -534,6 +677,12 @@ SHOPIFY_API_VERSION=2025-10</pre
           {{ $t('sync.loadingTab') }}
         </div>
         <div
+          v-else-if="!pushRows.length && hasActiveFilters && allPushRows.length"
+          class="card p-6 text-center text-sm text-slate-400 italic"
+        >
+          {{ $t('sync.filters.noMatches') }}
+        </div>
+        <div
           v-else-if="!pushRows.length"
           class="card p-6 text-center text-sm text-slate-400 italic"
         >
@@ -607,6 +756,12 @@ SHOPIFY_API_VERSION=2025-10</pre
 
         <div v-if="loading && !pull" class="card p-6 text-center text-sm text-slate-400 italic">
           {{ $t('sync.loadingTab') }}
+        </div>
+        <div
+          v-else-if="!pullRows.length && hasActiveFilters && allPullRows.length"
+          class="card p-6 text-center text-sm text-slate-400 italic"
+        >
+          {{ $t('sync.filters.noMatches') }}
         </div>
         <div
           v-else-if="!pullRows.length"
@@ -717,7 +872,7 @@ SHOPIFY_API_VERSION=2025-10</pre
     <div class="space-y-3">
       <input
         v-model="pickerSearch"
-        type="text"
+        type="search"
         class="input w-full"
         :placeholder="$t('sync.link.modalSearch')"
       />
@@ -737,7 +892,9 @@ SHOPIFY_API_VERSION=2025-10</pre
             />
             <!-- Fixed-size image slot keeps every row the same height so the
                  checkbox + text column line up regardless of which Shopify
-                 variants have featured images. -->
+                 variants have featured images. `loading="lazy"` defers
+                 offscreen fetches; `decoding="async"` keeps decode work off
+                 the main thread so scrolling stays smooth. -->
             <div
               class="size-10 shrink-0 rounded border border-slate-200 bg-slate-50 overflow-hidden flex items-center justify-center"
             >
@@ -746,6 +903,8 @@ SHOPIFY_API_VERSION=2025-10</pre
                 :src="c.imageUrl"
                 :alt="c.shopifyVariantTitle"
                 class="size-10 object-cover"
+                loading="lazy"
+                decoding="async"
               />
             </div>
             <div class="flex-1 min-w-0">

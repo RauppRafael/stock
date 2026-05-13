@@ -60,6 +60,11 @@ export type ShopifyVariantInfo = {
  */
 export type LocalVariantDisplay = {
   productName: string
+  // Category info is denormalised onto every row so the sync page can filter
+  // by category without a second round-trip. Nullable because a variant's
+  // parent product might not have a category preloaded (defensive — the diff
+  // builder always preloads it, but the type stays honest).
+  category: { id: number; name: string } | null
   color: { name: string; hexCode: string | null } | null
   size: { name: string } | null
   imageUrl: string | null
@@ -273,6 +278,9 @@ export default class ShopifySyncService {
   private displayFor(v: Variant): LocalVariantDisplay {
     return {
       productName: v.product?.name ?? '—',
+      category: v.product?.category
+        ? { id: v.product.category.id, name: v.product.category.name }
+        : null,
       color: v.color ? { name: v.color.name, hexCode: v.color.hexCode } : null,
       size: v.size ? { name: v.size.name } : null,
       imageUrl: v.imageUrl ?? null,

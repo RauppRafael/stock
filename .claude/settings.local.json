@@ -34,7 +34,8 @@
       "WebFetch(domain:community.shopify.dev)",
       "WebFetch(domain:github.com)",
       "WebFetch(domain:community.shopify.com)",
-      "Bash(git show *)"
+      "Bash(git show *)",
+      "Bash(taskkill /F /FI \"WINDOWTITLE eq node.exe\" /T)"
     ]
   }
 }

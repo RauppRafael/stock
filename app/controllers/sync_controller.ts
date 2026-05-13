@@ -1,6 +1,8 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import logger from '@adonisjs/core/services/logger'
+import Category from '#models/category'
 import Location from '#models/location'
+import CategoryTransformer from '#transformers/category_transformer'
 import LocationTransformer from '#transformers/location_transformer'
 import ShopifySetting from '#models/shopify_setting'
 import ShopifySyncService, { ShopifySyncError } from '#services/shopify_sync_service'
@@ -44,16 +46,18 @@ export default class SyncController {
       // One Shopify catalog walk drives all three diffs. Calling the three
       // builders independently used to fire three parallel walks per page
       // load, tripling API cost and rate-limit pressure.
-      const [diffs, locations, settings] = await Promise.all([
+      const [diffs, locations, categories, settings] = await Promise.all([
         service.buildAllDiffs(),
         Location.query().orderBy('name', 'asc'),
+        Category.notTrashed().orderBy('name', 'asc'),
         ShopifySetting.find(1),
       ])
       const { link: linkDiff, push: pushDiff, pull: pullDiff } = diffs
 
-      const resolvedLocations = await ctx.serialize.withoutWrapping(
-        LocationTransformer.transform(locations)
-      )
+      const [resolvedLocations, resolvedCategories] = await Promise.all([
+        ctx.serialize.withoutWrapping(LocationTransformer.transform(locations)),
+        ctx.serialize.withoutWrapping(CategoryTransformer.transform(categories)),
+      ])
 
       return response.json({
         data: {
@@ -62,6 +66,7 @@ export default class SyncController {
           push: pushDiff,
           pull: pullDiff,
           locations: resolvedLocations,
+          categories: resolvedCategories,
           lastPullAt: settings?.lastPullAt?.toISO() ?? null,
           lastPushAt: settings?.lastPushAt?.toISO() ?? null,
         },

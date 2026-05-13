@@ -322,6 +322,16 @@
       "noBaseline": "{title}: new (baselining)",
       "autoPushNote": "After applying, all mirrors of each variant will be re-pushed to the new local total."
     },
+    "filters": {
+      "searchPlaceholder": "Search variants, products, mirrors…",
+      "allCategories": "All categories",
+      "noMatches": "No rows match the current filters.",
+      "linkStatus": {
+        "all": "All",
+        "linked": "Linked",
+        "unlinked": "Unlinked"
+      }
+    },
     "lastPullAt": "Last pull: {when}",
     "lastPushAt": "Last push: {when}",
     "never": "never",
