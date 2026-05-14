@@ -8,6 +8,7 @@ import type { Data } from '@generated/data'
 import PageHeader from '~/components/PageHeader.vue'
 import Modal from '~/components/Modal.vue'
 import SyncVariantCell from '~/components/SyncVariantCell.vue'
+import ImageZoom from '~/components/ImageZoom.vue'
 
 const { t } = useI18n()
 
@@ -924,19 +925,17 @@ SHOPIFY_API_VERSION=2025-10</pre
             />
             <!-- Fixed-size image slot keeps every row the same height so the
                  checkbox + text column line up regardless of which Shopify
-                 variants have featured images. `loading="lazy"` defers
-                 offscreen fetches; `decoding="async"` keeps decode work off
-                 the main thread so scrolling stays smooth. -->
+                 variants have featured images. ImageZoom requests a sized
+                 thumbnail from Shopify's CDN (no full-resolution decodes)
+                 and opens a larger preview on click. -->
             <div
               class="size-10 shrink-0 rounded border border-slate-200 bg-slate-50 overflow-hidden flex items-center justify-center"
             >
-              <img
+              <ImageZoom
                 v-if="c.imageUrl"
                 :src="c.imageUrl"
                 :alt="c.shopifyVariantTitle"
-                class="size-10 object-cover"
-                loading="lazy"
-                decoding="async"
+                thumb-class="size-10 object-cover"
               />
             </div>
             <div class="flex-1 min-w-0">

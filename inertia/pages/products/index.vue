@@ -7,6 +7,7 @@ import type { Data } from '@generated/data'
 import PageHeader from '~/components/PageHeader.vue'
 import DataTable from '~/components/DataTable.vue'
 import ConfirmButton from '~/components/ConfirmButton.vue'
+import ImageZoom from '~/components/ImageZoom.vue'
 
 const { t } = useI18n()
 
@@ -88,29 +89,32 @@ const columns = computed(() => [
       :empty="$t('products.index.empty')"
     >
       <template #[`cell:name`]="{ row }">
-        <div class="flex flex-col gap-0.5">
-          <Link
-            route="products.show"
-            :params="{ id: row.id }"
-            class="font-medium text-slate-900 hover:text-brand-700 inline-flex items-center gap-1.5"
-          >
-            <span
-              v-if="row.isWildcard"
-              class="inline-flex items-center text-base leading-none"
-              :title="$t('products.wildcard.label')"
-              aria-hidden="true"
-              >🃏</span
+        <div class="flex items-center gap-3">
+          <ImageZoom :src="row.imageUrl" :alt="row.name" />
+          <div class="flex flex-col gap-0.5 min-w-0">
+            <Link
+              route="products.show"
+              :params="{ id: row.id }"
+              class="font-medium text-slate-900 hover:text-brand-700 inline-flex items-center gap-1.5"
             >
-            {{ row.name }}
-          </Link>
-          <span
-            v-if="row.wildcardSource"
-            class="text-[10px] text-violet-700 inline-flex items-center gap-1"
-            :title="$t('products.wildcard.derivedFromTitle')"
-          >
-            🃏
-            <span class="font-mono">{{ row.wildcardSource.code }}</span>
-          </span>
+              <span
+                v-if="row.isWildcard"
+                class="inline-flex items-center text-base leading-none"
+                :title="$t('products.wildcard.label')"
+                aria-hidden="true"
+                >🃏</span
+              >
+              {{ row.name }}
+            </Link>
+            <span
+              v-if="row.wildcardSource"
+              class="text-[10px] text-violet-700 inline-flex items-center gap-1"
+              :title="$t('products.wildcard.derivedFromTitle')"
+            >
+              🃏
+              <span class="font-mono">{{ row.wildcardSource.code }}</span>
+            </span>
+          </div>
         </div>
       </template>
       <template #[`cell:sku`]="{ row }">

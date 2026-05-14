@@ -1,8 +1,10 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { Data } from '@generated/data'
+import ImageZoom from '~/components/ImageZoom.vue'
 
-defineProps<{
+const props = defineProps<{
   variant: Data.Variant
   locationName?: string
   locationIcon?: string | null
@@ -10,13 +12,24 @@ defineProps<{
 }>()
 
 const { t } = useI18n()
+
+const imageUrl = computed(
+  () => props.variant.imageUrl ?? props.variant.product?.imageUrl ?? null
+)
 </script>
 
 <template>
   <div class="rounded-xl border border-slate-200 bg-gradient-to-br from-slate-50 to-white p-5">
     <div class="flex items-start gap-4">
+      <ImageZoom
+        v-if="imageUrl"
+        :src="imageUrl"
+        :alt="variant.product?.name ?? variant.displayName"
+        thumb-class="size-12 rounded-md object-cover border border-slate-200"
+        :thumb-width="120"
+      />
       <div
-        v-if="variant.size"
+        v-else-if="variant.size"
         class="size-12 shrink-0 rounded-md bg-slate-100 ring-1 ring-slate-200 flex items-center justify-center text-sm font-semibold text-slate-700 tabular-nums"
         :title="t('variantSummary.sizeTitle', { name: variant.size.name })"
       >

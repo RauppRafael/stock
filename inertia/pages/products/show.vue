@@ -6,6 +6,7 @@ import type { Data } from '@generated/data'
 import PageHeader from '~/components/PageHeader.vue'
 import StockBadge from '~/components/StockBadge.vue'
 import MovementRow from '~/components/MovementRow.vue'
+import ImageZoom from '~/components/ImageZoom.vue'
 
 const props = defineProps<{
   product: Data.Product
@@ -32,7 +33,16 @@ const totalOnHand = computed(() => props.stocks.reduce((sum, s) => sum + s.quant
 // dash-only cells.
 const hasColor = computed(() => props.product.category?.hasColor ?? false)
 const hasSize = computed(() => props.product.category?.hasSize ?? false)
-const columnCount = computed(() => 2 + (hasColor.value ? 1 : 0) + (hasSize.value ? 1 : 0))
+const hasAnyImage = computed(
+  () => !!props.product.imageUrl || props.variants.some((v) => v.imageUrl)
+)
+const columnCount = computed(
+  () => 2 + (hasColor.value ? 1 : 0) + (hasSize.value ? 1 : 0) + (hasAnyImage.value ? 1 : 0)
+)
+
+function imageFor(variant: Data.Variant): string | null {
+  return variant.imageUrl ?? props.product.imageUrl ?? null
+}
 </script>
 
 <template>
@@ -120,6 +130,7 @@ const columnCount = computed(() => 2 + (hasColor.value ? 1 : 0) + (hasSize.value
         <table class="w-full text-sm min-w-[640px]">
           <thead class="bg-slate-50 text-xs uppercase tracking-wider text-slate-500">
             <tr>
+              <th v-if="hasAnyImage" class="px-4 py-2 w-16"></th>
               <th v-if="hasColor" class="px-4 py-2 text-left">{{ $t('common.labels.color') }}</th>
               <th v-if="hasSize" class="px-4 py-2 text-left">{{ $t('common.labels.size') }}</th>
               <th class="px-4 py-2 text-left">{{ $t('products.show.stockByLocation') }}</th>
@@ -128,6 +139,9 @@ const columnCount = computed(() => 2 + (hasColor.value ? 1 : 0) + (hasSize.value
           </thead>
           <tbody class="divide-y divide-slate-100">
             <tr v-for="variant in variants" :key="variant.id">
+              <td v-if="hasAnyImage" class="px-4 py-3">
+                <ImageZoom :src="imageFor(variant)" :alt="product.name" />
+              </td>
               <td v-if="hasColor" class="px-4 py-3">
                 <span v-if="variant.color" class="inline-flex items-center gap-2">
                   <span

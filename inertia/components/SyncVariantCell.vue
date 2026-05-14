@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import ImageZoom from '~/components/ImageZoom.vue'
+
 /**
  * Compact variant cell used in the /sync tables. Mirrors the swatch + size
  * box pattern from VariantSummary / VariantSelector elsewhere in the app:
@@ -15,12 +17,7 @@ defineProps<{
 
 <template>
   <div class="flex items-center gap-2 min-w-0">
-    <img
-      v-if="imageUrl"
-      :src="imageUrl"
-      :alt="productName"
-      class="size-8 rounded object-cover border border-slate-200 shrink-0"
-    />
+    <ImageZoom :src="imageUrl" :alt="productName" />
     <span class="text-sm text-slate-900 font-medium truncate">{{ productName }}</span>
     <span
       v-if="color"

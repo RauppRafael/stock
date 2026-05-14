@@ -15,6 +15,7 @@ import { useValidatedProps } from '~/composables/use_validated_props'
 import PageHeader from '~/components/PageHeader.vue'
 import VariantSelector from '~/components/VariantSelector.vue'
 import QuantityStepper from '~/components/QuantityStepper.vue'
+import ImageZoom from '~/components/ImageZoom.vue'
 
 const props = defineProps<{
   categories: Data.Category[]
@@ -61,6 +62,9 @@ const selectedColor = computed(() => {
   if (!cId) return null
   return variants.value.find((v) => v.color?.id === cId)?.color ?? null
 })
+const selectedImageUrl = computed(
+  () => variants.value[0]?.imageUrl ?? variants.value[0]?.product?.imageUrl ?? null
+)
 
 const pendingChanges = computed(() => {
   let n = 0
@@ -222,31 +226,40 @@ function submit() {
 
         <div v-else class="space-y-5">
           <div
-            class="rounded-xl border border-slate-200 bg-gradient-to-br from-slate-50 to-white p-4"
+            class="rounded-xl border border-slate-200 bg-gradient-to-br from-slate-50 to-white p-4 flex items-start justify-between gap-3"
           >
-            <p class="text-base font-semibold text-slate-900 inline-flex items-center gap-2">
-              <span v-if="selectedCategoryIcon">{{ selectedCategoryIcon }}</span>
-              {{ selectedProductName }}
-            </p>
-            <div class="mt-2 flex flex-wrap gap-1.5 text-xs">
-              <span
-                class="inline-flex items-center gap-1.5 rounded-full bg-white border border-slate-200 px-2 py-0.5 text-slate-700 whitespace-nowrap"
-              >
-                <span v-if="selectedLocation?.icon">{{ selectedLocation.icon }}</span>
-                {{ selectedLocation?.name }}
-              </span>
-              <span
-                v-if="selectedColor"
-                class="inline-flex items-center gap-1.5 rounded-full bg-white border border-slate-200 px-2 py-0.5 text-slate-700 whitespace-nowrap"
-              >
+            <div class="min-w-0">
+              <p class="text-base font-semibold text-slate-900 inline-flex items-center gap-2">
+                <span v-if="selectedCategoryIcon">{{ selectedCategoryIcon }}</span>
+                {{ selectedProductName }}
+              </p>
+              <div class="mt-2 flex flex-wrap gap-1.5 text-xs">
                 <span
-                  v-if="selectedColor.hexCode"
-                  class="size-2.5 rounded-full ring-1 ring-slate-200"
-                  :style="{ background: selectedColor.hexCode }"
-                />
-                <span class="font-medium">{{ selectedColor.name }}</span>
-              </span>
+                  class="inline-flex items-center gap-1.5 rounded-full bg-white border border-slate-200 px-2 py-0.5 text-slate-700 whitespace-nowrap"
+                >
+                  <span v-if="selectedLocation?.icon">{{ selectedLocation.icon }}</span>
+                  {{ selectedLocation?.name }}
+                </span>
+                <span
+                  v-if="selectedColor"
+                  class="inline-flex items-center gap-1.5 rounded-full bg-white border border-slate-200 px-2 py-0.5 text-slate-700 whitespace-nowrap"
+                >
+                  <span
+                    v-if="selectedColor.hexCode"
+                    class="size-2.5 rounded-full ring-1 ring-slate-200"
+                    :style="{ background: selectedColor.hexCode }"
+                  />
+                  <span class="font-medium">{{ selectedColor.name }}</span>
+                </span>
+              </div>
             </div>
+            <ImageZoom
+              v-if="selectedImageUrl"
+              :src="selectedImageUrl"
+              :alt="selectedProductName ?? ''"
+              thumb-class="size-14 rounded-md object-cover border border-slate-200"
+              :thumb-width="160"
+            />
           </div>
 
           <ul class="divide-y divide-slate-100 rounded-xl border border-slate-200">

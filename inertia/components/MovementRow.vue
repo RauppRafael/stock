@@ -5,6 +5,7 @@ import { router } from '@inertiajs/vue3'
 import { useI18n } from 'vue-i18n'
 import type { Data } from '@generated/data'
 import VariantTags from '~/components/VariantTags.vue'
+import ImageZoom from '~/components/ImageZoom.vue'
 
 const props = defineProps<{
   movement: Data.StockMovement
@@ -13,6 +14,10 @@ const props = defineProps<{
 const { t } = useI18n()
 
 const canAdjust = computed(() => !!(props.movement.variantId && props.movement.locationId))
+
+const imageUrl = computed(
+  () => props.movement.variant?.imageUrl ?? props.movement.variant?.product?.imageUrl ?? null
+)
 
 function adjust() {
   if (!canAdjust.value) return
@@ -55,20 +60,25 @@ const deltaSign = computed(() => (props.movement.delta > 0 ? '+' : ''))
       <span v-if="!datePart && !timePart">—</span>
     </td>
     <td class="px-4 py-2.5">
-      <div class="font-medium text-slate-900 whitespace-nowrap">
-        {{
-          movement.variant?.product?.name ??
-          t('movements.fallbackVariant', { id: movement.variantId })
-        }}
-      </div>
-      <div
-        v-if="movement.variant?.product?.category?.name"
-        class="text-xs text-slate-400 inline-flex items-center gap-1 whitespace-nowrap"
-      >
-        <span v-if="movement.variant.product.category.icon">
-          {{ movement.variant.product.category.icon }}
-        </span>
-        {{ movement.variant.product.category.name }}
+      <div class="flex items-center gap-2.5" @click.stop>
+        <ImageZoom :src="imageUrl" :alt="movement.variant?.product?.name ?? ''" />
+        <div class="min-w-0">
+          <div class="font-medium text-slate-900 whitespace-nowrap">
+            {{
+              movement.variant?.product?.name ??
+              t('movements.fallbackVariant', { id: movement.variantId })
+            }}
+          </div>
+          <div
+            v-if="movement.variant?.product?.category?.name"
+            class="text-xs text-slate-400 inline-flex items-center gap-1 whitespace-nowrap"
+          >
+            <span v-if="movement.variant.product.category.icon">
+              {{ movement.variant.product.category.icon }}
+            </span>
+            {{ movement.variant.product.category.name }}
+          </div>
+        </div>
       </div>
     </td>
     <td class="px-4 py-2.5">

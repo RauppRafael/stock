@@ -8,6 +8,7 @@ import { categorySchema, locationSchema, productSchema, stockSchema } from '@con
 import { useValidatedProps } from '~/composables/use_validated_props'
 import PageHeader from '~/components/PageHeader.vue'
 import StockBadge from '~/components/StockBadge.vue'
+import ImageZoom from '~/components/ImageZoom.vue'
 
 type StockRow = Data.Stock
 
@@ -307,6 +308,18 @@ function rowClick(row: StockRow) {
                           {{ pg.product.category.icon }}
                         </span>
                         {{ pg.product.category?.name }}
+                      </div>
+                      <div
+                        v-if="pg.product.imageUrl"
+                        class="hidden lg:block mt-2"
+                        @click.stop
+                      >
+                        <ImageZoom
+                          :src="pg.product.imageUrl"
+                          :alt="pg.product.name"
+                          thumb-class="size-20 rounded-md object-cover border border-slate-200"
+                          :thumb-width="192"
+                        />
                       </div>
                       <div class="mt-1 text-xs text-slate-500 whitespace-nowrap">
                         {{ $t('stock.index.total') }}:
