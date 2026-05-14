@@ -124,7 +124,13 @@
       "title": "Estoque",
       "description": "Quantidades em estoque por variante e localização, em tempo real.",
       "newAdjustment": "+ Ajustar estoque",
-      "lowOnly": "Apenas estoque baixo / esgotado",
+      "stockStatus": {
+        "label": "Estoque",
+        "all": "Todos",
+        "inStock": "Com estoque",
+        "outOfStock": "Sem estoque"
+      },
+      "searchPlaceholder": "Buscar produto, cor, tamanho, localização…",
       "empty": "Nenhum estoque corresponde aos filtros atuais.",
       "total": "Total",
       "grandTotal": "Total geral",

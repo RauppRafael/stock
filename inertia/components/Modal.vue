@@ -57,11 +57,19 @@ watch(
     document.body.style.overflow = open ? 'hidden' : ''
     if (open) {
       lastFocused = document.activeElement as HTMLElement | null
-      // Wait for the panel to mount, then focus its first focusable element
-      // (typically the first input). Falls back to the panel itself.
+      // Wait for the panel to mount, then focus the first form control
+      // (input/select/textarea) so search-style modals land on the textbox.
+      // The close ✕ in the header is technically the first focusable element,
+      // but focusing it would make the user reach for the mouse to start typing.
       await nextTick()
-      const first = focusableElements()[0]
-      ;(first ?? panel.value)?.focus()
+      const focusables = focusableElements()
+      const firstField = focusables.find(
+        (el) =>
+          (el.tagName === 'INPUT' && (el as HTMLInputElement).type !== 'hidden') ||
+          el.tagName === 'SELECT' ||
+          el.tagName === 'TEXTAREA'
+      )
+      ;(firstField ?? focusables[0] ?? panel.value)?.focus()
     } else if (lastFocused && document.contains(lastFocused)) {
       lastFocused.focus()
       lastFocused = null

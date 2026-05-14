@@ -9,6 +9,7 @@ import PageHeader from '~/components/PageHeader.vue'
 import Modal from '~/components/Modal.vue'
 import SyncVariantCell from '~/components/SyncVariantCell.vue'
 import ImageZoom from '~/components/ImageZoom.vue'
+import { fuzzyMatchAny } from '~/utils/fuzzy_match'
 
 const { t } = useI18n()
 
@@ -116,8 +117,8 @@ const hasActiveFilters = computed(() => {
 
 /**
  * Match a display block against the active search + category filters.
- * Search is case-insensitive across product name, color name, size name,
- * and any linked Shopify product/variant title for that row.
+ * Search is fuzzy across product name, color name, size name, and any linked
+ * Shopify product/variant title for that row.
  */
 function matchesDisplayFilters(
   display: LocalVariantDisplay,
@@ -126,18 +127,13 @@ function matchesDisplayFilters(
   if (filterCategoryId.value !== null && display.category?.id !== filterCategoryId.value) {
     return false
   }
-  const q = search.value.trim().toLowerCase()
-  if (!q) return true
-  const haystack = [
+  return fuzzyMatchAny(search.value, [
     display.productName,
-    display.color?.name ?? '',
-    display.size?.name ?? '',
-    display.category?.name ?? '',
+    display.color?.name,
+    display.size?.name,
+    display.category?.name,
     ...extraSearchHaystack,
-  ]
-    .join(' ')
-    .toLowerCase()
-  return haystack.includes(q)
+  ])
 }
 
 /**
@@ -273,27 +269,32 @@ function closePicker() {
   pickerSearch.value = ''
 }
 
-/** Variants already linked or already pending for the current picker target. */
+/**
+ * Variants that should never appear as a pick: anything currently linked or
+ * already pending for *any* local variant. `shopify_variant_links.shopify_variant_id`
+ * is UNIQUE in the DB, so a gid that another row has staked claim to can't
+ * be picked here either.
+ */
 const pickerExcluded = computed(() => {
-  const v = pickerForVariantId.value
-  if (v === null) return new Set<string>()
-  const row = linkRows.value.find((r) => r.localVariantId === v)
-  const linked = new Set((row?.currentLinks ?? []).map((l) => l.shopifyVariantId))
-  for (const id of linkPending[v] ?? []) linked.add(id)
-  return linked
+  const excluded = new Set<string>()
+  for (const row of allLinkRows.value) {
+    for (const l of row.currentLinks) excluded.add(l.shopifyVariantId)
+  }
+  for (const ids of Object.values(linkPending)) {
+    for (const id of ids) excluded.add(id)
+  }
+  return excluded
 })
 
 const pickerOptions = computed(() => {
-  const q = pickerSearch.value.trim().toLowerCase()
   const excluded = pickerExcluded.value
   return linkCandidates.value.filter((c) => {
     if (excluded.has(c.shopifyVariantId)) return false
-    if (!q) return true
-    return (
-      c.shopifyProductTitle.toLowerCase().includes(q) ||
-      c.shopifyVariantTitle.toLowerCase().includes(q) ||
-      (c.currentSku?.toLowerCase().includes(q) ?? false)
-    )
+    return fuzzyMatchAny(pickerSearch.value, [
+      c.shopifyProductTitle,
+      c.shopifyVariantTitle,
+      c.currentSku,
+    ])
   })
 })
 

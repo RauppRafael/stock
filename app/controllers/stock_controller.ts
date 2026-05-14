@@ -85,14 +85,10 @@ export default class StockController {
       }
     }
 
-    if (filters.lowOnly) {
-      // Threshold lives on the product, so this stays in JS — moving it to
-      // SQL would require a JOIN we don't otherwise need.
-      stocks = stocks.filter((s) => {
-        const threshold = s.variant?.product?.lowStockThreshold
-        if (threshold === null || threshold === undefined) return s.quantity === 0
-        return s.quantity <= threshold
-      })
+    if (filters.stockStatus === 'inStock') {
+      stocks = stocks.filter((s) => s.quantity > 0)
+    } else if (filters.stockStatus === 'outOfStock') {
+      stocks = stocks.filter((s) => s.quantity === 0)
     }
 
     // The front-end groups rows by (product, location, color) via rowspan,
@@ -129,12 +125,9 @@ export default class StockController {
       Location.query().orderBy('name', 'asc'),
     ])
 
-    let products: Product[] = []
-    if (filters.categoryId) {
-      products = await Product.notTrashed()
-        .where('category_id', filters.categoryId)
-        .orderBy('name', 'asc')
-    }
+    const productsQuery = Product.notTrashed().orderBy('name', 'asc')
+    if (filters.categoryId) productsQuery.where('category_id', filters.categoryId)
+    const products = await productsQuery
 
     // Wildcard pool contribution per (printed variant, location) — i.e.
     // for each printed variant in scope, how much stock its source wildcard
@@ -155,7 +148,7 @@ export default class StockController {
         categoryId: filters.categoryId ?? null,
         productId: filters.productId ?? null,
         locationId: filters.locationId ?? null,
-        lowOnly: filters.lowOnly ?? false,
+        stockStatus: filters.stockStatus ?? 'all',
       },
     })
   }

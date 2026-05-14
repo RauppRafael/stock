@@ -72,7 +72,16 @@ export default class ProductsController {
       .withCount('derivatives')
       .orderBy('name', 'asc')
     if (categoryId) query.where('category_id', categoryId)
-    if (search) query.whereILike('name', `%${search}%`)
+    // Tokenize the search so word order doesn't matter — "fold hoodie" and
+    // "hoodie fold" both match "Fold Hoodie". Each whitespace-separated token
+    // becomes its own ILIKE that has to hit either the product name or code.
+    if (search) {
+      const tokens = search.split(/\s+/).filter(Boolean)
+      for (const token of tokens) {
+        const like = `%${token}%`
+        query.where((q) => q.whereILike('name', like).orWhereILike('code', like))
+      }
+    }
 
     const [products, categories] = await Promise.all([
       query,

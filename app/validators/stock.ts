@@ -58,7 +58,7 @@ export const stockIndexFiltersValidator = vine.compile(
     categoryId: vine.number().withoutDecimals().positive().optional(),
     productId: vine.number().withoutDecimals().positive().optional(),
     locationId: vine.number().withoutDecimals().positive().optional(),
-    lowOnly: vine.boolean().optional(),
+    stockStatus: vine.enum(['all', 'inStock', 'outOfStock'] as const).optional(),
   })
 )
 

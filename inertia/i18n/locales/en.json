@@ -124,7 +124,13 @@
       "title": "Stock",
       "description": "Live on-hand quantities by variant and location.",
       "newAdjustment": "+ Adjust stock",
-      "lowOnly": "Low / out of stock only",
+      "stockStatus": {
+        "label": "Stock",
+        "all": "All",
+        "inStock": "With stock",
+        "outOfStock": "Without stock"
+      },
+      "searchPlaceholder": "Search product, color, size, location…",
       "empty": "No stock matches the current filters.",
       "total": "Total",
       "grandTotal": "Grand total",

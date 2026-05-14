@@ -9,6 +9,7 @@ import { useValidatedProps } from '~/composables/use_validated_props'
 import PageHeader from '~/components/PageHeader.vue'
 import StockBadge from '~/components/StockBadge.vue'
 import ImageZoom from '~/components/ImageZoom.vue'
+import { fuzzyMatchAny } from '~/utils/fuzzy_match'
 
 type StockRow = Data.Stock
 
@@ -28,9 +29,12 @@ const props = defineProps<{
     categoryId: number | null
     productId: number | null
     locationId: number | null
-    lowOnly: boolean
+    stockStatus: StockStatusFilter
   }
 }>()
+
+type StockStatusFilter = 'all' | 'inStock' | 'outOfStock'
+const STOCK_STATUS_OPTIONS: StockStatusFilter[] = ['all', 'inStock', 'outOfStock']
 
 useValidatedProps(
   props,
@@ -44,7 +48,7 @@ useValidatedProps(
       categoryId: z.number().int().nullable(),
       productId: z.number().int().nullable(),
       locationId: z.number().int().nullable(),
-      lowOnly: z.boolean(),
+      stockStatus: z.enum(['all', 'inStock', 'outOfStock']),
     }),
   })
 )
@@ -54,6 +58,20 @@ function poolFor(row: StockRow): number {
 }
 
 const filters = reactive({ ...props.filters })
+// Client-side fuzzy search over the rendered rows. Lives outside `filters`
+// because it doesn't round-trip to the server — the table is already grouped
+// in-memory and narrowing locally feels instant.
+const search = ref('')
+
+// Reset productId when category changes — otherwise the previous category's
+// product carries over, the server filters by an impossible (category, product)
+// pair, and the table goes empty with no visible cause.
+watch(
+  () => filters.categoryId,
+  (next, prev) => {
+    if (next !== prev && filters.productId !== null) filters.productId = null
+  }
+)
 
 let timer: ReturnType<typeof setTimeout> | null = null
 
@@ -68,7 +86,7 @@ watch(
           ...(next.categoryId ? { categoryId: next.categoryId } : {}),
           ...(next.productId ? { productId: next.productId } : {}),
           ...(next.locationId ? { locationId: next.locationId } : {}),
-          ...(next.lowOnly ? { lowOnly: 'true' } : {}),
+          ...(next.stockStatus !== 'all' ? { stockStatus: next.stockStatus } : {}),
         },
         { preserveState: true, preserveScroll: true, replace: true }
       )
@@ -99,9 +117,23 @@ type ProductGroup = {
   rowCount: number
 }
 
+const filteredStocks = computed<StockRow[]>(() => {
+  if (!search.value.trim()) return props.stocks
+  return props.stocks.filter((row) =>
+    fuzzyMatchAny(search.value, [
+      row.variant?.product?.name,
+      row.variant?.product?.code,
+      row.variant?.product?.category?.name,
+      row.variant?.color?.name,
+      row.variant?.size?.name,
+      row.location?.name,
+    ])
+  )
+})
+
 const groups = computed<ProductGroup[]>(() => {
   const out: ProductGroup[] = []
-  for (const row of props.stocks) {
+  for (const row of filteredStocks.value) {
     const product = row.variant?.product
     if (!product) continue
     const productKey = String(product.id)
@@ -150,7 +182,7 @@ function totalFor(group: {
   return 0
 }
 
-const grandTotal = computed(() => props.stocks.reduce((s, r) => s + r.quantity, 0))
+const grandTotal = computed(() => filteredStocks.value.reduce((s, r) => s + r.quantity, 0))
 
 // Rowspan'd cells (product/location/color) live on the first <tr> of their
 // group, so a CSS `tr:hover` only highlights them when that first row is the
@@ -194,7 +226,16 @@ function rowClick(row: StockRow) {
       </template>
     </PageHeader>
 
-    <div class="card p-4 mb-4">
+    <div class="card p-4 mb-4 space-y-3">
+      <div>
+        <label class="label">{{ $t('common.labels.search') }}</label>
+        <input
+          v-model="search"
+          type="search"
+          class="input"
+          :placeholder="$t('stock.index.searchPlaceholder')"
+        />
+      </div>
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
         <div>
           <label class="label">{{ $t('common.labels.category') }}</label>
@@ -205,7 +246,7 @@ function rowClick(row: StockRow) {
         </div>
         <div>
           <label class="label">{{ $t('common.labels.product') }}</label>
-          <select v-model.number="filters.productId" class="select" :disabled="!filters.categoryId">
+          <select v-model.number="filters.productId" class="select">
             <option :value="null">{{ $t('common.allProducts') }}</option>
             <option v-for="p in products" :key="p.id" :value="p.id">{{ p.name }}</option>
           </select>
@@ -217,15 +258,26 @@ function rowClick(row: StockRow) {
             <option v-for="l in locations" :key="l.id" :value="l.id">{{ l.name }}</option>
           </select>
         </div>
-        <div class="flex items-end">
-          <label class="inline-flex items-center gap-2 text-sm text-slate-700">
-            <input
-              v-model="filters.lowOnly"
-              type="checkbox"
-              class="size-4 rounded border-slate-300"
-            />
-            {{ $t('stock.index.lowOnly') }}
-          </label>
+        <div>
+          <label class="label">{{ $t('stock.index.stockStatus.label') }}</label>
+          <div
+            class="inline-flex rounded-md border border-slate-200 overflow-hidden text-xs w-full"
+          >
+            <button
+              v-for="opt in STOCK_STATUS_OPTIONS"
+              :key="opt"
+              type="button"
+              class="flex-1 px-3 py-2 transition whitespace-nowrap"
+              :class="
+                filters.stockStatus === opt
+                  ? 'bg-brand-600 text-white'
+                  : 'bg-white text-slate-600 hover:bg-slate-50'
+              "
+              @click="filters.stockStatus = opt"
+            >
+              {{ $t(`stock.index.stockStatus.${opt}`) }}
+            </button>
+          </div>
         </div>
       </div>
     </div>
